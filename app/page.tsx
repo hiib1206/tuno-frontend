@@ -2,16 +2,7 @@ import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import {
-  Brain,
-  TrendingUp,
-  Shield,
-  BarChart3,
-  Zap,
-  Users,
-  ArrowRight,
-  CheckCircle2,
-} from "lucide-react";
+import { Brain, TrendingUp, Shield, BarChart3, Zap, Users, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function LandingPage() {
   return (
@@ -24,16 +15,15 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="mb-6 text-balance text-5xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl">
-              감정을 배제한
+              AI가 예측하는
               <br />
-              <span className="text-accent">데이터 기반 투자</span>
+              <span className="text-accent">당신의 투자 미래</span>
             </h1>
 
             <p className="mb-8 text-pretty text-lg text-muted-foreground md:text-xl">
-              AI 알고리즘이 시장을 분석하고, 최적의 포트폴리오를 자동으로
-              관리합니다.
+              종목과 기간을 입력하면 AI가 과거 데이터를 분석하여
               <br />
-              이제 합리적인 투자 결정으로 금융 목표를 달성하세요.
+              미래 투자 성과를 예측합니다. 데이터 기반의 합리적인 투자 결정을 내리세요.
             </p>
 
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -42,8 +32,8 @@ export default function LandingPage() {
                 className="bg-primary text-primary-foreground"
                 asChild
               >
-                <Link href="/signup">
-                  무료로 시작하기
+                <Link href="/predict">
+                  AI 예측 시작하기
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -54,8 +44,8 @@ export default function LandingPage() {
 
             <div className="mt-16 rounded-2xl border border-border bg-card p-4 shadow-2xl">
               <img
-                src="/modern-stock-trading-dashboard-with-dark-theme-and.jpg"
-                alt="플랫폼 대시보드"
+                src="/ai-stock-market-prediction-dashboard-with-charts-s.jpg"
+                alt="AI 주식 예측 플랫폼"
                 className="h-auto w-full rounded-lg"
               />
             </div>
@@ -68,16 +58,16 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <div className="text-center">
-              <div className="mb-2 text-4xl font-bold text-accent">98.7%</div>
-              <div className="text-sm text-muted-foreground">투자 정확도</div>
+              <div className="mb-2 text-4xl font-bold text-accent">95.3%</div>
+              <div className="text-sm text-muted-foreground">예측 정확도</div>
             </div>
             <div className="text-center">
-              <div className="mb-2 text-4xl font-bold text-accent">24/7</div>
-              <div className="text-sm text-muted-foreground">자동 모니터링</div>
+              <div className="mb-2 text-4xl font-bold text-accent">50,000+</div>
+              <div className="text-sm text-muted-foreground">분석된 종목 데이터</div>
             </div>
             <div className="text-center">
-              <div className="mb-2 text-4xl font-bold text-accent">15,000+</div>
-              <div className="text-sm text-muted-foreground">활성 투자자</div>
+              <div className="mb-2 text-4xl font-bold text-accent">10초</div>
+              <div className="text-sm text-muted-foreground">평균 예측 시간</div>
             </div>
           </div>
         </div>
@@ -91,7 +81,7 @@ export default function LandingPage() {
               왜 InvestAI를 선택해야 할까요?
             </h2>
             <p className="text-pretty text-lg text-muted-foreground">
-              전문 투자자 수준의 투자 전략을 누구나 쉽게 이용할 수 있습니다
+              AI 기반 데이터 분석으로 합리적인 투자 의사결정을 지원합니다
             </p>
           </div>
 
@@ -100,10 +90,9 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                 <Brain className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">AI 기반 분석</h3>
+              <h3 className="mb-2 text-xl font-semibold">AI 기반 예측</h3>
               <p className="text-muted-foreground">
-                머신러닝 알고리즘이 실시간으로 시장 데이터를 분석하여 최적의
-                투자 기회를 찾아냅니다
+                머신러닝 알고리즘이 과거 데이터를 학습하여 미래 주가를 예측합니다
               </p>
             </Card>
 
@@ -112,11 +101,10 @@ export default function LandingPage() {
                 <Zap className="h-6 w-6 text-accent" />
               </div>
               <h3 className="mb-2 text-xl font-semibold">
-                자동 포트폴리오 관리
+                빠른 분석
               </h3>
               <p className="text-muted-foreground">
-                설정한 투자 목표와 리스크 수준에 맞춰 포트폴리오를 자동으로
-                조정하고 리밸런싱합니다
+                종목 코드와 기간만 입력하면 몇 초 안에 상세한 예측 결과를 제공합니다
               </p>
             </Card>
 
@@ -124,10 +112,9 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                 <Shield className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">리스크 관리</h3>
+              <h3 className="mb-2 text-xl font-semibold">객관적 분석</h3>
               <p className="text-muted-foreground">
-                AI가 시장 변동성을 실시간으로 모니터링하여 손실을 최소화하고
-                투자를 보호합니다
+                감정을 배제한 데이터 기반 분석으로 합리적인 투자 판단을 돕습니다
               </p>
             </Card>
 
@@ -136,11 +123,10 @@ export default function LandingPage() {
                 <BarChart3 className="h-6 w-6 text-accent" />
               </div>
               <h3 className="mb-2 text-xl font-semibold">
-                데이터 기반 의사결정
+                상세한 시각화
               </h3>
               <p className="text-muted-foreground">
-                감정적 판단을 배제하고 객관적인 데이터와 통계에 기반한 투자
-                결정을 내립니다
+                차트와 그래프로 예측 결과를 직관적으로 이해할 수 있습니다
               </p>
             </Card>
 
@@ -148,10 +134,9 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                 <TrendingUp className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">성과 추적</h3>
+              <h3 className="mb-2 text-xl font-semibold">과거 데이터 분석</h3>
               <p className="text-muted-foreground">
-                실시간 성과 분석과 상세한 리포트로 투자 현황을 한눈에 파악할 수
-                있습니다
+                수년간의 시장 데이터를 분석하여 패턴을 찾고 미래를 예측합니다
               </p>
             </Card>
 
@@ -159,10 +144,9 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                 <Users className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">쉬운 접근성</h3>
+              <h3 className="mb-2 text-xl font-semibold">쉬운 사용</h3>
               <p className="text-muted-foreground">
-                복잡한 금융 지식 없이도 전문가 수준의 투자 전략을 활용할 수
-                있습니다
+                복잡한 금융 지식 없이도 누구나 쉽게 AI 예측을 활용할 수 있습니다
               </p>
             </Card>
           </div>
@@ -177,7 +161,7 @@ export default function LandingPage() {
               어떻게 작동하나요?
             </h2>
             <p className="text-pretty text-lg text-muted-foreground">
-              세 단계로 시작하는 간단한 투자 프로세스
+              세 단계로 시작하는 간단한 예측 프로세스
             </p>
           </div>
 
@@ -186,10 +170,9 @@ export default function LandingPage() {
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-2xl font-bold text-accent-foreground">
                 1
               </div>
-              <h3 className="mb-2 text-xl font-semibold">투자 프로필 설정</h3>
+              <h3 className="mb-2 text-xl font-semibold">종목 & 기간 입력</h3>
               <p className="text-muted-foreground">
-                투자 목표, 기간, 리스크 선호도를 입력하면 AI가 맞춤형 전략을
-                수립합니다
+                예측하고 싶은 주식 종목과 분석 기간을 선택합니다
               </p>
             </div>
 
@@ -197,10 +180,9 @@ export default function LandingPage() {
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-2xl font-bold text-accent-foreground">
                 2
               </div>
-              <h3 className="mb-2 text-xl font-semibold">AI 분석 및 추천</h3>
+              <h3 className="mb-2 text-xl font-semibold">AI 데이터 분석</h3>
               <p className="text-muted-foreground">
-                실시간 시장 데이터를 분석하여 최적의 투자 포트폴리오를 자동으로
-                구성합니다
+                AI가 해당 기간의 과거 투자 정보를 학습하고 패턴을 분석합니다
               </p>
             </div>
 
@@ -209,11 +191,10 @@ export default function LandingPage() {
                 3
               </div>
               <h3 className="mb-2 text-xl font-semibold">
-                자동 관리 및 최적화
+                예측 결과 확인
               </h3>
               <p className="text-muted-foreground">
-                시장 상황에 따라 포트폴리오를 지속적으로 모니터링하고 자동으로
-                조정합니다
+                상세한 예측 결과와 시각화된 데이터로 투자 의사결정을 내립니다
               </p>
             </div>
           </div>
@@ -325,10 +306,10 @@ export default function LandingPage() {
       <section className="border-y border-border bg-primary py-20 text-primary-foreground">
         <div className="container mx-auto px-4 text-center">
           <h2 className="mb-4 text-balance text-3xl font-bold md:text-4xl">
-            지금 바로 시작하세요
+            지금 바로 AI 예측을 시작하세요
           </h2>
           <p className="mb-8 text-pretty text-lg opacity-90">
-            14일 무료 체험으로 InvestAI의 강력한 기능을 경험해보세요
+            14일 무료 체험으로 InvestAI의 강력한 예측 기능을 경험해보세요
           </p>
           <Button
             size="lg"
@@ -381,7 +362,7 @@ export default function LandingPage() {
                   <Link href="/#pricing">요금제</Link>
                 </li>
                 <li>
-                  <Link href="/dashboard">대시보드</Link>
+                  <Link href="/predict">AI 예측</Link>
                 </li>
               </ul>
             </div>

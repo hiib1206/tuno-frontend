@@ -38,16 +38,22 @@ export function Header() {
             작동 방식
           </Link>
           <Link
-            href="/dashboard"
+            href="/predict"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            대시보드
+            AI 예측
           </Link>
           <Link
             href="/#pricing"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             요금제
+          </Link>
+          <Link
+            href="/mypage"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            마이페이지
           </Link>
         </nav>
 
