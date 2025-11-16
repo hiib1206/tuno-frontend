@@ -1,8 +1,17 @@
-import { Header } from "@/components/header"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import Link from "next/link"
-import { Brain, TrendingUp, Shield, BarChart3, Zap, Users, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Header } from "@/components/header";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import Link from "next/link";
+import {
+  Brain,
+  TrendingUp,
+  Shield,
+  BarChart3,
+  Zap,
+  Users,
+  ArrowRight,
+  CheckCircle2,
+} from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -10,18 +19,10 @@ export default function LandingPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-32 pb-20">
+      <section className="relative overflow-hidden pt-50 pb-20">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-accent/5 to-transparent" />
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/10 px-4 py-2 text-sm text-foreground">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-accent"></span>
-              </span>
-              AI 기반 자동 투자 플랫폼
-            </div>
-
             <h1 className="mb-6 text-balance text-5xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl">
               감정을 배제한
               <br />
@@ -29,13 +30,18 @@ export default function LandingPage() {
             </h1>
 
             <p className="mb-8 text-pretty text-lg text-muted-foreground md:text-xl">
-              AI 알고리즘이 시장을 분석하고, 최적의 포트폴리오를 자동으로 관리합니다.
+              AI 알고리즘이 시장을 분석하고, 최적의 포트폴리오를 자동으로
+              관리합니다.
               <br />
               이제 합리적인 투자 결정으로 금융 목표를 달성하세요.
             </p>
 
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button size="lg" className="bg-primary text-primary-foreground" asChild>
+              <Button
+                size="lg"
+                className="bg-primary text-primary-foreground"
+                asChild
+              >
                 <Link href="/signup">
                   무료로 시작하기
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -96,8 +102,8 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-xl font-semibold">AI 기반 분석</h3>
               <p className="text-muted-foreground">
-                머신러닝 알고리즘이 실시간으로 시장 데이터를 분석하여 최적의 투자
-                기회를 찾아냅니다
+                머신러닝 알고리즘이 실시간으로 시장 데이터를 분석하여 최적의
+                투자 기회를 찾아냅니다
               </p>
             </Card>
 
@@ -105,10 +111,12 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                 <Zap className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">자동 포트폴리오 관리</h3>
+              <h3 className="mb-2 text-xl font-semibold">
+                자동 포트폴리오 관리
+              </h3>
               <p className="text-muted-foreground">
-                설정한 투자 목표와 리스크 수준에 맞춰 포트폴리오를 자동으로 조정하고
-                리밸런싱합니다
+                설정한 투자 목표와 리스크 수준에 맞춰 포트폴리오를 자동으로
+                조정하고 리밸런싱합니다
               </p>
             </Card>
 
@@ -118,8 +126,8 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-xl font-semibold">리스크 관리</h3>
               <p className="text-muted-foreground">
-                AI가 시장 변동성을 실시간으로 모니터링하여 손실을 최소화하고 투자를
-                보호합니다
+                AI가 시장 변동성을 실시간으로 모니터링하여 손실을 최소화하고
+                투자를 보호합니다
               </p>
             </Card>
 
@@ -127,10 +135,12 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                 <BarChart3 className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">데이터 기반 의사결정</h3>
+              <h3 className="mb-2 text-xl font-semibold">
+                데이터 기반 의사결정
+              </h3>
               <p className="text-muted-foreground">
-                감정적 판단을 배제하고 객관적인 데이터와 통계에 기반한 투자 결정을
-                내립니다
+                감정적 판단을 배제하고 객관적인 데이터와 통계에 기반한 투자
+                결정을 내립니다
               </p>
             </Card>
 
@@ -151,7 +161,8 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-xl font-semibold">쉬운 접근성</h3>
               <p className="text-muted-foreground">
-                복잡한 금융 지식 없이도 전문가 수준의 투자 전략을 활용할 수 있습니다
+                복잡한 금융 지식 없이도 전문가 수준의 투자 전략을 활용할 수
+                있습니다
               </p>
             </Card>
           </div>
@@ -197,7 +208,9 @@ export default function LandingPage() {
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-2xl font-bold text-accent-foreground">
                 3
               </div>
-              <h3 className="mb-2 text-xl font-semibold">자동 관리 및 최적화</h3>
+              <h3 className="mb-2 text-xl font-semibold">
+                자동 관리 및 최적화
+              </h3>
               <p className="text-muted-foreground">
                 시장 상황에 따라 포트폴리오를 지속적으로 모니터링하고 자동으로
                 조정합니다
@@ -410,5 +423,5 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
