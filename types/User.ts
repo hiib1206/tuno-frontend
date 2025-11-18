@@ -1,0 +1,84 @@
+import { Role, IsActive } from "./Common";
+
+export class User {
+  id: number;
+  username: string;
+  pw?: string;
+  nick: string;
+  email?: string;
+  address?: string;
+  role?: Role;
+  createdAt?: Date;
+  updatedAt?: Date;
+  isActive?: IsActive;
+
+  constructor(
+    id: number,
+    username: string,
+    nick: string,
+    pw?: string,
+    email?: string,
+    address?: string,
+    role?: Role,
+    createdAt?: Date,
+    updatedAt?: Date,
+    isActive?: IsActive
+  ) {
+    this.id = id;
+    this.username = username;
+    this.pw = pw;
+    this.nick = nick;
+    this.email = email;
+    this.address = address;
+    this.role = role;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.isActive = isActive;
+  }
+
+  static fromMap(map: Record<string, any>): User {
+    return new User(
+      map.id,
+      map.username,
+      map.nick,
+      map.pw ?? undefined,
+      map.email ?? undefined,
+      map.address ?? undefined,
+      map.role ?? undefined,
+      map.createdAt
+        ? typeof map.createdAt === "string"
+          ? new Date(map.createdAt)
+          : map.createdAt
+        : undefined,
+      map.updatedAt
+        ? typeof map.updatedAt === "string"
+          ? new Date(map.updatedAt)
+          : map.updatedAt
+        : undefined,
+      map.isActive ?? undefined
+    );
+  }
+
+  toMap(): Record<string, any> {
+    return {
+      id: this.id,
+      username: this.username,
+      pw: this.pw,
+      nick: this.nick,
+      email: this.email,
+      address: this.address,
+      role: this.role,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      isActive: this.isActive,
+    };
+  }
+
+  static fromJson(json: string): User {
+    return User.fromMap(JSON.parse(json));
+  }
+
+  toJson(): string {
+    return JSON.stringify(this.toMap());
+  }
+}

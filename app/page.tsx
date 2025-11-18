@@ -2,7 +2,16 @@ import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { Brain, TrendingUp, Shield, BarChart3, Zap, Users, ArrowRight, CheckCircle2 } from 'lucide-react';
+import {
+  Brain,
+  TrendingUp,
+  Shield,
+  BarChart3,
+  Zap,
+  Users,
+  ArrowRight,
+  CheckCircle2,
+} from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -15,6 +24,8 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="mb-6 text-balance text-5xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl">
+              (매인 페이지 나중에 수정)
+              <br />
               AI가 예측하는
               <br />
               <span className="text-accent">당신의 투자 미래</span>
@@ -23,7 +34,8 @@ export default function LandingPage() {
             <p className="mb-8 text-pretty text-lg text-muted-foreground md:text-xl">
               종목과 기간을 입력하면 AI가 과거 데이터를 분석하여
               <br />
-              미래 투자 성과를 예측합니다. 데이터 기반의 합리적인 투자 결정을 내리세요.
+              미래 투자 성과를 예측합니다. 데이터 기반의 합리적인 투자 결정을
+              내리세요.
             </p>
 
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -63,11 +75,15 @@ export default function LandingPage() {
             </div>
             <div className="text-center">
               <div className="mb-2 text-4xl font-bold text-accent">50,000+</div>
-              <div className="text-sm text-muted-foreground">분석된 종목 데이터</div>
+              <div className="text-sm text-muted-foreground">
+                분석된 종목 데이터
+              </div>
             </div>
             <div className="text-center">
               <div className="mb-2 text-4xl font-bold text-accent">10초</div>
-              <div className="text-sm text-muted-foreground">평균 예측 시간</div>
+              <div className="text-sm text-muted-foreground">
+                평균 예측 시간
+              </div>
             </div>
           </div>
         </div>
@@ -92,7 +108,8 @@ export default function LandingPage() {
               </div>
               <h3 className="mb-2 text-xl font-semibold">AI 기반 예측</h3>
               <p className="text-muted-foreground">
-                머신러닝 알고리즘이 과거 데이터를 학습하여 미래 주가를 예측합니다
+                머신러닝 알고리즘이 과거 데이터를 학습하여 미래 주가를
+                예측합니다
               </p>
             </Card>
 
@@ -100,11 +117,10 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                 <Zap className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">
-                빠른 분석
-              </h3>
+              <h3 className="mb-2 text-xl font-semibold">빠른 분석</h3>
               <p className="text-muted-foreground">
-                종목 코드와 기간만 입력하면 몇 초 안에 상세한 예측 결과를 제공합니다
+                종목 코드와 기간만 입력하면 몇 초 안에 상세한 예측 결과를
+                제공합니다
               </p>
             </Card>
 
@@ -122,9 +138,7 @@ export default function LandingPage() {
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
                 <BarChart3 className="h-6 w-6 text-accent" />
               </div>
-              <h3 className="mb-2 text-xl font-semibold">
-                상세한 시각화
-              </h3>
+              <h3 className="mb-2 text-xl font-semibold">상세한 시각화</h3>
               <p className="text-muted-foreground">
                 차트와 그래프로 예측 결과를 직관적으로 이해할 수 있습니다
               </p>
@@ -190,9 +204,7 @@ export default function LandingPage() {
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-2xl font-bold text-accent-foreground">
                 3
               </div>
-              <h3 className="mb-2 text-xl font-semibold">
-                예측 결과 확인
-              </h3>
+              <h3 className="mb-2 text-xl font-semibold">예측 결과 확인</h3>
               <p className="text-muted-foreground">
                 상세한 예측 결과와 시각화된 데이터로 투자 의사결정을 내립니다
               </p>

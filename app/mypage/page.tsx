@@ -1,14 +1,28 @@
-"use client"
+"use client";
 
-import { Header } from "@/components/header"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { User, Mail, Phone, Lock, CreditCard, History, Settings, Bell, Shield, LogOut, Edit2, TrendingUp, Calendar } from 'lucide-react'
+import { Header } from "@/components/header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import {
+  User,
+  Mail,
+  Phone,
+  Lock,
+  CreditCard,
+  History,
+  Settings,
+  Bell,
+  Shield,
+  LogOut,
+  Edit2,
+  TrendingUp,
+  Calendar,
+} from "lucide-react";
 
 export default function MyPage() {
   return (
@@ -18,9 +32,7 @@ export default function MyPage() {
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold">마이페이지</h1>
-          <p className="text-muted-foreground">
-            계정 정보와 설정을 관리하세요
-          </p>
+          <p className="text-muted-foreground">계정 정보와 설정을 관리하세요</p>
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
@@ -29,13 +41,18 @@ export default function MyPage() {
             <Card className="p-6">
               <div className="mb-6 flex flex-col items-center text-center">
                 <Avatar className="mb-4 h-24 w-24">
-                  <AvatarImage src="/placeholder.svg?height=96&width=96" alt="프로필" />
+                  <AvatarImage
+                    src="/placeholder.svg?height=96&width=96"
+                    alt="프로필"
+                  />
                   <AvatarFallback className="bg-accent text-2xl text-accent-foreground">
-                    홍길
+                    홍길동
                   </AvatarFallback>
                 </Avatar>
                 <h3 className="mb-1 text-lg font-semibold">홍길동</h3>
-                <p className="text-sm text-muted-foreground">hong@example.com</p>
+                <p className="text-sm text-muted-foreground">
+                  hong@example.com
+                </p>
                 <Badge className="mt-3 bg-accent/10 text-accent">
                   프로 플랜
                 </Badge>
@@ -66,10 +83,9 @@ export default function MyPage() {
           {/* Main Content */}
           <div className="lg:col-span-3">
             <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="profile">프로필</TabsTrigger>
                 <TabsTrigger value="subscription">구독</TabsTrigger>
-                <TabsTrigger value="history">예측 내역</TabsTrigger>
                 <TabsTrigger value="settings">설정</TabsTrigger>
               </TabsList>
 
@@ -77,30 +93,8 @@ export default function MyPage() {
               <TabsContent value="profile" className="space-y-6">
                 <Card className="p-6">
                   <h3 className="mb-6 text-lg font-semibold">개인 정보</h3>
-                  
+
                   <form className="space-y-4">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="firstName">이름</Label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            id="firstName"
-                            defaultValue="길동"
-                            className="pl-9"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="lastName">성</Label>
-                        <Input
-                          id="lastName"
-                          defaultValue="홍"
-                        />
-                      </div>
-                    </div>
-
                     <div className="space-y-2">
                       <Label htmlFor="email">이메일</Label>
                       <div className="relative">
@@ -135,7 +129,7 @@ export default function MyPage() {
 
                 <Card className="p-6">
                   <h3 className="mb-6 text-lg font-semibold">비밀번호 변경</h3>
-                  
+
                   <form className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="currentPassword">현재 비밀번호</Label>
@@ -202,7 +196,9 @@ export default function MyPage() {
                     <div className="mb-4 flex items-baseline justify-between">
                       <div>
                         <h4 className="text-2xl font-bold">₩79,000</h4>
-                        <p className="text-sm text-muted-foreground">월 구독료</p>
+                        <p className="text-sm text-muted-foreground">
+                          월 구독료
+                        </p>
                       </div>
                       <Button variant="outline" size="sm">
                         플랜 변경
@@ -229,7 +225,10 @@ export default function MyPage() {
                     <Button variant="outline" className="flex-1">
                       구독 일시정지
                     </Button>
-                    <Button variant="outline" className="flex-1 text-destructive hover:bg-destructive/10">
+                    <Button
+                      variant="outline"
+                      className="flex-1 text-destructive hover:bg-destructive/10"
+                    >
                       구독 취소
                     </Button>
                   </div>
@@ -249,7 +248,9 @@ export default function MyPage() {
                         </div>
                         <div>
                           <p className="font-medium">•••• •••• •••• 1234</p>
-                          <p className="text-sm text-muted-foreground">만료: 12/26</p>
+                          <p className="text-sm text-muted-foreground">
+                            만료: 12/26
+                          </p>
                         </div>
                       </div>
                       <Button variant="outline" size="sm">
@@ -274,11 +275,41 @@ export default function MyPage() {
 
                   <div className="space-y-4">
                     {[
-                      { ticker: "AAPL", name: "Apple Inc.", date: "2025.01.15", prediction: "+7.05%", accuracy: "92%" },
-                      { ticker: "TSLA", name: "Tesla Inc.", date: "2025.01.14", prediction: "+3.21%", accuracy: "88%" },
-                      { ticker: "NVDA", name: "NVIDIA Corp.", date: "2025.01.13", prediction: "+12.8%", accuracy: "94%" },
-                      { ticker: "005930", name: "삼성전자", date: "2025.01.12", prediction: "+4.5%", accuracy: "87%" },
-                      { ticker: "MSFT", name: "Microsoft Corp.", date: "2025.01.11", prediction: "+6.2%", accuracy: "91%" },
+                      {
+                        ticker: "AAPL",
+                        name: "Apple Inc.",
+                        date: "2025.01.15",
+                        prediction: "+7.05%",
+                        accuracy: "92%",
+                      },
+                      {
+                        ticker: "TSLA",
+                        name: "Tesla Inc.",
+                        date: "2025.01.14",
+                        prediction: "+3.21%",
+                        accuracy: "88%",
+                      },
+                      {
+                        ticker: "NVDA",
+                        name: "NVIDIA Corp.",
+                        date: "2025.01.13",
+                        prediction: "+12.8%",
+                        accuracy: "94%",
+                      },
+                      {
+                        ticker: "005930",
+                        name: "삼성전자",
+                        date: "2025.01.12",
+                        prediction: "+4.5%",
+                        accuracy: "87%",
+                      },
+                      {
+                        ticker: "MSFT",
+                        name: "Microsoft Corp.",
+                        date: "2025.01.11",
+                        prediction: "+6.2%",
+                        accuracy: "91%",
+                      },
                     ].map((item, index) => (
                       <div
                         key={index}
@@ -296,7 +327,9 @@ export default function MyPage() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium text-accent">{item.prediction}</p>
+                          <p className="font-medium text-accent">
+                            {item.prediction}
+                          </p>
                           <p className="text-sm text-muted-foreground">
                             정확도: {item.accuracy}
                           </p>
@@ -406,14 +439,20 @@ export default function MyPage() {
                 <Card className="border-destructive/50 p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <LogOut className="h-5 w-5 text-destructive" />
-                    <h3 className="text-lg font-semibold text-destructive">계정 관리</h3>
+                    <h3 className="text-lg font-semibold text-destructive">
+                      계정 관리
+                    </h3>
                   </div>
 
                   <p className="mb-4 text-sm text-muted-foreground">
-                    계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
+                    계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다. 이
+                    작업은 되돌릴 수 없습니다.
                   </p>
 
-                  <Button variant="outline" className="text-destructive hover:bg-destructive/10">
+                  <Button
+                    variant="outline"
+                    className="text-destructive hover:bg-destructive/10"
+                  >
                     계정 삭제
                   </Button>
                 </Card>
@@ -423,5 +462,5 @@ export default function MyPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }
