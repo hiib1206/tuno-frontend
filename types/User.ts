@@ -6,8 +6,11 @@ export class User {
   pw?: string;
   nick: string;
   email?: string;
+  emailVerifiedAt?: Date;
+  phone?: string;
   address?: string;
   role?: Role;
+  profileImageUrl?: string;
   createdAt?: Date;
   updatedAt?: Date;
   isActive?: IsActive;
@@ -18,8 +21,11 @@ export class User {
     nick: string,
     pw?: string,
     email?: string,
+    emailVerifiedAt?: Date,
+    phone?: string,
     address?: string,
     role?: Role,
+    profileImageUrl?: string,
     createdAt?: Date,
     updatedAt?: Date,
     isActive?: IsActive
@@ -29,8 +35,11 @@ export class User {
     this.pw = pw;
     this.nick = nick;
     this.email = email;
+    this.emailVerifiedAt = emailVerifiedAt;
+    this.phone = phone;
     this.address = address;
     this.role = role;
+    this.profileImageUrl = profileImageUrl;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.isActive = isActive;
@@ -43,8 +52,15 @@ export class User {
       map.nick,
       map.pw ?? undefined,
       map.email ?? undefined,
+      map.emailVerifiedAt
+        ? typeof map.emailVerifiedAt === "string"
+          ? new Date(map.emailVerifiedAt)
+          : map.emailVerifiedAt
+        : undefined,
+      map.phone ?? undefined,
       map.address ?? undefined,
       map.role ?? undefined,
+      map.profileImageUrl ?? undefined,
       map.createdAt
         ? typeof map.createdAt === "string"
           ? new Date(map.createdAt)
@@ -66,8 +82,11 @@ export class User {
       pw: this.pw,
       nick: this.nick,
       email: this.email,
+      emailVerifiedAt: this.emailVerifiedAt,
+      phone: this.phone,
       address: this.address,
       role: this.role,
+      profileImageUrl: this.profileImageUrl,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       isActive: this.isActive,

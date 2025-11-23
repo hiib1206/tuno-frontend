@@ -1,29 +1,44 @@
-"use client"
+"use client";
 
-import { Header } from "@/components/header"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { useState } from "react"
-import { Brain, TrendingUp, TrendingDown, Calendar, Search, Sparkles, LineChart, AlertCircle } from 'lucide-react'
+import { Header } from "@/components/header";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import {
+  Brain,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  Search,
+  Sparkles,
+  LineChart,
+  AlertCircle,
+} from "lucide-react";
 
 export default function PredictPage() {
-  const [ticker, setTicker] = useState("")
-  const [period, setPeriod] = useState("")
-  const [predicting, setPredicting] = useState(false)
-  const [showResults, setShowResults] = useState(false)
+  const [ticker, setTicker] = useState("");
+  const [period, setPeriod] = useState("");
+  const [predicting, setPredicting] = useState(false);
+  const [showResults, setShowResults] = useState(false);
 
   const handlePredict = () => {
-    setPredicting(true)
+    setPredicting(true);
     // Simulate AI prediction
     setTimeout(() => {
-      setPredicting(false)
-      setShowResults(true)
-    }, 2000)
-  }
+      setPredicting(false);
+      setShowResults(true);
+    }, 2000);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,9 +46,10 @@ export default function PredictPage() {
 
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold">AI 주식 예측</h1>
+          <h1 className="mb-2 text-3xl font-bold">AI 종목 분석</h1>
           <p className="text-muted-foreground">
-            종목과 기간을 입력하면 AI가 과거 데이터를 분석하여 미래를 예측합니다
+            종목과 기간등의 정보를 입력하면 AI가 과거 데이터를 분석하여 미래를
+            예측합니다
           </p>
         </div>
 
@@ -45,7 +61,7 @@ export default function PredictPage() {
                 <Brain className="h-6 w-6 text-accent-foreground" />
               </div>
               <div>
-                <h3 className="font-semibold">AI 예측 엔진</h3>
+                <h3 className="font-semibold">AI 모델</h3>
                 <p className="text-sm text-muted-foreground">
                   딥러닝 기반 시계열 분석 모델 활성화
                 </p>
@@ -65,7 +81,7 @@ export default function PredictPage() {
           {/* Input Form */}
           <div className="lg:col-span-1">
             <Card className="p-6 sticky top-24">
-              <h2 className="mb-6 text-xl font-semibold">예측 설정</h2>
+              <h2 className="mb-6 text-xl font-semibold">종목 설정</h2>
 
               <div className="space-y-6">
                 <div className="space-y-2">
@@ -105,7 +121,7 @@ export default function PredictPage() {
                   </p>
                 </div>
 
-                <Button 
+                <Button
                   className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                   onClick={handlePredict}
                   disabled={!ticker || !period || predicting}
@@ -118,7 +134,7 @@ export default function PredictPage() {
                   ) : (
                     <>
                       <Sparkles className="mr-2 h-4 w-4" />
-                      예측 시작
+                      분석 시작
                     </>
                   )}
                 </Button>
@@ -127,30 +143,30 @@ export default function PredictPage() {
                 <div className="border-t border-border pt-6">
                   <p className="mb-3 text-sm font-medium">인기 종목</p>
                   <div className="flex flex-wrap gap-2">
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => setTicker("AAPL")}
                     >
                       AAPL
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => setTicker("TSLA")}
                     >
                       TSLA
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => setTicker("NVDA")}
                     >
                       NVDA
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => setTicker("005930")}
                     >
                       삼성전자
@@ -163,7 +179,8 @@ export default function PredictPage() {
                   <div className="flex items-start gap-2">
                     <AlertCircle className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
                     <p className="text-xs text-muted-foreground">
-                      AI 예측은 참고용이며, 실제 투자 결정은 본인의 판단과 책임하에 이루어져야 합니다.
+                      AI 예측은 참고용이며, 실제 투자 결정은 본인의 판단과
+                      책임하에 이루어져야 합니다.
                     </p>
                   </div>
                 </Card>
@@ -192,7 +209,9 @@ export default function PredictPage() {
                   <div className="mb-6 flex items-center justify-between">
                     <div>
                       <h2 className="text-2xl font-bold">Apple Inc. (AAPL)</h2>
-                      <p className="text-sm text-muted-foreground">분석 기간: 최근 1년</p>
+                      <p className="text-sm text-muted-foreground">
+                        분석 기간: 최근 1년
+                      </p>
                     </div>
                     <Badge className="bg-accent/10 text-accent">
                       <Sparkles className="mr-1 h-3 w-3" />
@@ -202,18 +221,24 @@ export default function PredictPage() {
 
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div className="rounded-lg border border-border p-4">
-                      <p className="mb-1 text-sm text-muted-foreground">현재 가격</p>
+                      <p className="mb-1 text-sm text-muted-foreground">
+                        현재 가격
+                      </p>
                       <p className="text-2xl font-bold">$185.43</p>
                     </div>
                     <div className="rounded-lg border border-accent bg-accent/5 p-4">
-                      <p className="mb-1 text-sm text-muted-foreground">예상 가격 (30일 후)</p>
+                      <p className="mb-1 text-sm text-muted-foreground">
+                        예상 가격 (30일 후)
+                      </p>
                       <div className="flex items-center gap-2">
                         <p className="text-2xl font-bold">$198.50</p>
                         <TrendingUp className="h-5 w-5 text-accent" />
                       </div>
                     </div>
                     <div className="rounded-lg border border-border p-4">
-                      <p className="mb-1 text-sm text-muted-foreground">예상 수익률</p>
+                      <p className="mb-1 text-sm text-muted-foreground">
+                        예상 수익률
+                      </p>
                       <p className="text-2xl font-bold text-accent">+7.05%</p>
                     </div>
                   </div>
@@ -236,8 +261,10 @@ export default function PredictPage() {
 
                 {/* AI Analysis */}
                 <Card className="p-6">
-                  <h3 className="mb-4 text-lg font-semibold">AI 분석 인사이트</h3>
-                  
+                  <h3 className="mb-4 text-lg font-semibold">
+                    AI 분석 인사이트
+                  </h3>
+
                   <div className="space-y-4">
                     <div className="rounded-lg border-l-4 border-accent bg-accent/5 p-4">
                       <div className="mb-2 flex items-center gap-2">
@@ -254,13 +281,15 @@ export default function PredictPage() {
                         <li className="flex items-start gap-2">
                           <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent"></span>
                           <span>
-                            거래량이 지속적으로 증가하고 있어 시장 관심이 높습니다
+                            거래량이 지속적으로 증가하고 있어 시장 관심이
+                            높습니다
                           </span>
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent"></span>
                           <span>
-                            계절적 패턴 분석 결과 향후 30일간 상승 가능성이 높습니다
+                            계절적 패턴 분석 결과 향후 30일간 상승 가능성이
+                            높습니다
                           </span>
                         </li>
                       </ul>
@@ -275,13 +304,15 @@ export default function PredictPage() {
                         <li className="flex items-start gap-2">
                           <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-muted-foreground"></span>
                           <span>
-                            단기 변동성이 있을 수 있으며, 외부 시장 요인에 영향을 받을 수 있습니다
+                            단기 변동성이 있을 수 있으며, 외부 시장 요인에
+                            영향을 받을 수 있습니다
                           </span>
                         </li>
                         <li className="flex items-start gap-2">
                           <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-muted-foreground"></span>
                           <span>
-                            AI 예측은 과거 데이터 기반이며 미래를 보장하지 않습니다
+                            AI 예측은 과거 데이터 기반이며 미래를 보장하지
+                            않습니다
                           </span>
                         </li>
                       </ul>
@@ -309,8 +340,8 @@ export default function PredictPage() {
 
                 {/* Action Buttons */}
                 <div className="flex gap-4">
-                  <Button 
-                    className="flex-1" 
+                  <Button
+                    className="flex-1"
                     variant="outline"
                     onClick={() => setShowResults(false)}
                   >
@@ -326,5 +357,5 @@ export default function PredictPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

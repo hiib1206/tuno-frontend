@@ -4,10 +4,29 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuthStore } from "@/stores/authStore";
 import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuItemDestructive,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useTheme } from "next-themes";
+import { Moon, Sun, User, Settings, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ProfileAvatar } from "./ProfileAvatar";
 
 export function Header() {
   const { user, logout } = useAuthStore();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -59,27 +78,78 @@ export function Header() {
             href="/predict"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            AI 예측
+            AI 종목 분석
           </Link>
         </nav>
 
         <div className="flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-3">
-              <Link
-                href="/mypage"
-                className="flex items-center gap-2 hover:opacity-80"
-              >
-                <Avatar>
-                  <AvatarFallback>
-                    {user.nick.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-medium">{user.nick}</span>
-              </Link>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                로그아웃
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1 transition-colors">
+                    <ProfileAvatar size="sm" />
+                    <span className="text-sm font-medium">{user.nick}</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user.nick}
+                      </p>
+                      {user.email && (
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      )}
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/mypage" className="flex items-center">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>내 정보 관리</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/mypage?tab=settings"
+                      className="flex items-center"
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>설정</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() =>
+                      setTheme(theme === "dark" ? "light" : "dark")
+                    }
+                    className="flex items-center"
+                  >
+                    {mounted && theme === "dark" ? (
+                      <>
+                        <Sun className="mr-2 h-4 w-4" />
+                        <span>라이트 모드</span>
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="mr-2 h-4 w-4" />
+                        <span>다크 모드</span>
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItemDestructive
+                    onClick={handleLogout}
+                    className="flex items-center"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>로그아웃</span>
+                  </DropdownMenuItemDestructive>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <>

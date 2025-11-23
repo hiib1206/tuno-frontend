@@ -1,16 +1,156 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { UserPlus, ArrowLeft } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  UserPlus,
+  ArrowLeft,
+  CheckCircle2,
+  XCircle,
+  Loader2,
+} from "lucide-react";
+import authApi from "@/api/authApi";
+import userApi from "@/api/userApi";
+import { useNicknameCheck } from "@/hooks/useNicknameCheck";
 
 export default function SignupPage() {
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [nick, setNick] = useState("");
+  const [pw, setPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
   const [termsAgreed, setTermsAgreed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  // 중복 체크 상태
+  const [usernameStatus, setUsernameStatus] = useState<
+    "idle" | "checking" | "available" | "unavailable"
+  >("idle");
+  const [usernameMessage, setUsernameMessage] = useState("");
+
+  // 닉네임 체크 훅 사용
+  const { nickStatus, nickMessage } = useNicknameCheck(nick);
+
+  // 비밀번호 일치 상태
+  const [passwordMatchStatus, setPasswordMatchStatus] = useState<
+    "idle" | "match" | "mismatch"
+  >("idle");
+  const [passwordMatchMessage, setPasswordMatchMessage] = useState("");
+
+  // 아이디 중복 체크 (debounce) + 4자 이하 경고 메시지
+  useEffect(() => {
+    if (!username) {
+      setUsernameStatus("idle");
+      setUsernameMessage("");
+      return;
+    }
+
+    if (username.length > 0 && username.length < 4) {
+      setUsernameStatus("unavailable");
+      setUsernameMessage("아이디는 최소 4자 이상이어야 합니다.");
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setUsernameStatus("checking");
+      try {
+        const response = await userApi.checkUsername(username);
+        if (response.success) {
+          setUsernameStatus("available");
+          setUsernameMessage("사용 가능한 아이디입니다.");
+        }
+      } catch (err: any) {
+        if (!err.response.data.success) {
+          setUsernameStatus("unavailable");
+          setUsernameMessage(err.response.data.message);
+        } else {
+          setUsernameStatus("idle");
+          setUsernameMessage("");
+        }
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [username]);
+
+  // 비밀번호 일치 확인
+  useEffect(() => {
+    if (pw.length == 0 && confirmPw.length == 0) {
+      setPasswordMatchStatus("idle");
+      setPasswordMatchMessage("");
+    } else {
+      if (pw === confirmPw) {
+        setPasswordMatchStatus("match");
+        setPasswordMatchMessage("비밀번호가 일치합니다.");
+      } else {
+        setPasswordMatchStatus("mismatch");
+        setPasswordMatchMessage("비밀번호가 일치하지 않습니다.");
+      }
+    }
+  }, [pw, confirmPw]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+
+    // 비밀번호 확인 검증
+    if (pw !== confirmPw) {
+      setError("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+    setSuccess(false);
+
+    try {
+      await authApi.register(username, nick, pw);
+      // 회원가입 성공
+      setSuccess(true);
+      setIsLoading(false);
+
+      // 입력 필드 초기화
+      setUsername("");
+      setNick("");
+      setPw("");
+      setConfirmPw("");
+      setTermsAgreed(false);
+      setUsernameStatus("idle");
+      setPasswordMatchStatus("idle");
+      setUsernameMessage("");
+      setPasswordMatchMessage("");
+
+      // 2초 후 모달 닫고 로그인 페이지로 이동
+      setTimeout(() => {
+        setSuccess(false);
+        router.push("/login");
+      }, 2000);
+    } catch (err: any) {
+      if (err.response?.data?.success === false) {
+        setError(err.response.data.message);
+      } else {
+        console.log(err);
+        setError("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
+      }
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-accent/5 to-background p-4 py-12">
       <div className="w-full max-w-md">
@@ -51,20 +191,115 @@ export default function SignupPage() {
             </p>
           </div>
 
-          <form className="space-y-4">
+          {error && (
+            <div className="mb-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="username">아이디</Label>
-              <Input id="username" type="text" placeholder="아이디" required />
+              <div className="relative">
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="아이디"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
+                  required
+                  disabled={isLoading || success}
+                  className={
+                    usernameStatus === "unavailable"
+                      ? "border-destructive pr-10"
+                      : usernameStatus === "available"
+                      ? "border-green-500 pr-10"
+                      : undefined
+                  }
+                />
+                {usernameStatus === "checking" && (
+                  <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+                )}
+                {usernameStatus === "available" && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
+                )}
+                {usernameStatus === "unavailable" && (
+                  <XCircle className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-destructive" />
+                )}
+              </div>
+              {usernameMessage && (
+                <p
+                  className={`text-xs ${
+                    usernameStatus === "available"
+                      ? "text-green-600 dark:text-green-400"
+                      : usernameStatus === "unavailable"
+                      ? "text-destructive"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {usernameMessage}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="nick">닉네임</Label>
-              <Input id="nick" type="text" placeholder="닉네임" required />
+              <div className="relative">
+                <Input
+                  id="nick"
+                  type="text"
+                  placeholder="닉네임"
+                  value={nick}
+                  onChange={(e) => setNick(e.target.value)}
+                  autoComplete="nickname"
+                  required
+                  disabled={isLoading || success}
+                  className={
+                    nickStatus === "unavailable"
+                      ? "border-destructive pr-10"
+                      : nickStatus === "available"
+                      ? "border-green-500 pr-10"
+                      : undefined
+                  }
+                />
+                {nickStatus === "checking" && (
+                  <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+                )}
+                {nickStatus === "available" && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
+                )}
+                {nickStatus === "unavailable" && (
+                  <XCircle className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-destructive" />
+                )}
+              </div>
+              {nickMessage && (
+                <p
+                  className={`text-xs ${
+                    nickStatus === "available"
+                      ? "text-green-600 dark:text-green-400"
+                      : nickStatus === "unavailable"
+                      ? "text-destructive"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {nickMessage}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="pw">비밀번호</Label>
-              <Input id="pw" type="password" placeholder="••••••••" required />
+              <Input
+                id="pw"
+                type="password"
+                placeholder="••••••••"
+                value={pw}
+                onChange={(e) => setPw(e.target.value)}
+                autoComplete="new-password"
+                required
+                disabled={isLoading}
+              />
               <p className="text-xs text-muted-foreground">
                 나중에 추가. 최소 8자 이상, 영문, 숫자, 특수문자 포함.
               </p>
@@ -72,12 +307,44 @@ export default function SignupPage() {
 
             <div className="space-y-2">
               <Label htmlFor="confirm-pw">비밀번호 확인</Label>
-              <Input
-                id="confirm-pw"
-                type="password"
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <Input
+                  id="confirm-pw"
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPw}
+                  onChange={(e) => setConfirmPw(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                  disabled={isLoading || success}
+                  className={
+                    passwordMatchStatus === "mismatch"
+                      ? "border-destructive pr-10"
+                      : passwordMatchStatus === "match"
+                      ? "border-green-500 pr-10"
+                      : undefined
+                  }
+                />
+                {passwordMatchStatus === "match" && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
+                )}
+                {passwordMatchStatus === "mismatch" && (
+                  <XCircle className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-destructive" />
+                )}
+              </div>
+              {passwordMatchMessage && (
+                <p
+                  className={`text-xs ${
+                    passwordMatchStatus === "match"
+                      ? "text-green-600 dark:text-green-400"
+                      : passwordMatchStatus === "mismatch"
+                      ? "text-destructive"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {passwordMatchMessage}
+                </p>
+              )}
             </div>
 
             <div className="flex items-start gap-2">
@@ -121,10 +388,25 @@ export default function SignupPage() {
             <Button
               type="submit"
               className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-              disabled={!termsAgreed}
+              disabled={
+                !termsAgreed ||
+                isLoading ||
+                success ||
+                username.length == 0 ||
+                usernameStatus !== "available" ||
+                nick.length == 0 ||
+                nickStatus !== "available" ||
+                pw.length == 0 ||
+                confirmPw.length == 0 ||
+                passwordMatchStatus !== "match"
+              }
             >
               <UserPlus className="mr-2 h-4 w-4" />
-              무료로 시작하기
+              {isLoading
+                ? "가입 중..."
+                : success
+                ? "회원가입 완료"
+                : "무료로 시작하기"}
             </Button>
           </form>
 
@@ -196,6 +478,25 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
+
+      {/* 회원가입 완료 모달 */}
+      <Dialog open={success} onOpenChange={setSuccess}>
+        <DialogContent className="sm:max-w-md [&>button]:hidden">
+          <DialogHeader>
+            <div className="flex items-center justify-center mb-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
+                <CheckCircle2 className="h-10 w-10 text-green-500" />
+              </div>
+            </div>
+            <DialogTitle className="text-center text-2xl">
+              회원가입이 완료되었습니다.
+            </DialogTitle>
+            <DialogDescription className="text-center pt-2">
+              잠시 후 로그인 페이지로 이동합니다.
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

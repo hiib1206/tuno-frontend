@@ -74,14 +74,14 @@ apiClient.interceptors.response.use(
       try {
         // refresh 요청 (쿠키에 refresh token이 있으므로 별도 헤더 불필요)
         const refreshResponse = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/refresh`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`,
           {},
           {
             withCredentials: true,
           }
         );
 
-        const newAccessToken = refreshResponse.data.accessToken;
+        const newAccessToken = refreshResponse.data.data.accessToken;
 
         // 새로운 access token 저장
         useAuthStore.getState().setAccessToken(newAccessToken);
@@ -102,8 +102,8 @@ apiClient.interceptors.response.use(
         useAuthStore.getState().setAccessToken(null);
         useAuthStore.getState().setUser(null);
 
-        // 로그인 페이지로 리다이렉트 (브라우저 환경에서만)
-        if (typeof window !== "undefined") {
+        // 로그인 페이지로 리다이렉트 (브라우저 환경에서만, skipRedirect 플래그가 없을 때만)
+        if (typeof window !== "undefined" && !originalRequest.skipRedirect) {
           window.location.href = "/login";
         }
 
