@@ -17,4 +17,3 @@ export function PredictionChart() {
     </Card>
   );
 }
-

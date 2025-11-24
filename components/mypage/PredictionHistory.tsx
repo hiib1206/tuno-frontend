@@ -96,4 +96,3 @@ export function PredictionHistory() {
     </div>
   );
 }
-

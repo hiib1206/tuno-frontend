@@ -27,4 +27,3 @@ export function ConfidenceScore({ score }: ConfidenceScoreProps) {
     </Card>
   );
 }
-

@@ -54,4 +54,3 @@ export function AnalysisInsights({ insights }: AnalysisInsightsProps) {
     </Card>
   );
 }
-
