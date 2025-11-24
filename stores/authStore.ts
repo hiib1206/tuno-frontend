@@ -49,7 +49,6 @@ export const useAuthStore = create<AuthStore>()(
       uploadProfileImage: async (file: File) => {
         const response = await userApi.uploadProfileImage(file);
         if (response.success) {
-          console.log(response.data.user);
           set({ user: User.fromMap(response.data.user) });
         }
       },

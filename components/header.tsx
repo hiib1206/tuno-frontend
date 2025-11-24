@@ -1,9 +1,5 @@
 "use client";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useAuthStore } from "@/stores/authStore";
-import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +9,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuthStore } from "@/stores/authStore";
+import { LogOut, Moon, Settings, Sun, User } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Moon, Sun, User, Settings, LogOut } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ProfileAvatar } from "./ProfileAvatar";
 
@@ -75,7 +74,7 @@ export function Header() {
             요금제
           </Link>
           <Link
-            href="/predict"
+            href="/analysis"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             AI 종목 분석

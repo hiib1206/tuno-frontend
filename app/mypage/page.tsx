@@ -1,16 +1,16 @@
 "use client";
 
 import { Header } from "@/components/header";
-import { useState, useEffect } from "react";
-import { useAuthStore } from "@/stores/authStore";
-import { Sidebar, type MenuItem } from "@/components/mypage/Sidebar";
 import { Dashboard } from "@/components/mypage/Dashboard";
-import { PredictionHistory } from "@/components/mypage/PredictionHistory";
 import { Favorites } from "@/components/mypage/Favorites";
-import { ProfileSettings } from "@/components/mypage/ProfileSettings";
 import { NotificationSettings } from "@/components/mypage/NotificationSettings";
-import { SubscriptionManagement } from "@/components/mypage/SubscriptionManagement";
+import { PredictionHistory } from "@/components/mypage/PredictionHistory";
+import { ProfileSettings } from "@/components/mypage/ProfileSettings";
 import { SecuritySettings } from "@/components/mypage/SecuritySettings";
+import { Sidebar, type MenuItem } from "@/components/mypage/Sidebar";
+import { SubscriptionManagement } from "@/components/mypage/SubscriptionManagement";
+import { useAuthStore } from "@/stores/authStore";
+import { useEffect, useState } from "react";
 
 export default function MyPage() {
   const [activeMenu, setActiveMenu] = useState<MenuItem>("profile");

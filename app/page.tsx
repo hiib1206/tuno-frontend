@@ -1,17 +1,17 @@
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import Link from "next/link";
 import {
-  Brain,
-  TrendingUp,
-  Shield,
-  BarChart3,
-  Zap,
-  Users,
   ArrowRight,
+  BarChart3,
+  Brain,
   CheckCircle2,
+  Shield,
+  TrendingUp,
+  Users,
+  Zap,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function LandingPage() {
   return (

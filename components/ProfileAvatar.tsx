@@ -48,12 +48,11 @@ export function ProfileAvatar({
     );
   }
 
-  // user가 있지만 프로필 이미지 URL이 없으면 닉네임 첫 글자 표시
   return (
     <Avatar className={cn(sizeClasses[size], className)}>
       <AvatarImage
         className={cn("object-cover", textSizes[effectiveTextSize])}
-        src={`${user.profileImageUrl}?t=${Date.now()}` || undefined}
+        src={user.profileImageUrl}
         alt="프로필"
       />
       {showFallback && (
