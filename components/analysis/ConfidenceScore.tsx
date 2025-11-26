@@ -6,7 +6,7 @@ interface ConfidenceScoreProps {
 
 export function ConfidenceScore({ score }: ConfidenceScoreProps) {
   return (
-    <Card className="border-accent/20 bg-accent/5 p-6">
+    <Card className="border-accent/20 bg-accent-05 p-6">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="mb-1 font-semibold">AI 예측 신뢰도</h3>

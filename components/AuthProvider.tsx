@@ -1,6 +1,6 @@
 "use client";
-import { useEffect } from "react";
 import { useAuthStore } from "@/stores/authStore";
+import { useEffect } from "react";
 
 export function AuthProvider() {
   //get으로 최신 상태 직접 가져오기 (hydration 완료 후 값)

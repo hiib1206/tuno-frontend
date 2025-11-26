@@ -22,7 +22,7 @@ export function AnalysisInsights({ insights }: AnalysisInsightsProps) {
             key={index}
             className={`rounded-lg border-l-4 p-4 ${
               insight.type === "positive"
-                ? "border-accent bg-accent/5"
+                ? "border-accent bg-accent-05"
                 : "border-muted bg-muted/30"
             }`}
           >

@@ -41,7 +41,7 @@ export function PredictionSummary({
           <p className="mb-1 text-sm text-muted-foreground">현재 가격</p>
           <p className="text-2xl font-bold">{currentPrice}</p>
         </div>
-        <div className="rounded-lg border border-accent bg-accent/5 p-4">
+        <div className="rounded-lg border border-accent bg-accent-05 p-4">
           <p className="mb-1 text-sm text-muted-foreground">
             예상 가격 (30일 후)
           </p>

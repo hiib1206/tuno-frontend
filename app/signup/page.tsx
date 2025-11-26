@@ -1,11 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import authApi from "@/api/authApi";
+import userApi from "@/api/userApi";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -15,16 +12,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useNicknameCheck } from "@/hooks/useNicknameCheck";
 import {
-  UserPlus,
   ArrowLeft,
   CheckCircle2,
-  XCircle,
   Loader2,
+  UserPlus,
+  XCircle,
 } from "lucide-react";
-import authApi from "@/api/authApi";
-import userApi from "@/api/userApi";
-import { useNicknameCheck } from "@/hooks/useNicknameCheck";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -152,7 +152,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-accent/5 to-background p-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-accent-05 to-background p-4 py-12">
       <div className="w-full max-w-md">
         {/* Back to Home */}
         <Link
@@ -454,7 +454,7 @@ export default function SignupPage() {
           </p>
         </Card>
 
-        <div className="mt-8 rounded-lg border border-accent/20 bg-accent/5 p-4">
+        <div className="mt-8 rounded-lg border border-accent/20 bg-accent-05 p-4">
           <div className="flex items-start gap-2">
             <svg
               className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"

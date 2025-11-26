@@ -43,7 +43,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-accent/5 to-background p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-accent-05 to-background p-4">
       <div className="w-full max-w-md">
         {/* Back to Home */}
         <Link
