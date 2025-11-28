@@ -1,17 +1,16 @@
 "use client";
 
-import authApi from "@/api/authApi";
+import userApi from "@/api/userApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNicknameCheck } from "@/hooks/useNicknameCheck";
-import { cn, formatDate } from "@/lib/utils";
+import { useToast } from "@/hooks/useToast";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import {
-  Calendar,
   CheckCircle2,
   Loader2,
-  Lock,
   Mail,
   Phone,
   User,
@@ -37,6 +36,7 @@ export function ProfileSettings() {
   const [imageError, setImageError] = useState("");
   // ref는 React에서 DOM 요소에 직접 접근할 때 사용. useRef로 생성한 ref 객체를 연결
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (user?.nick) {
@@ -97,7 +97,6 @@ export function ProfileSettings() {
     return `${minutes}분 ${secs.toString().padStart(2, "0")}초`;
   };
 
-  // 핸들러 함수들
   const handleCancelNickEdit = () => {
     setNickValue(user?.nick || "");
     setIsEditingNick(false);
@@ -110,7 +109,7 @@ export function ProfileSettings() {
     setIsSendingCode(true);
     setEmailError("");
     try {
-      const response = await authApi.requestEmailVerification(emailValue);
+      const response = await userApi.requestEmailVerification(emailValue);
       if (response?.data?.expiresAt) {
         setExpiresAt(response.data.expiresAt);
       }
@@ -146,7 +145,7 @@ export function ProfileSettings() {
     setIsSendingCode(true);
     setEmailError("");
     try {
-      const response = await authApi.resendEmailVerification(emailValue);
+      const response = await userApi.resendEmailVerification(emailValue);
       if (response?.data?.expiresAt) {
         setExpiresAt(response.data.expiresAt);
       }
@@ -167,7 +166,7 @@ export function ProfileSettings() {
     setIsVerifying(true);
     setEmailError("");
     try {
-      await authApi.verifyEmailCode(emailValue, verificationCode);
+      await userApi.verifyEmailCode(emailValue, verificationCode);
       setIsVerifying(false);
       setIsCodeSent(false);
       setVerificationCode("");
@@ -228,12 +227,49 @@ export function ProfileSettings() {
     }
   };
 
+  // 닉네임 변경 핸들러
+  const handleConfirmNickEdit = async () => {
+    if (!nickValue) {
+      toast({
+        title: "실패!",
+        description: "닉네임을 입력해주세요.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsEditingNick(false);
+    try {
+      await userApi.updateNickname(nickValue);
+      toast({
+        title: "성공!",
+        description: "닉네임이 변경되었습니다.",
+        variant: "success",
+      });
+      me();
+    } catch (err: any) {
+      setIsEditingNick(false);
+      if (err.response?.status === 400 && err.response?.data?.message) {
+        toast({
+          title: "실패!",
+          description: err.response?.data?.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "실패!",
+          description: "닉네임 변경에 실패했습니다.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   return (
     <div className="p-6">
       <h2 className="mb-1 text-2xl font-bold">내 정보 관리</h2>
 
       <div className="space-y-4">
-        <div className="mb-4 flex items-center gap-4 my-4">
+        <div className="mb-4 flex items-center gap-4 my-6">
           <h3 className="text-lg font-semibold">프로필</h3>
           <div className="h-px flex-1 bg-muted-foreground/30"></div>
         </div>
@@ -289,7 +325,7 @@ export function ProfileSettings() {
                   "pl-9 pr-10",
                   isEditingNick && "border-ring/80 ring-ring/20",
                   nickStatus === "unavailable" && "border-destructive",
-                  nickStatus === "available" && "border-green-500"
+                  nickStatus === "available" && "border-accent"
                 )}
                 disabled={!isEditingNick}
               />
@@ -299,7 +335,7 @@ export function ProfileSettings() {
                     <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />
                   )}
                   {nickStatus === "available" && (
-                    <CheckCircle2 className="absolute right-3 top-3 h-4 w-4 text-green-500" />
+                    <CheckCircle2 className="absolute right-3 top-3 h-4 w-4 text-accent" />
                   )}
                   {nickStatus === "unavailable" && (
                     <XCircle className="absolute right-3 top-3 h-4 w-4 text-destructive" />
@@ -333,10 +369,10 @@ export function ProfileSettings() {
                   variant="change"
                   size="default"
                   className="flex-1 whitespace-nowrap"
-                  onClick={() => setIsEditingNick(false)}
+                  onClick={handleConfirmNickEdit}
                   disabled={nickStatus !== "available"}
                 >
-                  확인
+                  변경 하기
                 </Button>
               </div>
             )}
@@ -345,7 +381,7 @@ export function ProfileSettings() {
             <p
               className={`text-xs ${
                 nickStatus === "available"
-                  ? "text-green-600 dark:text-green-400"
+                  ? "text-accent dark:text-accent"
                   : nickStatus === "unavailable"
                   ? "text-destructive"
                   : "text-muted-foreground"
@@ -552,43 +588,6 @@ export function ProfileSettings() {
             >
               변경
             </Button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="password">비밀번호</Label>
-          <div className="flex flex-col gap-2 lg:flex-row">
-            <div className="relative w-full lg:w-1/2">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="password"
-                type="password"
-                defaultValue="••••••••"
-                className="pl-9"
-                disabled
-              />
-            </div>
-            <Button
-              type="button"
-              variant="change"
-              size="default"
-              className="whitespace-nowrap"
-            >
-              변경
-            </Button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="joinDate">가입일</Label>
-          <div className="relative">
-            <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              id="joinDate"
-              value={formatDate(user?.createdAt)}
-              disabled
-              className="pl-9"
-            />
           </div>
         </div>
       </div>

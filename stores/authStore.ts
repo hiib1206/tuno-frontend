@@ -41,7 +41,7 @@ export const useAuthStore = create<AuthStore>()(
         useAuthStore.persist.clearStorage();
       },
       me: async (options?: { skipRedirect?: boolean }) => {
-        const response = await authApi.me(options);
+        const response = await userApi.me(options);
         if (response.success) {
           set({ user: User.fromMap(response.data.user) });
         }

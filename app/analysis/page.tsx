@@ -21,6 +21,7 @@ import {
   Download,
   Home,
   Menu,
+  Plus,
   TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
@@ -69,7 +70,7 @@ export default function AnalysisPage() {
       <div
         className={`${
           sidebarOpen ? "w-70" : "w-14"
-        } transition-all duration-300 border-r border-border overflow-hidden flex-shrink-0 relative bg-accent-light`}
+        } transition-all duration-300 border-r border-border overflow-hidden flex-shrink-0 relative bg-background-sidebar`}
       >
         {/* Toggle Button - always visible */}
         <Button
@@ -102,17 +103,17 @@ export default function AnalysisPage() {
                   setPeriod("");
                 }}
                 variant="ghost"
-                className="flex items-center w-full justify-start !px-2 group hover:bg-muted/50"
+                className="flex items-center w-full justify-start !px-2 hover:text-accent hover:bg-muted/50"
               >
-                <BarChart3 className="size-5 group-hover:text-accent" />
+                <Plus className="size-5" />
                 <h2 className="text-base font-medium">새 분석</h2>
               </Button>
               <Button
                 onClick={() => setHistoryOpen(!historyOpen)}
                 variant="ghost"
-                className="flex items-center w-full justify-start !px-2 group hover:bg-muted/50"
+                className="flex items-center w-full justify-start !px-2 hover:text-accent hover:bg-muted/50"
               >
-                <Clock className="size-5 group-hover:text-accent" />
+                <Clock className="size-5" />
                 <h2 className="text-base font-medium">분석 내역</h2>
                 {historyOpen ? (
                   <ChevronDown className="size-4" />
@@ -146,7 +147,7 @@ export default function AnalysisPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden dark:bg-secondary/50">
+      <div className="flex-1 flex flex-col overflow-hidden bg-background-main">
         <div
           className={`h-17 px-6 flex items-center justify-between flex-shrink-0 ${
             showResults ? "border-b border-border" : ""

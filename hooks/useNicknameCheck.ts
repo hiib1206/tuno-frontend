@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import userApi from "@/api/userApi";
+import { useEffect, useState } from "react";
 
 type NickStatus = "idle" | "checking" | "available" | "unavailable";
 
@@ -92,34 +92,18 @@ export function useNicknameCheck(
           setNickMessage("사용 가능한 닉네임입니다.");
         }
       } catch (err: any) {
-        console.log(err);
-        // 네트워크 에러 처리 (err.response가 없는 경우)
-        if (!err.response) {
-          setNickStatus("unavailable");
-          setNickMessage(
-            "네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
-          );
-          return;
-        }
-
-        // 500 에러 처리
-        if (err.response?.status === 500) {
-          setNickStatus("unavailable");
-          setNickMessage(
-            "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
-          );
-          return;
-        }
-
         // 일반적인 비즈니스 로직 에러 (예: 중복 닉네임)
-        if (!err.response?.data?.success) {
+        if (err.response?.status === 400 || !err.response?.data?.success) {
           setNickStatus("unavailable");
           setNickMessage(
             err.response?.data?.message || "사용할 수 없는 닉네임입니다."
           );
+          return;
         } else {
-          setNickStatus("idle");
-          setNickMessage("");
+          setNickStatus("unavailable");
+          setNickMessage(
+            "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+          );
         }
       }
     }, debounceMs);

@@ -75,7 +75,7 @@ export function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
               className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                 activeMenu === item.id
                   ? "bg-accent/10 text-accent"
-                  : "text-muted-foreground hover:bg-accent-05 hover:text-foreground"
+                  : "text-foreground hover:bg-accent-05 hover:text-foreground"
               }`}
             >
               <Icon className="h-4 w-4" />

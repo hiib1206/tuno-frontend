@@ -1,5 +1,6 @@
 import { AuthProvider } from "@/components/AuthProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Toaster } from "@/components/ToastProvider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -47,6 +48,7 @@ export default function RootLayout({
         >
           <AuthProvider />
           {children}
+          <Toaster />
           {/* <Analytics는 vercel에 정보 보내서 분석하는 서비스이므로 일단 주석처리 */}
           {/* <Analytics /> */}
         </ThemeProvider>

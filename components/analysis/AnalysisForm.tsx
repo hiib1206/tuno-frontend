@@ -36,7 +36,7 @@ export function AnalysisForm({
     <div className="h-full flex items-center justify-center">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
-          <h3 className="text-4xl font-bold mb-2 leading-tight">
+          <h3 className="text-4xl font-bold mb-2 leading-12">
             환영합니다. <br />
             분석을 시작해 볼까요?
           </h3>
@@ -46,7 +46,7 @@ export function AnalysisForm({
           </p>
         </div>
 
-        <Card className="p-6">
+        <Card className="p-6 bg-background-sidebar">
           <div className="space-y-6">
             <div>
               <Label htmlFor="ticker" className="text-sm mb-2 block">
@@ -59,7 +59,7 @@ export function AnalysisForm({
                   placeholder="AAPL, 삼성전자, 005930..."
                   value={ticker}
                   onChange={(e) => onTickerChange(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 border-border"
                 />
               </div>
             </div>
@@ -69,7 +69,7 @@ export function AnalysisForm({
                 분석 기간
               </Label>
               <Select value={period} onValueChange={onPeriodChange}>
-                <SelectTrigger id="period">
+                <SelectTrigger id="period" className="border-border">
                   <SelectValue placeholder="기간을 선택하세요" />
                 </SelectTrigger>
                 <SelectContent>
@@ -82,7 +82,7 @@ export function AnalysisForm({
             </div>
 
             <Button
-              className="w-full"
+              className="w-full bg-accent/80 text-accent-foreground hover:bg-accent/90"
               size="lg"
               onClick={onAnalyze}
               disabled={!ticker || !period || analyzing}

@@ -20,31 +20,6 @@ const authApi = {
     const response = await apiClient.post("/api/auth/logout");
     return response.data;
   },
-  me: async (options?: { skipRedirect?: boolean }) => {
-    const response = await apiClient.get("/api/auth/me", {
-      skipRedirect: options?.skipRedirect,
-    });
-    return response.data;
-  },
-  requestEmailVerification: async (email: string) => {
-    const response = await apiClient.post("/api/auth/email/request", {
-      email,
-    });
-    return response.data;
-  },
-  verifyEmailCode: async (email: string, code: string) => {
-    const response = await apiClient.post("/api/auth/email/verify", {
-      email,
-      code,
-    });
-    return response.data;
-  },
-  resendEmailVerification: async (email: string) => {
-    const response = await apiClient.post("/api/auth/email/resend", {
-      email,
-    });
-    return response.data;
-  },
 };
 
 export default authApi;
