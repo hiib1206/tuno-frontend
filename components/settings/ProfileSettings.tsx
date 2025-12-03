@@ -265,16 +265,16 @@ export function ProfileSettings() {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="mb-1 text-2xl font-bold">내 정보 관리</h2>
+    <div className="p-5">
+      <h2 className="mb-1 text-xl font-bold">내 정보 관리</h2>
 
       <div className="space-y-4">
-        <div className="mb-4 flex items-center gap-4 my-6">
+        <div className="flex items-center gap-3 my-4">
           <h3 className="text-lg font-semibold">프로필</h3>
           <div className="h-px flex-1 bg-muted-foreground/30"></div>
         </div>
 
-        <div className="mb-8 flex items-center gap-4">
+        <div className="mb-6 flex items-center gap-4">
           <ProfileAvatar size="xl" textSize="2xl" />
           <div>
             <input

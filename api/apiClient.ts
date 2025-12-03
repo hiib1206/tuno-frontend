@@ -2,7 +2,7 @@ import { useAuthStore } from "@/stores/authStore";
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: process.env?.NEXT_PUBLIC_API_URL || "http://59.25.224.32:4000",
   headers: {
     "Content-Type": "application/json",
   },
@@ -92,7 +92,6 @@ apiClient.interceptors.response.use(
         // 원래 요청 재시도
         originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
         return apiClient(originalRequest);
       } catch (refreshError: any) {
         // refresh 요청도 401을 받은 경우 대기 중인 요청들 전부 실패 처리

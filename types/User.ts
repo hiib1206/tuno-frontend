@@ -1,4 +1,4 @@
-import { Role, IsActive } from "./Common";
+import { IsActive, Role } from "./Common";
 
 export class User {
   id: number;
@@ -11,6 +11,7 @@ export class User {
   address?: string;
   role?: Role;
   profileImageUrl?: string;
+  profileImageUpdatedAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
   isActive?: IsActive;
@@ -26,6 +27,7 @@ export class User {
     address?: string,
     role?: Role,
     profileImageUrl?: string,
+    profileImageUpdatedAt?: Date,
     createdAt?: Date,
     updatedAt?: Date,
     isActive?: IsActive
@@ -40,6 +42,7 @@ export class User {
     this.address = address;
     this.role = role;
     this.profileImageUrl = profileImageUrl;
+    this.profileImageUpdatedAt = profileImageUpdatedAt;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.isActive = isActive;
@@ -61,6 +64,11 @@ export class User {
       map.address ?? undefined,
       map.role ?? undefined,
       map.profileImageUrl ?? undefined,
+      map.profileImageUpdatedAt
+        ? typeof map.profileImageUpdatedAt === "string"
+          ? new Date(map.profileImageUpdatedAt)
+          : map.profileImageUpdatedAt
+        : undefined,
       map.createdAt
         ? typeof map.createdAt === "string"
           ? new Date(map.createdAt)
@@ -87,6 +95,7 @@ export class User {
       address: this.address,
       role: this.role,
       profileImageUrl: this.profileImageUrl,
+      profileImageUpdatedAt: this.profileImageUpdatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       isActive: this.isActive,

@@ -152,18 +152,18 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-accent-05 to-background p-4 py-12">
+    <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md">
         {/* Back to Home */}
         <Link
           href="/"
-          className="mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
           홈으로 돌아가기
         </Link>
 
-        <Card className="p-8">
+        <Card className="p-8 border-">
           {/* Logo */}
           <div className="mb-8 flex items-center justify-center gap-2">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
@@ -211,11 +211,12 @@ export default function SignupPage() {
                   required
                   disabled={isLoading || success}
                   className={
-                    usernameStatus === "unavailable"
+                    "rounded " +
+                    (usernameStatus === "unavailable"
                       ? "border-destructive pr-10"
                       : usernameStatus === "available"
                       ? "border-green-500 pr-10"
-                      : undefined
+                      : undefined)
                   }
                 />
                 {usernameStatus === "checking" && (
@@ -256,11 +257,12 @@ export default function SignupPage() {
                   required
                   disabled={isLoading || success}
                   className={
-                    nickStatus === "unavailable"
+                    "rounded " +
+                    (nickStatus === "unavailable"
                       ? "border-destructive pr-10"
                       : nickStatus === "available"
                       ? "border-green-500 pr-10"
-                      : undefined
+                      : undefined)
                   }
                 />
                 {nickStatus === "checking" && (
@@ -299,6 +301,7 @@ export default function SignupPage() {
                 autoComplete="new-password"
                 required
                 disabled={isLoading}
+                className="rounded"
               />
               <p className="text-xs text-muted-foreground">
                 나중에 추가. 최소 8자 이상, 영문, 숫자, 특수문자 포함.
@@ -318,11 +321,12 @@ export default function SignupPage() {
                   required
                   disabled={isLoading || success}
                   className={
-                    passwordMatchStatus === "mismatch"
+                    "rounded " +
+                    (passwordMatchStatus === "mismatch"
                       ? "border-destructive pr-10"
                       : passwordMatchStatus === "match"
                       ? "border-green-500 pr-10"
-                      : undefined
+                      : undefined)
                   }
                 />
                 {passwordMatchStatus === "match" && (
@@ -387,7 +391,7 @@ export default function SignupPage() {
 
             <Button
               type="submit"
-              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+              className=" w-full rounded bg-accent text-accent-foreground hover:bg-accent/90"
               disabled={
                 !termsAgreed ||
                 isLoading ||
@@ -453,30 +457,6 @@ export default function SignupPage() {
             </Link>
           </p>
         </Card>
-
-        <div className="mt-8 rounded-lg border border-accent/20 bg-accent-05 p-4">
-          <div className="flex items-start gap-2">
-            <svg
-              className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <div className="text-sm">
-              <p className="font-medium">14일 무료 체험 포함</p>
-              <p className="text-muted-foreground">
-                신용카드 정보 없이 바로 시작하세요. 언제든지 취소 가능합니다.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* 회원가입 완료 모달 */}

@@ -17,8 +17,6 @@ export function AuthProvider() {
       } catch (error: any) {
         useAuthStore.getState().setUser(null);
         useAuthStore.getState().setAccessToken(null);
-        // persist 스토리지에서 완전히 제거
-        useAuthStore.persist.clearStorage();
       }
     };
 

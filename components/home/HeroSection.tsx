@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function HeroSection() {
   return (
@@ -29,30 +30,36 @@ export default function HeroSection() {
             지금 바로 AI가 분석한 시장의 흐름을 확인하세요.
           </motion.p>
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            <motion.button
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0 0 30px var(--color-primary-glow)",
-              }}
-              whileTap={{ scale: 0.95 }}
-              animate={{
-                boxShadow: [
-                  "0 0 0px var(--color-primary-glow)",
-                  "0 0 20px var(--color-primary-glow)",
-                  "0 0 0px var(--color-primary-glow)",
-                ],
-              }}
-              transition={{
-                boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-              }}
-              className="px-8 py-4 rounded-full text-lg font-bold bg-[var(--color-accent)] text-[var(--color-accent-foreground)]"
-            >
-              무료로 예측하기
-            </motion.button>
+            <Link href="/analysis" className="inline-block">
+              <motion.div
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 0 30px var(--color-primary-glow)",
+                }}
+                whileTap={{ scale: 0.95 }}
+                animate={{
+                  boxShadow: [
+                    "0 0 0px var(--color-primary-glow)",
+                    "0 0 20px var(--color-primary-glow)",
+                    "0 0 0px var(--color-primary-glow)",
+                  ],
+                }}
+                transition={{
+                  boxShadow: {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  },
+                }}
+                className="cursor-pointer px-8 py-2.5 rounded-full text-lg font-bold bg-[var(--color-accent)] text-[var(--color-accent-foreground)]"
+              >
+                무료로 써보기
+              </motion.div>
+            </Link>
           </motion.div>
         </div>
       </div>

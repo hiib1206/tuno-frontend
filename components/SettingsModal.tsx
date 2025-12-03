@@ -6,8 +6,7 @@ import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import { Sidebar, type MenuItem } from "@/components/settings/Sidebar";
 import { SubscriptionManagement } from "@/components/settings/SubscriptionManagement";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { useAuthStore } from "@/stores/authStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface SettingsModalProps {
   open: boolean;
@@ -16,19 +15,15 @@ interface SettingsModalProps {
 
 export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
   const [activeMenu, setActiveMenu] = useState<MenuItem>("profile");
-  const { me } = useAuthStore();
-
-  useEffect(() => {
-    if (open) {
-      me();
-    }
-  }, [open, me]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 max-w-3xl overflow-hidden h-[700px] top-[50%] translate-y-[-50%]">
+      <DialogContent
+        className="p-0 max-w-2xl overflow-hidden h-[700px] top-[50%] translate-y-[-50%]"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogTitle className="sr-only">설정</DialogTitle>
-        <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-[1fr_3fr] bg-background-sidebar">
+        <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-[1.1fr_3fr]">
           {/* Left Sidebar Navigation */}
           <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
 

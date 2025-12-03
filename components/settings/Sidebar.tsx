@@ -36,9 +36,9 @@ export function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
   ];
 
   return (
-    <div className="p-4">
+    <div className="py-4 px-2">
       {/* Mobile Dropdown Menu - visible on small screens */}
-      <div className="mb-4 lg:hidden">
+      <div className="lg:hidden">
         <Select
           value={activeMenu}
           onValueChange={(value) => setActiveMenu(value as MenuItem)}
@@ -65,17 +65,17 @@ export function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
       </div>
 
       {/* Desktop Menu Items - visible on large screens */}
-      <nav className="hidden space-y-1 lg:block">
+      <nav className="hidden lg:block">
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
             <button
               key={item.id}
               onClick={() => setActiveMenu(item.id)}
-              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+              className={`cursor-pointer flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors ${
                 activeMenu === item.id
-                  ? "bg-accent/10 text-accent"
-                  : "text-foreground hover:bg-accent-05 hover:text-foreground"
+                  ? "bg-background-subtle text-accent"
+                  : "text-foreground hover:bg-background-subtle"
               }`}
             >
               <Icon className="h-4 w-4" />

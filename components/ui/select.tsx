@@ -45,8 +45,7 @@ function SelectTrigger({
         "data-[placeholder]:text-muted-foreground",
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
         "hover:bg-input/50",
-        // ---- 포커스/상태 ----
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none",
+        // ---- 상태 ----
         "aria-invalid:ring-destructive-medium aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40",
         // ---- 크기 ----
         "data-[size=default]:h-9 data-[size=sm]:h-8",
@@ -61,11 +60,12 @@ function SelectTrigger({
         "transition-[color,box-shadow]",
         className
       )}
+      suppressHydrationWarning
       {...props}
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-6 opacity-100" />
+        <ChevronDownIcon className="ml-1 size-4 opacity-100" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -128,14 +128,14 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "focus:bg-muted/50 [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        " data-[state=checked]:text-accent-text focus:bg-muted/50 [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
       {...props}
     >
       <span className="absolute right-2 flex size-3.5 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <CheckIcon className="size-4" />
+          <CheckIcon className="size-4 text-accent-text" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

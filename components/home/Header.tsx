@@ -50,13 +50,12 @@ export default function Header() {
 
         {/* CTA Button */}
         <div className="hidden md:block">
-          <button
-            className="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300
-                     bg-[var(--color-accent)] text-[var(--color-accent-foreground)]
-                     hover:shadow-[0_0_20px_var(--color-primary-glow)] hover:scale-105 active:scale-95"
+          <Link
+            href="/analysis"
+            className="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 cursor-pointer bg-accent text-accent-foreground hover:bg-accent/90"
           >
             무료로 예측하기
-          </button>
+          </Link>
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -86,13 +85,13 @@ export default function Header() {
               {item}
             </Link>
           ))}
-          <button
-            className="w-full py-3 rounded-full font-semibold text-base
-                     bg-[var(--color-accent)] text-[var(--color-accent-foreground)]
-                     hover:shadow-[0_0_20px_var(--color-primary-glow)]"
+          <Link
+            href="/analysis"
+            className="w-full py-3 rounded-full font-semibold text-base text-center
+            cursor-pointer bg-accent text-accent-foreground"
           >
             무료로 예측하기
-          </button>
+          </Link>
         </motion.div>
       )}
     </header>
