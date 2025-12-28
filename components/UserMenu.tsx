@@ -23,6 +23,7 @@ export function UserMenu() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -30,7 +31,6 @@ export function UserMenu() {
 
   const handleLogout = () => {
     logout();
-    router.push("/");
   };
 
   if (!user) {
@@ -39,14 +39,20 @@ export function UserMenu() {
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild>
-          <button className="cursor-pointer flex items-center gap-2 hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1 transition-colors">
-            <ProfileAvatar size="sm" />
-            <span className="text-sm font-medium">{user.nick}</span>
+          <button className="cursor-pointer flex items-center hover:opacity-80 rounded-full transition-colors ">
+            <ProfileAvatar size="md" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuContent
+          align="end"
+          className="w-56"
+          onCloseAutoFocus={(event) => {
+            // Radix의 기본 포커스 복원 막기
+            event.preventDefault();
+          }}
+        >
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">{user.nick}</p>
@@ -59,25 +65,31 @@ export function UserMenu() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={() => setIsSettingsOpen(true)}
-            className="flex items-center group"
+            onClick={() => {
+              setIsDropdownOpen(false);
+              // 드롭다운 닫힘 애니메이션이 완료된 후 모달 열기
+              setTimeout(() => {
+                setIsSettingsOpen(true);
+              }, 200);
+            }} // 애니메이션 시간에 맞춰 조정 (보통 100-200ms)}}
+            className="flex items-center hover:text-accent"
           >
-            <Settings className="mr-2 h-4 w-4 group-hover:text-accent" />
+            <Settings className="mr-2 h-4 w-4" />
             <span>설정</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="flex items-center group"
+            className="flex items-center hover:text-accent"
           >
             {mounted && theme === "dark" ? (
               <>
-                <Sun className="mr-2 h-4 w-4 group-hover:text-accent" />
+                <Sun className="mr-2 h-4 w-4" />
                 <span>라이트 모드</span>
               </>
             ) : (
               <>
-                <Moon className="mr-2 h-4 w-4 group-hover:text-accent" />
+                <Moon className="mr-2 h-4 w-4" />
                 <span>다크 모드</span>
               </>
             )}
@@ -92,6 +104,7 @@ export function UserMenu() {
           </DropdownMenuItemDestructive>
         </DropdownMenuContent>
       </DropdownMenu>
+
       {isSettingsOpen && (
         <SettingsModal open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       )}

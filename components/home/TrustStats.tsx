@@ -54,7 +54,7 @@ function Counter({
   return (
     <span
       ref={nodeRef}
-      className="font-mono text-4xl md:text-6xl font-bold text-[var(--color-accent)]"
+      className="text-4xl md:text-6xl font-bold text-[var(--color-accent)]"
     >
       {prefix}
       {count.toLocaleString()}

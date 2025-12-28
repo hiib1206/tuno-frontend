@@ -1,18 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-sans: "Inter", "sans-serif";
-  --font-mono: "Geist Mono", "monospace";
+  --font-sans: var(--font-instrument-sans), "sans-serif";
 
   /* Light Mode Colors */
   --background: oklch(1 0 0);
-  --background-subtle: oklch(0.98 0.005 250);
+  --background-1: oklch(1 0 0);
+  --background-2: oklch(0.98 0 0);
+  --background-3: oklch(0.98 0.01 130);
   --foreground: oklch(0.15 0 0);
+  --foreground-white: oklch(98 0 0);
 
-  --card: oklch(1 0 0);
+  --card: oklch(0.98 0 0);
   --card-foreground: oklch(0.15 0 0);
 
   --popover: oklch(1 0 0);
@@ -25,13 +28,16 @@
   --secondary-foreground: oklch(0.205 0 0);
 
   --muted: oklch(0.96 0 0);
+  --muted-2: oklch(0.98 0 0);
+  --muted-3: oklch(0.92 0 0);
+  --muted-4: oklch(0.8 0 0);
   --muted-foreground: oklch(0.5 0 0);
 
   /* Brand Accent */
-  --accent: oklch(0.7 0.18 149.7);
+  --accent: oklch(0.65 0.2 149.7);
   --accent-foreground: oklch(0.96 0 0);
-  --accent-text: oklch(0.68 0.18 149.7);
-  --accent-hover: oklch(0.75 0.18 149.7);
+  --accent-text: oklch(0.65 0.18 149.7);
+  --accent-hover: oklch(0.7 0.18 149.7);
   --accent-05: oklch(0.7 0.18 149.7 / 0.05);
   --accent-10: oklch(0.7 0.18 149.7 / 0.1);
   --accent-20: oklch(0.7 0.18 149.7 / 0.2);
@@ -40,6 +46,7 @@
   --destructive-foreground: oklch(0.99 0 0);
 
   --border: oklch(0.8 0 0);
+  --border-2: oklch(0.9 0 0);
   --input: oklch(0.9 0 0);
   --ring: oklch(0.4 0 0 / 0.5);
 
@@ -54,23 +61,22 @@
 
   --sidebar: oklch(0.95 0 260);
   --sidebar-foreground: oklch(0.15 0 0);
-  --sidebar-primary: oklch(0.7 0.18 149.7);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.15 0 0);
-  --sidebar-border: oklch(0.92 0 0);
+  --sidebar-border: oklch(0.9 0 0);
 }
 
 .dark {
   /* Dark Mode Colors */
   --background: oklch(0.12 0 0);
-  --background-subtle: oklch(0.18 0 0);
+  --background-1: oklch(0.25 0 0);
+  --background-2: oklch(0.22 0 0);
+  --background-3: oklch(0.18 0 0);
   --foreground: oklch(0.98 0 0);
+  --foreground-white: oklch(0.98 0 0);
 
-  --card: oklch(0.12 0 0);
+  --card: oklch(0.22 0 0);
   --card-foreground: oklch(0.98 0 0);
 
-  --popover: oklch(0.15 0 0);
+  --popover: oklch(0.22 0 0);
   --popover-foreground: oklch(0.98 0 0);
 
   --primary: oklch(0.98 0 0);
@@ -80,13 +86,16 @@
   --secondary-foreground: oklch(0.98 0 0);
 
   --muted: oklch(0.22 0 0);
+  --muted-2: oklch(0.22 0 0);
+  --muted-3: oklch(0.24 0 0);
+  --muted-4: oklch(0.3 0 0);
   --muted-foreground: oklch(0.65 0 0);
 
   /* Brand Accent */
-  --accent: oklch(0.7 0.18 149.7);
+  --accent: oklch(0.72 0.22 150);
   --accent-foreground: oklch(0.12 0 0);
-  --accent-text: oklch(0.7 0.18 149.7);
-  --accent-hover: oklch(0.8 0.18 149.7);
+  --accent-text: oklch(0.65 0.18 150);
+  --accent-hover: oklch(0.8 0.25 150);
   --accent-05: oklch(0.7 0.18 149.7 / 0.05);
   --accent-10: oklch(0.7 0.18 149.7 / 0.1);
   --accent-20: oklch(0.7 0.18 149.7 / 0.2);
@@ -94,8 +103,9 @@
   --destructive: oklch(0.65 0.25 25.331);
   --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.25 0 0);
+  --border: oklch(0.35 0 0);
+  --border-2: oklch(0.35 0 0);
+  --input: oklch(0.35 0 0);
   --ring: oklch(0.9 0 0);
 
   /* Chart Colors */
@@ -107,20 +117,18 @@
 
   --sidebar: oklch(0.12 0 0);
   --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.7 0.18 149.7);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.22 0 0);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
   --sidebar-border: oklch(0.25 0 0);
 }
 
 @theme inline {
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
 
   --color-background: var(--background);
-  --color-background-subtle: var(--background-subtle);
+  --color-background-1: var(--background-1);
+  --color-background-2: var(--background-2);
+  --color-background-3: var(--background-3);
   --color-foreground: var(--foreground);
+  --color-foreground-white: var(--foreground-white);
 
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -135,9 +143,13 @@
   --color-secondary-foreground: var(--secondary-foreground);
 
   --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
+  --color-muted-3: var(--muted-3);
+  --color-muted-4: var(--muted-4);
   --color-muted-foreground: var(--muted-foreground);
 
   --color-accent: var(--accent);
+  --color-accent-background: var(--accent-background);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-text: var(--accent-text);
   --color-accent-hover: var(--accent-hover);
@@ -149,6 +161,7 @@
   --color-destructive-foreground: var(--destructive-foreground);
 
   --color-border: var(--border);
+  --color-border-2: var(--border-2);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
@@ -165,10 +178,6 @@
 
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
 }
 
@@ -188,11 +197,158 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply font-sans bg-background text-foreground;
+  }
+
+  /* Search input clear button 숨기기 - 모든 브라우저 */
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-decoration {
+    display: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type="search"]::-moz-search-clear-button {
+    display: none;
   }
 }
 
 html {
   /* 스크롤 시 부드럽게 이동 #features 이런거 할때 쓰는거 */
   scroll-behavior: smooth;
+}
+
+.prose * {
+  margin: 0;
+  color: var(--foreground);
+}
+
+/* Tiptap Image Resize Styles */
+.image-resize-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 0.5rem 0;
+}
+
+.image-resize-wrapper.selected {
+  outline: 2px solid var(--accent);
+}
+
+.image-resize-wrapper.resizing {
+  user-select: none;
+}
+
+.image-resize-wrapper .resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: var(--accent);
+  border-radius: 2px;
+  z-index: 10;
+}
+
+.resize-handle-top-left {
+  top: -6px;
+  left: -6px;
+  cursor: nwse-resize;
+}
+
+.resize-handle-top-right {
+  top: -6px;
+  right: -6px;
+  cursor: nesw-resize;
+}
+
+.resize-handle-bottom-left {
+  bottom: -6px;
+  left: -6px;
+  cursor: nesw-resize;
+}
+
+.resize-handle-bottom-right {
+  bottom: -6px;
+  right: -6px;
+  cursor: nwse-resize;
+}
+
+.image-resize-wrapper .resize-handle:hover {
+  background-color: var(--accent-hover);
+}
+
+/* Tiptap YouTube Styles */
+.youtube-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 1rem auto;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+}
+
+.youtube-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.youtube-resize-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 0.5rem 0;
+}
+
+.youtube-resize-wrapper.selected {
+  outline: 2px solid var(--accent);
+}
+
+/* ================================
+Skeleton Gradient Animation
+   ================================ */
+@keyframes gradient-slide {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-gradient {
+  background: linear-gradient(
+    90deg,
+    var(--muted-3) 0%,
+    var(--muted) 50%,
+    var(--muted-3) 100%
+  );
+  background-size: 200% 100%;
+  animation: gradient-slide 2s ease-in-out infinite;
+}
+
+/* ================================
+Accordion Animation
+   ================================ */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+.animate-accordion-down {
+  animation: accordion-down 0.2s ease-out;
+}
+.animate-accordion-up {
+  animation: accordion-up 0.2s ease-out;
 }

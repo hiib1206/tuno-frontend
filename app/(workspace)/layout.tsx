@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Sidebar } from "@/components/workspace/sidebar";
-import { useAuthStore } from "@/stores/authStore";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -11,13 +11,9 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { me } = useAuthStore();
+  useRequireAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    me();
-  }, []);
 
   // 화면 크기 감지 및 반응형 처리
   useEffect(() => {
@@ -51,7 +47,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="flex h-screen w-full bg-background-subtle overflow-hidden relative">
+    <div className="flex h-screen w-full bg-background-1 overflow-hidden relative">
       {/* 모바일 오버레이 */}
       {isMobile && isSidebarOpen && (
         <div

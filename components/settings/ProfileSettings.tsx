@@ -314,7 +314,7 @@ export function ProfileSettings() {
         <div className="space-y-2">
           <Label htmlFor="nick">닉네임</Label>
           <div className="flex flex-col gap-2 lg:flex-row">
-            <div className="relative w-full lg:w-1/2">
+            <div className="relative w-full">
               <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="nick"
@@ -413,7 +413,7 @@ export function ProfileSettings() {
           </Label>
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2 lg:flex-row">
-              <div className="relative w-full lg:w-1/2">
+              <div className="relative w-full">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
@@ -511,7 +511,7 @@ export function ProfileSettings() {
                   </p>
                 )}
                 <div className="flex flex-col gap-2 lg:flex-row">
-                  <div className="relative w-full lg:w-1/2">
+                  <div className="relative w-full">
                     <Input
                       type="text"
                       value={verificationCode}
@@ -521,10 +521,10 @@ export function ProfileSettings() {
                           setVerificationCode(value);
                         }
                       }}
-                      placeholder="6자리 인증 코드를 입력하세요"
+                      placeholder="6자리 인증 코드를 입력하세요."
                       className={cn(
-                        "pr-32",
-                        remainingTime !== null && remainingTime <= 60 && "pr-36"
+                        "pr-30",
+                        remainingTime !== null && remainingTime <= 60 && "pr-30"
                       )}
                       maxLength={6}
                       inputMode="numeric"
@@ -570,7 +570,7 @@ export function ProfileSettings() {
         <div className="space-y-2">
           <Label htmlFor="phone">전화번호</Label>
           <div className="flex flex-col gap-2 lg:flex-row">
-            <div className="relative w-full lg:w-1/2">
+            <div className="relative w-full">
               <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="phone"

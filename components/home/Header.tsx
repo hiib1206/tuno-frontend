@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandText } from "@/components/ui/BrandText";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
@@ -27,12 +28,8 @@ export default function Header() {
     >
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
-        <Link
-          href="/"
-          className="text-2xl font-bold tracking-tighter flex items-center gap-2"
-        >
-          <span className="text-foreground">Prophet</span>
-          <span className="text-[var(--color-accent)]">AI</span>
+        <Link href="/" className="text-2xl">
+          <BrandText>Tuno</BrandText>
         </Link>
 
         {/* Desktop Nav */}
@@ -47,16 +44,6 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-
-        {/* CTA Button */}
-        <div className="hidden md:block">
-          <Link
-            href="/analysis"
-            className="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 cursor-pointer bg-accent text-accent-foreground hover:bg-accent/90"
-          >
-            무료로 예측하기
-          </Link>
-        </div>
 
         {/* Mobile Menu Toggle */}
         <button
@@ -85,13 +72,6 @@ export default function Header() {
               {item}
             </Link>
           ))}
-          <Link
-            href="/analysis"
-            className="w-full py-3 rounded-full font-semibold text-base text-center
-            cursor-pointer bg-accent text-accent-foreground"
-          >
-            무료로 예측하기
-          </Link>
         </motion.div>
       )}
     </header>

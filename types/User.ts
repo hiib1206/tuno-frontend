@@ -102,10 +102,12 @@ export class User {
     };
   }
 
+  // JSON 문자열을 User 객체로 변환
   static fromJson(json: string): User {
     return User.fromMap(JSON.parse(json));
   }
 
+  // User 객체를 JSON 문자열로 변환
   toJson(): string {
     return JSON.stringify(this.toMap());
   }

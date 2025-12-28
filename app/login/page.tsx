@@ -1,34 +1,71 @@
 "use client";
 
+import { BrandText } from "@/components/ui/BrandText";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getOrCreateDeviceId, getRedirectUrl, withRedirect } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { ArrowLeft, LogIn } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const login = useAuthStore((state) => state.login);
   const [username, setUsername] = useState("");
   const [pw, setPw] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [rememberId, setRememberId] = useState(false);
+  const [showOAuthErrorModal, setShowOAuthErrorModal] = useState(false);
 
   // 저장된 아이디 불러오기
   useEffect(() => {
-    const savedUsername = localStorage.getItem("savedUsername");
+    const savedUsername = localStorage.getItem("saved-username");
     if (savedUsername) {
       setUsername(savedUsername);
       setRememberId(true);
     }
   }, []);
+
+  // OAuth 콜백 처리
+  useEffect(() => {
+    const oauthCallback = searchParams.get("oauth_success");
+    const oauthError = searchParams.get("error");
+
+    // OAuth 실패 처리
+    if (oauthError) {
+      setShowOAuthErrorModal(true);
+      // URL에서 error 파라미터만 제거 (컴포넌트 리렌더링 없이)
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("error");
+        window.history.replaceState({}, "", url.toString());
+      }
+      return;
+    }
+
+    // OAuth 성공 처리
+    if (oauthCallback === "true") {
+      const redirect = getRedirectUrl(searchParams);
+      const redirectPath = redirect || "/";
+      router.push(redirectPath);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,11 +77,13 @@ export default function LoginPage() {
       if (success) {
         // 아이디 저장 처리
         if (rememberId) {
-          localStorage.setItem("savedUsername", username);
+          localStorage.setItem("saved-username", username);
         } else {
-          localStorage.removeItem("savedUsername");
+          localStorage.removeItem("saved-username");
         }
-        router.push("/analysis");
+        const redirect = getRedirectUrl(searchParams);
+        const redirectPath = redirect || "/";
+        router.push(redirectPath);
       } else {
         setError("로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
       }
@@ -60,8 +99,58 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    const deviceId = getOrCreateDeviceId();
+    const redirectUrl = getRedirectUrl(searchParams);
+    const redirectParam = encodeURIComponent(redirectUrl || "");
+
+    const params = new URLSearchParams();
+    if (deviceId) {
+      params.append("deviceId", deviceId);
+    }
+    if (redirectUrl) {
+      params.append("redirect", redirectParam);
+    }
+    const queryString = params.toString();
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google${
+      queryString ? `?${queryString}` : ""
+    }`;
+  };
+
+  const handleNaverLogin = async () => {
+    const deviceId = getOrCreateDeviceId();
+    const redirect = getRedirectUrl(searchParams);
+    const params = new URLSearchParams();
+    if (deviceId) {
+      params.append("deviceId", deviceId);
+    }
+    if (redirect) {
+      params.append("redirect", redirect);
+    }
+    const queryString = params.toString();
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/naver${
+      queryString ? `?${queryString}` : ""
+    }`;
+  };
+
+  const handleKakaoLogin = async () => {
+    const deviceId = getOrCreateDeviceId();
+    const redirect = getRedirectUrl(searchParams);
+    const params = new URLSearchParams();
+    if (deviceId) {
+      params.append("deviceId", deviceId);
+    }
+    if (redirect) {
+      params.append("redirect", redirect);
+    }
+    const queryString = params.toString();
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/kakao${
+      queryString ? `?${queryString}` : ""
+    }`;
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background-2 p-4">
       <div className="w-full max-w-md">
         {/* Back to Home */}
         <Link
@@ -72,15 +161,17 @@ export default function LoginPage() {
           홈으로 돌아가기
         </Link>
 
-        <Card className="p-8">
+        <Card className="p-8 border-none bg-background-1">
           {/* Logo */}
-          <div className="mb-8 flex items-center justify-center gap-2">
-            <span className="text-2xl font-semibold">앱 이름뭐로하징</span>
+          <div className="mb-8 flex items-center justify-center">
+            <BrandText className="text-3xl">Tuno</BrandText>
           </div>
 
           <div className="mb-4 text-center">
             <h1 className="mb-2 text-2xl font-bold">로그인</h1>
-            <p className="text-sm text-muted-foreground">뭐라고 적징.</p>
+            <p className="text-sm text-muted-foreground">
+              Tuno의 강력한 투자 분석 도구를 사용해보세요
+            </p>
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -144,12 +235,14 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="mt-4 w-full rounded bg-accent text-accent-foreground hover:bg-accent/90"
+              className="group mt-4 w-full rounded bg-accent text-accent-foreground hover:bg-accent/90 hover:scale-100 transition-all duration-300"
               disabled={isLoading}
               tabIndex={3}
             >
-              <LogIn className="mr-2 h-4 w-4" />
-              {isLoading ? "로그인 중..." : "로그인"}
+              <div className="group-hover:scale-110 transition-all duration-300 flex items-center justify-center">
+                <LogIn className="mr-2 h-4 w-4" />
+                {isLoading ? "로그인 중..." : "로그인"}
+              </div>
             </Button>
           </form>
 
@@ -158,7 +251,9 @@ export default function LoginPage() {
               <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-card px-2 text-muted-foreground">또는</span>
+              <span className="bg-background-1 px-2 text-muted-foreground">
+                또는
+              </span>
             </div>
           </div>
 
@@ -168,10 +263,7 @@ export default function LoginPage() {
               variant="login"
               className="h-12 w-12 rounded-full p-0 relative"
               type="button"
-              onClick={() => {
-                // Google 로그인 로직 추가
-                console.log("Google 로그인");
-              }}
+              onClick={handleGoogleLogin}
               aria-label="Google로 로그인"
             >
               <Image
@@ -187,10 +279,7 @@ export default function LoginPage() {
               variant="login"
               className="h-12 w-12 rounded-full p-0 relative"
               type="button"
-              onClick={() => {
-                // Naver 로그인 로직 추가
-                console.log("Naver 로그인");
-              }}
+              onClick={handleNaverLogin}
               aria-label="네이버로 로그인"
             >
               <Image
@@ -206,14 +295,11 @@ export default function LoginPage() {
               variant="login"
               className="h-12 w-12 rounded-full p-0 relative"
               type="button"
-              onClick={() => {
-                // Kakao 로그인 로직 추가
-                console.log("Kakao 로그인");
-              }}
+              onClick={handleKakaoLogin}
               aria-label="카카오로 로그인"
             >
               <Image
-                src="/icons/login-btn-kakao.png"
+                src="/icons/login-btn-kakao.svg"
                 alt="Kakao 로그인"
                 fill
                 className="rounded-full object-contain"
@@ -224,7 +310,7 @@ export default function LoginPage() {
           <p className="mt-6 text-center text-sm text-muted-foreground">
             계정이 없으신가요?{" "}
             <Link
-              href="/signup"
+              href={withRedirect("/signup", getRedirectUrl(searchParams))}
               className="font-semibold text-accent hover:underline"
             >
               회원가입
@@ -243,6 +329,31 @@ export default function LoginPage() {
           </Link>
           에 동의하는 것으로 간주됩니다.
         </p>
+
+        {/* OAuth 에러 모달 */}
+        <Dialog
+          open={showOAuthErrorModal}
+          onOpenChange={setShowOAuthErrorModal}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl">
+                소셜 로그인 실패
+              </DialogTitle>
+              <DialogDescription>
+                소셜 로그인에 실패했습니다. 다시 시도해주세요.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                onClick={() => setShowOAuthErrorModal(false)}
+                className="w-full sm:w-auto"
+              >
+                확인
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

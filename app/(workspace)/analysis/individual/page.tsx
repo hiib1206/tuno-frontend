@@ -180,8 +180,8 @@ export default function AnalysisPage() {
 
           {/* AI 모델 선택 */}
           <Card className="col-span-2 p-7 rounded-3xl border-none flex flex-col">
-            <h2 className="text-xl font-semibold">AI 모델 선택</h2>
-            <div className="space-y-3">
+            <div className="flex items-center gap-4">
+              <h2 className="text-xl font-semibold">AI 모델 </h2>
               <Select value={selectedModel} onValueChange={setSelectedModel}>
                 <SelectTrigger className="rounded">
                   <SelectValue placeholder="모델 선택" />
@@ -198,15 +198,15 @@ export default function AnalysisPage() {
                   </SelectItem>
                 </SelectContent>
               </Select>
+            </div>
 
-              <div className="p-1">
-                <h3 className="font-semibold text-foreground mb-1">
-                  {aiModels[selectedModel as keyof typeof aiModels].name}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {aiModels[selectedModel as keyof typeof aiModels].description}
-                </p>
-              </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">
+                {aiModels[selectedModel as keyof typeof aiModels].name}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {aiModels[selectedModel as keyof typeof aiModels].description}
+              </p>
             </div>
 
             {/* 분석 시작 버튼 */}

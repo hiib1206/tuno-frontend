@@ -62,15 +62,7 @@ export function ProfileAvatar({
     <Avatar className={cn(sizeClasses[size], className)}>
       <AvatarImage
         className={cn("object-cover", textSizes[effectiveTextSize])}
-        src={
-          user.profileImageUrl
-            ? `${user.profileImageUrl}${
-                user.profileImageUpdatedAt
-                  ? `?t=${user.profileImageUpdatedAt.getTime()}`
-                  : ""
-              }`
-            : undefined
-        }
+        src={user.profileImageUrl ? `${user.profileImageUrl}` : undefined}
         alt="프로필"
       />
       {showFallback && (

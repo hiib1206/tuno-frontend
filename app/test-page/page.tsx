@@ -7,11 +7,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserMenu } from "@/components/UserMenu";
 import { toast } from "@/hooks/useToast";
 import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function TestPage() {
   const { user, me } = useAuthStore();
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      const confirmLeave = confirm("정말 나가시겠습니까?");
+      if (!confirmLeave) {
+        e.preventDefault();
+        e.returnValue = ""; // 일부 브라우저에서 필요
+        return "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [router]);
 
   // 마운트 시 me() 호출
   useEffect(() => {

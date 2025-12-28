@@ -5,30 +5,21 @@ import Link from "next/link";
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 bg-background">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Content */}
-      <div className="container mx-auto px-6 relative z-10 grid md:grid-cols-2 gap-12 items-center">
+      <div className="container mx-auto relative z-10 grid gap-12 items-center">
         <div className="text-left">
           <motion.h1
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="text-5xl md:text-7xl font-bold leading-tight mb-6"
+            className="text-5xl md:text-6xl font-bold leading-snug mb-6"
           >
-            과거의 데이터로,
+            앞서가는 투자의 길
             <br />
-            <span className="text-[var(--color-accent)]">미래의 부</span>를
-            예측하다.
+            <span className="text-[var(--color-accent)]">앱 이름 </span>이
+            함께합니다
           </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-            className="text-xl text-muted-foreground mb-8 max-w-lg"
-          >
-            Prophet AI는 과거 투자 데이터를 학습해 다음 수익 기회를 예측합니다.
-            지금 바로 AI가 분석한 시장의 흐름을 확인하세요.
-          </motion.p>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -57,15 +48,12 @@ export default function HeroSection() {
                 }}
                 className="cursor-pointer px-8 py-2.5 rounded-full text-lg font-bold bg-[var(--color-accent)] text-[var(--color-accent-foreground)]"
               >
-                무료로 써보기
+                투자 분석 하기
               </motion.div>
             </Link>
           </motion.div>
         </div>
       </div>
-
-      {/* Gradient Overlay for better text readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent z-0 pointer-events-none" />
     </section>
   );
 }

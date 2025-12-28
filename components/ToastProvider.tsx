@@ -197,13 +197,39 @@ function useToast() {
 function Toaster() {
   const { toasts } = useToast();
 
+  // variant에 따른 기본 title 매핑
+  const getDefaultTitle = (variant?: string | null) => {
+    switch (variant) {
+      case "success":
+        return "성공 알림";
+      case "warning":
+        return "경고 알림";
+      case "info":
+        return "정보 알림";
+      case "destructive":
+        return "오류 알림";
+      default:
+        return "알림";
+    }
+  };
+
   return (
     <ToastProviderPrimitive>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
+      {toasts.map(function ({
+        id,
+        title,
+        description,
+        action,
+        variant,
+        ...props
+      }) {
+        // title이 없으면 variant에 따라 기본값 사용
+        const displayTitle = title || getDefaultTitle(variant);
+
         return (
-          <Toast key={id} {...props}>
+          <Toast key={id} {...props} variant={variant}>
             <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
+              {displayTitle && <ToastTitle>{displayTitle}</ToastTitle>}
               {description && (
                 <ToastDescription>{description}</ToastDescription>
               )}

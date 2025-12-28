@@ -23,7 +23,7 @@ export default function MarqueeTicker() {
             (item, idx) => (
               <div
                 key={`${item.symbol}-${idx}`}
-                className="flex items-center gap-2 text-sm font-mono"
+                className="flex items-center gap-2 text-sm"
               >
                 <span className="font-bold text-foreground">{item.symbol}</span>
                 <span className="text-muted-foreground">{item.value}</span>

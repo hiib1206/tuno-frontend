@@ -1,5 +1,18 @@
 import apiClient from "./apiClient";
 
+// getCommunityStats 응답 타입
+export interface CommunityStatsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    stats: {
+      postCount: number;
+      commentCount: number;
+      likeCount: number;
+    };
+  };
+}
+
 const userApi = {
   // 내 정보 조회
   me: async (options?: { skipRedirect?: boolean }) => {
@@ -67,6 +80,11 @@ const userApi = {
       currentPassword,
       newPassword,
     });
+    return response.data;
+  },
+  // 커뮤니티 통계 조회
+  getCommunityStats: async (): Promise<CommunityStatsResponse> => {
+    const response = await apiClient.get("/api/user/community/stats");
     return response.data;
   },
 };

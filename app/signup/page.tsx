@@ -2,6 +2,7 @@
 
 import authApi from "@/api/authApi";
 import userApi from "@/api/userApi";
+import { BrandText } from "@/components/ui/BrandText";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,25 +10,29 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNicknameCheck } from "@/hooks/useNicknameCheck";
+import { getRedirectUrl, withRedirect } from "@/lib/utils";
 import {
   ArrowLeft,
   CheckCircle2,
   Loader2,
+  UserCheck,
   UserPlus,
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [username, setUsername] = useState("");
   const [nick, setNick] = useState("");
   const [pw, setPw] = useState("");
@@ -36,6 +41,12 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  // 약관 동의 모달 온 오프프
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  // 약관 동의 모달 내부 탭 상태
+  const [activeTab, setActiveTab] = useState<"terms" | "privacy">("terms");
+  // 약관 동의 모달 내부 동의 상태
+  const [modalAgreed, setModalAgreed] = useState(false);
 
   // 중복 체크 상태
   const [usernameStatus, setUsernameStatus] = useState<
@@ -138,10 +149,14 @@ export default function SignupPage() {
       // 2초 후 모달 닫고 로그인 페이지로 이동
       setTimeout(() => {
         setSuccess(false);
-        router.push("/login");
+        const redirect = getRedirectUrl(searchParams);
+        router.push(withRedirect("/login", redirect));
       }, 2000);
     } catch (err: any) {
-      if (err.response?.data?.success === false) {
+      if (
+        err.response?.data?.success === false ||
+        err.response?.status === 400
+      ) {
         setError(err.response.data.message);
       } else {
         console.log(err);
@@ -152,7 +167,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="bg-background-2 flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md">
         {/* Back to Home */}
         <Link
@@ -163,36 +178,21 @@ export default function SignupPage() {
           홈으로 돌아가기
         </Link>
 
-        <Card className="p-8 border-">
+        <Card className="p-8 border-none bg-background-1">
           {/* Logo */}
-          <div className="mb-8 flex items-center justify-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <svg
-                className="h-6 w-6 text-primary-foreground"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                />
-              </svg>
-            </div>
-            <span className="text-2xl font-semibold">InvestAI</span>
+          <div className="mb-8 flex items-center justify-center">
+            <BrandText className="text-3xl">Tuno</BrandText>
           </div>
 
           <div className="mb-8 text-center">
             <h1 className="mb-2 text-2xl font-bold">회원가입</h1>
             <p className="text-sm text-muted-foreground">
-              14일 무료 체험을 시작하세요
+              Tuno의 회원이 되어 다양한 서비스를 이용해보세요
             </p>
           </div>
 
           {error && (
-            <div className="mb-4 rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="mb-4 rounded bg-destructive/10 p-3 text-sm text-destructive">
               {error}
             </div>
           )}
@@ -211,7 +211,7 @@ export default function SignupPage() {
                   required
                   disabled={isLoading || success}
                   className={
-                    "rounded " +
+                    "focus-visible:ring-0 rounded " +
                     (usernameStatus === "unavailable"
                       ? "border-destructive pr-10"
                       : usernameStatus === "available"
@@ -257,7 +257,7 @@ export default function SignupPage() {
                   required
                   disabled={isLoading || success}
                   className={
-                    "rounded " +
+                    "rounded focus-visible:ring-0 " +
                     (nickStatus === "unavailable"
                       ? "border-destructive pr-10"
                       : nickStatus === "available"
@@ -301,7 +301,7 @@ export default function SignupPage() {
                 autoComplete="new-password"
                 required
                 disabled={isLoading}
-                className="rounded"
+                className="rounded focus-visible:ring-0"
               />
               <p className="text-xs text-muted-foreground">
                 나중에 추가. 최소 8자 이상, 영문, 숫자, 특수문자 포함.
@@ -321,7 +321,7 @@ export default function SignupPage() {
                   required
                   disabled={isLoading || success}
                   className={
-                    "rounded " +
+                    "rounded focus-visible:ring-0 " +
                     (passwordMatchStatus === "mismatch"
                       ? "border-destructive pr-10"
                       : passwordMatchStatus === "match"
@@ -351,41 +351,36 @@ export default function SignupPage() {
               )}
             </div>
 
-            <div className="flex items-start gap-2">
+            <div className="mt-10 flex items-start gap-2">
               <Checkbox
                 id="terms"
                 className="mt-1"
                 checked={termsAgreed}
-                onCheckedChange={(checked) => setTermsAgreed(checked === true)}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setTermsModalOpen(true);
+                  } else {
+                    setTermsAgreed(false);
+                  }
+                }}
               />
               <Label
                 htmlFor="terms"
-                className="text-sm font-normal leading-relaxed"
+                className="text-sm font-normal leading-relaxed cursor-pointer"
+                onClick={() => {
+                  if (!termsAgreed) {
+                    setTermsModalOpen(true);
+                  }
+                }}
               >
-                <Link
-                  href="/terms"
-                  className="font-medium text-accent hover:underline"
-                >
+                <span className="font-medium text-accent hover:underline">
                   이용약관
-                </Link>{" "}
+                </span>{" "}
                 및{" "}
-                <Link
-                  href="/privacy"
-                  className="font-medium text-accent hover:underline"
-                >
+                <span className="font-medium text-accent hover:underline">
                   개인정보처리방침
-                </Link>
+                </span>
                 에 동의합니다
-              </Label>
-            </div>
-
-            <div className="flex items-start gap-2">
-              <Checkbox id="marketing" className="mt-1" />
-              <Label
-                htmlFor="marketing"
-                className="text-sm font-normal leading-relaxed text-muted-foreground"
-              >
-                마케팅 정보 수신에 동의합니다 (선택)
               </Label>
             </div>
 
@@ -414,43 +409,10 @@ export default function SignupPage() {
             </Button>
           </form>
 
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-card px-2 text-muted-foreground">또는</span>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <Button variant="outline" className="w-full" type="button">
-              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              Google로 가입하기
-            </Button>
-          </div>
-
           <p className="mt-6 text-center text-sm text-muted-foreground">
             이미 계정이 있으신가요?{" "}
             <Link
-              href="/login"
+              href={withRedirect("/login", getRedirectUrl(searchParams))}
               className="font-semibold text-accent hover:underline"
             >
               로그인
@@ -459,13 +421,419 @@ export default function SignupPage() {
         </Card>
       </div>
 
+      {/* 약관 동의 모달 */}
+      <Dialog
+        open={termsModalOpen}
+        onOpenChange={(open) => {
+          setTermsModalOpen(open);
+          if (!open) {
+            // 모달이 닫힐 때 상태 초기화
+            setModalAgreed(false);
+            setActiveTab("terms");
+          }
+        }}
+      >
+        <DialogContent className="bg-background-1 border-none sm:max-w-2xl max-h-[85vh] flex flex-col top-[50%] translate-y-[-50%]">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl mb-3">
+              이용약관 및 개인정보처리방침
+            </DialogTitle>
+            <DialogDescription className="text-center text-sm text-muted-foreground">
+              아래 내용을 확인하시고 동의해주세요.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* 탭 */}
+          <div className="flex border-b border-border">
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("terms");
+                setModalAgreed(false);
+              }}
+              className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === "terms"
+                  ? "border-b-2 border-accent text-accent"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              이용약관
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("privacy");
+                setModalAgreed(false);
+              }}
+              className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === "privacy"
+                  ? "border-b-2 border-accent text-accent"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              개인정보처리방침
+            </button>
+          </div>
+
+          {/* 약관 내용 */}
+          <div className="flex-1 overflow-y-auto mt-4 pr-2">
+            <div className="text-sm text-foreground space-y-4">
+              {activeTab === "terms" ? (
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-base">제1조 (목적)</h3>
+                  <p>
+                    본 약관은 Tuno(이하 "회사")가 제공하는 서비스의 이용과
+                    관련하여 회사와 이용자 간의 권리, 의무 및 책임사항, 기타
+                    필요한 사항을 규정함을 목적으로 합니다.
+                  </p>
+
+                  <h3 className="font-semibold text-base">제2조 (정의)</h3>
+                  <p>
+                    1. "서비스"란 회사가 제공하는 AI 기반 주식 투자 분석 및 관련
+                    서비스를 의미합니다.
+                  </p>
+                  <p>
+                    2. "이용자"란 본 약관에 동의하고 회사가 제공하는 서비스를
+                    이용하는 회원 및 비회원을 의미합니다.
+                  </p>
+                  <p>
+                    3. "회원"이란 회사에 개인정보를 제공하여 회원등록을 한
+                    자로서, 회사의 정보를 지속적으로 제공받으며, 회사가 제공하는
+                    서비스를 계속적으로 이용할 수 있는 자를 의미합니다.
+                  </p>
+
+                  <h3 className="font-semibold text-base">
+                    제3조 (약관의 게시와 개정)
+                  </h3>
+                  <p>
+                    1. 회사는 본 약관의 내용을 이용자가 쉽게 알 수 있도록 서비스
+                    초기 화면에 게시합니다.
+                  </p>
+                  <p>
+                    2. 회사는 필요한 경우 관련 법령을 위배하지 않는 범위에서 본
+                    약관을 개정할 수 있습니다.
+                  </p>
+                  <p>
+                    3. 회사가 약관을 개정할 경우에는 적용일자 및 개정사유를
+                    명시하여 현행약관과 함께 서비스의 초기화면에 그 적용일자 7일
+                    이전부터 적용일자 전일까지 공지합니다.
+                  </p>
+
+                  <h3 className="font-semibold text-base">
+                    제4조 (서비스의 제공 및 변경)
+                  </h3>
+                  <p>1. 회사는 다음과 같은 서비스를 제공합니다:</p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>AI 기반 주식 분석 및 예측 서비스</li>
+                    <li>투자 포트폴리오 관리 서비스</li>
+                    <li>시장 동향 및 뉴스 제공 서비스</li>
+                    <li>
+                      기타 회사가 추가 개발하거나 제휴계약 등을 통해 이용자에게
+                      제공하는 일체의 서비스
+                    </li>
+                  </ul>
+                  <p>
+                    2. 회사는 서비스의 내용을 변경할 수 있으며, 변경 시에는
+                    사전에 공지합니다.
+                  </p>
+
+                  <h3 className="font-semibold text-base">
+                    제5조 (서비스의 중단)
+                  </h3>
+                  <p>
+                    1. 회사는 컴퓨터 등 정보통신설비의 보수점검, 교체 및 고장,
+                    통신의 두절 등의 사유가 발생한 경우에는 서비스의 제공을
+                    일시적으로 중단할 수 있습니다.
+                  </p>
+                  <p>
+                    2. 회사는 제1항의 사유로 서비스의 제공이 일시적으로
+                    중단됨으로 인하여 이용자 또는 제3자가 입은 손해에 대하여
+                    배상합니다. 단, 회사가 고의 또는 과실이 없음을 입증하는
+                    경우에는 그러하지 아니합니다.
+                  </p>
+
+                  <h3 className="font-semibold text-base">제6조 (회원가입)</h3>
+                  <p>
+                    1. 이용자는 회사가 정한 가입 양식에 따라 회원정보를 기입한
+                    후 본 약관에 동의한다는 의사표시를 함으로서 회원가입을
+                    신청합니다.
+                  </p>
+                  <p>
+                    2. 회사는 제1항과 같이 회원가입을 신청한 이용자 중 다음 각
+                    호에 해당하지 않는 한 회원으로 등록합니다:
+                  </p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>
+                      가입신청자가 이전에 회원자격을 상실한 적이 있는 경우
+                    </li>
+                    <li>등록 내용에 허위, 기재누락, 오기가 있는 경우</li>
+                    <li>
+                      기타 회원으로 등록하는 것이 회사의 기술상 현저히 지장이
+                      있다고 판단되는 경우
+                    </li>
+                  </ul>
+
+                  <h3 className="font-semibold text-base">
+                    제7조 (회원 탈퇴 및 자격 상실 등)
+                  </h3>
+                  <p>
+                    1. 회원은 회사에 언제든지 탈퇴를 요청할 수 있으며 회사는
+                    즉시 회원탈퇴를 처리합니다.
+                  </p>
+                  <p>
+                    2. 회원이 다음 각 호의 사유에 해당하는 경우, 회사는
+                    회원자격을 제한 및 정지시킬 수 있습니다:
+                  </p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>가입 신청 시에 허위 내용을 등록한 경우</li>
+                    <li>
+                      다른 사람의 서비스 이용을 방해하거나 그 정보를 도용하는 등
+                      전자상거래 질서를 위협하는 경우
+                    </li>
+                    <li>
+                      서비스를 이용하여 법령 또는 이 약관이 금지하거나
+                      공서양속에 반하는 행위를 하는 경우
+                    </li>
+                  </ul>
+
+                  <h3 className="font-semibold text-base">
+                    제8조 (개인정보보호)
+                  </h3>
+                  <p>
+                    회사는 이용자의 개인정보 수집시 서비스제공을 위하여 필요한
+                    범위에서 최소한의 개인정보를 수집합니다. 회사는 회원가입시
+                    구매계약이행에 필요한 정보를 미리 수집하지 않습니다.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-base">
+                    제1조 (개인정보의 처리목적)
+                  </h3>
+                  <p>
+                    Tuno(이하 "회사")는 다음의 목적을 위하여 개인정보를
+                    처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의
+                    용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는
+                    개인정보보호법 제18조에 따라 별도의 동의를 받는 등 필요한
+                    조치를 이행할 예정입니다.
+                  </p>
+                  <p>
+                    1. 홈페이지 회원 가입 및 관리: 회원 가입의사 확인, 회원제
+                    서비스 제공에 따른 본인 식별·인증, 회원자격 유지·관리,
+                    서비스 부정이용 방지, 각종 고지·통지, 고충처리 등을 목적으로
+                    개인정보를 처리합니다.
+                  </p>
+                  <p>
+                    2. 재화 또는 서비스 제공: 서비스 제공, 콘텐츠 제공,
+                    맞춤서비스 제공, 본인인증, 요금결제·정산 등을 목적으로
+                    개인정보를 처리합니다.
+                  </p>
+                  <p>
+                    3. 마케팅 및 광고에의 활용: 신규 서비스(제품) 개발 및 맞춤
+                    서비스 제공, 이벤트 및 광고성 정보 제공 및 참여기회 제공,
+                    서비스의 유효성 확인, 접속빈도 파악 또는 회원의 서비스
+                    이용에 대한 통계 등을 목적으로 개인정보를 처리합니다.
+                  </p>
+
+                  <h3 className="font-semibold text-base">
+                    제2조 (개인정보의 처리 및 보유기간)
+                  </h3>
+                  <p>
+                    1. 회사는 법령에 따른 개인정보 보유·이용기간 또는
+                    정보주체로부터 개인정보를 수집시에 동의받은 개인정보
+                    보유·이용기간 내에서 개인정보를 처리·보유합니다.
+                  </p>
+                  <p>2. 각각의 개인정보 처리 및 보유 기간은 다음과 같습니다:</p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>
+                      홈페이지 회원 가입 및 관리: 회원 탈퇴시까지 (다만,
+                      관계법령 위반에 따른 수사·조사 등이 진행중인 경우에는 해당
+                      수사·조사 종료시까지)
+                    </li>
+                    <li>
+                      재화 또는 서비스 제공: 재화·서비스 공급완료 및
+                      요금결제·정산 완료시까지
+                    </li>
+                    <li>마케팅 및 광고에의 활용: 회원 탈퇴시까지</li>
+                  </ul>
+
+                  <h3 className="font-semibold text-base">
+                    제3조 (처리하는 개인정보의 항목)
+                  </h3>
+                  <p>회사는 다음의 개인정보 항목을 처리하고 있습니다:</p>
+                  <p>
+                    1. 홈페이지 회원 가입 및 관리: 필수항목(아이디, 비밀번호,
+                    닉네임), 선택항목(이메일, 전화번호)
+                  </p>
+                  <p>
+                    2. 재화 또는 서비스 제공: 필수항목(아이디, 닉네임),
+                    선택항목(결제정보)
+                  </p>
+                  <p>
+                    3. 인터넷 서비스 이용과정에서 자동 수집되는 정보: IP주소,
+                    쿠키, MAC주소, 서비스 이용 기록, 방문 기록, 불량 이용 기록
+                    등
+                  </p>
+
+                  <h3 className="font-semibold text-base">
+                    제4조 (개인정보의 제3자 제공)
+                  </h3>
+                  <p>
+                    1. 회사는 정보주체의 개인정보를 제1조(개인정보의
+                    처리목적)에서 명시한 범위 내에서만 처리하며, 정보주체의
+                    동의, 법률의 특별한 규정 등 개인정보 보호법 제17조 및
+                    제18조에 해당하는 경우에만 개인정보를 제3자에게 제공합니다.
+                  </p>
+                  <p>
+                    2. 회사는 원칙적으로 이용자의 개인정보를 외부에 제공하지
+                    않습니다. 다만, 아래의 경우에는 예외로 합니다:
+                  </p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>이용자들이 사전에 동의한 경우</li>
+                    <li>
+                      법령의 규정에 의거하거나, 수사 목적으로 법령에 정해진
+                      절차와 방법에 따라 수사기관의 요구가 있는 경우
+                    </li>
+                  </ul>
+
+                  <h3 className="font-semibold text-base">
+                    제5조 (개인정보처리의 위탁)
+                  </h3>
+                  <p>
+                    1. 회사는 원활한 개인정보 업무처리를 위하여 다음과 같이
+                    개인정보 처리업무를 위탁하고 있습니다:
+                  </p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>클라우드 서비스 제공: AWS, Google Cloud 등</li>
+                    <li>결제 처리: 결제 대행사</li>
+                  </ul>
+                  <p>
+                    2. 회사는 위탁계약 체결시 개인정보 보호법 제26조에 따라
+                    위탁업무 수행목적 외 개인정보 처리금지, 기술적·관리적
+                    보호조치, 재위탁 제한, 수탁자에 대한 관리·감독, 손해배상
+                    등에 관한 사항을 계약서 등 문서에 명시하고, 수탁자가
+                    개인정보를 안전하게 처리하는지를 감독하고 있습니다.
+                  </p>
+
+                  <h3 className="font-semibold text-base">
+                    제6조 (정보주체의 권리·의무 및 행사방법)
+                  </h3>
+                  <p>
+                    1. 정보주체는 회사에 대해 언제든지 다음 각 호의 개인정보
+                    보호 관련 권리를 행사할 수 있습니다:
+                  </p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>개인정보 처리정지 요구권</li>
+                    <li>개인정보 열람요구권</li>
+                    <li>개인정보 정정·삭제요구권</li>
+                    <li>개인정보 처리정지 요구권</li>
+                  </ul>
+                  <p>
+                    2. 제1항에 따른 권리 행사는 회사에 대해 서면, 전자우편,
+                    모사전송(FAX) 등을 통하여 하실 수 있으며 회사는 이에 대해
+                    지체없이 조치하겠습니다.
+                  </p>
+
+                  <h3 className="font-semibold text-base">
+                    제7조 (개인정보의 파기)
+                  </h3>
+                  <p>
+                    1. 회사는 개인정보 보유기간의 경과, 처리목적 달성 등
+                    개인정보가 불필요하게 되었을 때에는 지체없이 해당 개인정보를
+                    파기합니다.
+                  </p>
+                  <p>2. 개인정보 파기의 절차 및 방법은 다음과 같습니다:</p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>
+                      파기절차: 회사는 파기 사유가 발생한 개인정보를 선정하고,
+                      회사의 개인정보 보호책임자의 승인을 받아 개인정보를
+                      파기합니다.
+                    </li>
+                    <li>
+                      파기방법: 회사는 전자적 파일 형태로 기록·저장된 개인정보는
+                      기록을 재생할 수 없도록 파기하며, 종이 문서에 기록·저장된
+                      개인정보는 분쇄기로 분쇄하거나 소각하여 파기합니다.
+                    </li>
+                  </ul>
+
+                  <h3 className="font-semibold text-base">
+                    제8조 (개인정보 보호책임자)
+                  </h3>
+                  <p>
+                    회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고,
+                    개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을
+                    위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.
+                  </p>
+                  <p>개인정보 보호책임자: Tuno 개인정보보호팀</p>
+                  <p>연락처: privacy@tuno.com</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 모달 내부 동의 체크박스 */}
+          <div className="mt-4 pt-4 border-t border-border">
+            <div className="flex gap-2">
+              <Checkbox
+                id="modal-terms"
+                checked={modalAgreed}
+                onCheckedChange={(checked) => setModalAgreed(checked === true)}
+              />
+              <Label
+                htmlFor="modal-terms"
+                className="text-sm font-normal leading-none cursor-pointer"
+              >
+                {activeTab === "terms" ? "이용약관" : "개인정보처리방침"}에
+                동의합니다.
+              </Label>
+            </div>
+          </div>
+
+          <DialogFooter className="mt-4 gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="cancel-outline"
+              onClick={() => {
+                setTermsModalOpen(false);
+                setModalAgreed(false);
+                setActiveTab("terms");
+              }}
+            >
+              취소
+            </Button>
+            <Button
+              type="button"
+              variant="accent-outline"
+              onClick={() => {
+                if (modalAgreed) {
+                  if (activeTab === "terms") {
+                    // 이용약관 동의 후 개인정보처리방침으로 이동
+                    setActiveTab("privacy");
+                    setModalAgreed(false);
+                  } else {
+                    // 개인정보처리방침까지 모두 동의 완료
+                    setTermsAgreed(true);
+                    setTermsModalOpen(false);
+                    setModalAgreed(false);
+                    setActiveTab("terms");
+                  }
+                }
+              }}
+              disabled={!modalAgreed}
+            >
+              {activeTab === "terms" ? "다음" : "완료"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* 회원가입 완료 모달 */}
       <Dialog open={success} onOpenChange={setSuccess}>
-        <DialogContent className="sm:max-w-md [&>button]:hidden">
+        <DialogContent className="bg-background-1 border-none sm:max-w-md [&>button]:hidden">
           <DialogHeader>
             <div className="flex items-center justify-center mb-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
-                <CheckCircle2 className="h-10 w-10 text-green-500" />
+              <div className="flex h-16 w-16 items-center justify-center">
+                <UserCheck className="h-10 w-10 text-green-500" />
               </div>
             </div>
             <DialogTitle className="text-center text-2xl">

@@ -24,13 +24,16 @@ import {
   LogOut,
   Menu,
   Moon,
+  Newspaper,
   Settings,
   Sun,
+  Users,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BrandText } from "../ui/BrandText";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -39,6 +42,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { user, logout } = useAuthStore();
@@ -54,6 +58,8 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
     await logout();
     router.push("/");
   };
+
+  const currentTab = searchParams?.get("tab") || "news";
 
   const routes = [
     {
@@ -80,12 +86,22 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       href: "/history",
       active: pathname === "/history",
     },
+    {
+      label: "뉴스",
+      icon: Newspaper,
+      href: "/community/news",
+    },
+    {
+      label: "커뮤니티",
+      icon: Users,
+      href: "/community",
+    },
   ];
 
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-background transition-all duration-300 relative",
+        "flex flex-col h-full bg-background-2 transition-all duration-300 relative",
         isOpen ? "w-64" : "w-16"
       )}
     >
@@ -105,20 +121,15 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
               variant="ghost"
               size="icon"
               onClick={onToggle}
-              className="absolute top-5 right-2 z-10 hover:bg-background-subtle [&_svg]:!w-5 [&_svg]:!h-5"
+              className="absolute top-5 right-2 z-10 hover:bg-background-1 [&_svg]:!w-5 [&_svg]:!h-5"
             >
               <ArrowLeft />
             </Button>
           )}
 
           {/* 로고 영역 */}
-          <div className="flex items-center gap-2 px-2">
-            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-              <LineChart className="w-5 h-5 text-accent-foreground" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-sidebar-foreground whitespace-nowrap">
-              Prophet AI
-            </h1>
+          <div className="px-3">
+            <BrandText className="text-2xl">Tuno</BrandText>
           </div>
         </div>
       </div>
@@ -132,7 +143,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
             : "opacity-0 -translate-x-2 pointer-events-none absolute"
         )}
       >
-        <div className="px-2 pb-2">
+        <div className="px-2 pb-2 mt-1">
           {/* 네비게이션 메뉴 */}
           <nav className="space-y-1">
             {routes.map((route) => (
@@ -142,8 +153,8 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap",
                   route.active
-                    ? "bg-background-subtle text-accent-text"
-                    : "text-foreground/60 hover:text-foreground hover:bg-background-subtle"
+                    ? "bg-background-1 text-accent-text"
+                    : "text-foreground/60 hover:text-foreground hover:bg-background-1"
                 )}
               >
                 <route.icon className="w-5 h-5 flex-shrink-0" />
@@ -176,7 +187,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
             variant="ghost"
             size="icon"
             onClick={onToggle}
-            className="w-10 h-10 rounded-md hover:bg-background-subtle [&_svg]:!w-5 [&_svg]:!h-5"
+            className="w-10 h-10 rounded-md hover:bg-background-1 [&_svg]:!w-5 [&_svg]:!h-5"
           >
             <Menu />
           </Button>
@@ -187,8 +198,8 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
               className={cn(
                 "flex items-center justify-center w-10 h-10 rounded-md text-sm font-medium transition-all duration-200",
                 route.active
-                  ? "bg-background-subtle text-accent-text"
-                  : "text-foreground/60 hover:text-foreground hover:bg-background-subtle"
+                  ? "bg-background-1 text-accent-text"
+                  : "text-foreground/60 hover:text-foreground hover:bg-background-1"
               )}
               title={route.label}
             >
@@ -200,7 +211,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
       {/* User 프로필 영역 - 열린 상태일 때만 표시 (하단 고정, 스크롤되지 않음) */}
       {isOpen && (
-        <div className="flex-shrink-0 py-1 px-2 border-t border-sidebar-border bg-background">
+        <div className="flex-shrink-0 py-1 px-2 border-t border-sidebar-border">
           {user && (
             <DropdownMenu
               open={isDropdownOpen}
@@ -208,7 +219,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
             >
               {/* 프로필 아바타 및 닉네임 */}
               <DropdownMenuTrigger asChild>
-                <button className="w-full px-2 py-2 rounded-md hover:bg-background-subtle transition-colors focus:outline-none focus:ring-1 focus:ring-sidebar-primary cursor-pointer">
+                <button className="w-full px-2 py-2 rounded-md hover:bg-background-1 transition-colors focus:outline-none focus:ring-1 cursor-pointer">
                   <div className="flex items-center gap-3">
                     <ProfileAvatar size="md" />
                     <div className="flex-1 text-left min-w-0">
@@ -228,9 +239,23 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 </button>
               </DropdownMenuTrigger>
               {/* 드롭다운 메뉴 - 설정, 테마 변경, 로그아웃 */}
-              <DropdownMenuContent align="end" side="top" className="w-60">
+              <DropdownMenuContent
+                align="end"
+                side="top"
+                className="w-60"
+                onCloseAutoFocus={(event) => {
+                  // Radix의 기본 포커스 복원 막기
+                  event.preventDefault();
+                }}
+              >
                 <DropdownMenuItem
-                  onClick={() => setIsSettingsOpen(true)}
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    // 드롭다운 닫힘 애니메이션이 완료된 후 모달 열기
+                    setTimeout(() => {
+                      setIsSettingsOpen(true);
+                    }, 200); // 애니메이션 시간에 맞춰 조정 (보통 100-200ms)
+                  }}
                   className="flex items-center hover:text-accent-text"
                 >
                   <Settings className="mr-2 h-4 w-4" />
