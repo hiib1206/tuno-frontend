@@ -1,11 +1,19 @@
 import apiClient from "./apiClient";
 
 const authApi = {
-  register: async (username: string, nick: string, pw: string) => {
+  register: async (
+    username: string,
+    nick: string,
+    pw: string,
+    email: string,
+    signupToken: string
+  ) => {
     const response = await apiClient.post("/api/auth/register", {
       username,
       nick,
       pw,
+      email,
+      signupToken,
     });
     return response.data;
   },
@@ -18,6 +26,25 @@ const authApi = {
   },
   logout: async () => {
     const response = await apiClient.post("/api/auth/logout");
+    return response.data;
+  },
+  sendEmailCode: async (email: string) => {
+    const response = await apiClient.post("/api/auth/email/send", {
+      email,
+    });
+    return response.data;
+  },
+  resendEmailCode: async (email: string) => {
+    const response = await apiClient.post("/api/auth/email/resend", {
+      email,
+    });
+    return response.data;
+  },
+  verifyEmailCode: async (email: string, code: string) => {
+    const response = await apiClient.post("/api/auth/email/verify", {
+      email,
+      code,
+    });
     return response.data;
   },
 };

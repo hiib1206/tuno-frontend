@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { useNicknameCheck } from "@/hooks/useNicknameCheck";
 import { getRedirectUrl, withRedirect } from "@/lib/utils";
 import {
@@ -62,6 +63,33 @@ export default function SignupPage() {
     "idle" | "match" | "mismatch"
   >("idle");
   const [passwordMatchMessage, setPasswordMatchMessage] = useState("");
+
+  // 이메일 인증 훅 사용
+  const {
+    email,
+    setEmail,
+    emailStatus,
+    emailMessage,
+    emailCode,
+    setEmailCode,
+    emailCodeMessage,
+    isCodeSent,
+    isSendingCode,
+    isVerifying,
+    emailVerified,
+    remainingSeconds,
+    codeExpiresIn,
+    codeSentMessage,
+    emailError,
+    signupToken,
+    attempts,
+    maxAttempts,
+    handleSendEmailCode,
+    handleResendEmailCode,
+    handleVerifyEmailCode,
+    handleChangeEmail,
+    reset: resetEmail,
+  } = useEmailVerification();
 
   // 아이디 중복 체크 (debounce) + 4자 이하 경고 메시지
   useEffect(() => {
@@ -115,9 +143,34 @@ export default function SignupPage() {
     }
   }, [pw, confirmPw]);
 
+  // 이메일 에러를 전역 에러와 병합
+  useEffect(() => {
+    if (emailError) {
+      setError(emailError);
+    }
+  }, [emailError]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+
+    // 이메일 검증
+    if (!email || emailStatus !== "valid") {
+      setError("올바른 이메일을 입력해주세요.");
+      return;
+    }
+
+    // 이메일 인증 확인
+    if (!emailVerified) {
+      setError("이메일 인증을 완료해주세요.");
+      return;
+    }
+
+    // signupToken 확인
+    if (!signupToken) {
+      setError("이메일 인증 토큰이 없습니다. 다시 인증해주세요.");
+      return;
+    }
 
     // 비밀번호 확인 검증
     if (pw !== confirmPw) {
@@ -130,7 +183,7 @@ export default function SignupPage() {
     setSuccess(false);
 
     try {
-      await authApi.register(username, nick, pw);
+      await authApi.register(username, nick, pw, email, signupToken);
       // 회원가입 성공
       setSuccess(true);
       setIsLoading(false);
@@ -145,6 +198,7 @@ export default function SignupPage() {
       setPasswordMatchStatus("idle");
       setUsernameMessage("");
       setPasswordMatchMessage("");
+      resetEmail();
 
       // 2초 후 모달 닫고 로그인 페이지로 이동
       setTimeout(() => {
@@ -192,7 +246,7 @@ export default function SignupPage() {
           </div>
 
           {error && (
-            <div className="mb-4 rounded bg-destructive/10 p-3 text-sm text-destructive">
+            <div className=" rounded bg-destructive/10 p-3 text-sm text-destructive">
               {error}
             </div>
           )}
@@ -291,6 +345,206 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="email">이메일</Label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="이메일"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                    required
+                    disabled={isLoading || success || emailVerified}
+                    className={
+                      "rounded focus-visible:ring-0 " +
+                      (emailStatus === "invalid"
+                        ? "border-destructive pr-10"
+                        : emailStatus === "valid" && emailVerified
+                        ? "border-green-500 pr-10"
+                        : emailStatus === "valid"
+                        ? "border-green-500"
+                        : undefined)
+                    }
+                  />
+                  {emailStatus === "valid" && emailVerified && (
+                    <CheckCircle2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
+                  )}
+                  {emailStatus === "invalid" && (
+                    <XCircle className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-destructive" />
+                  )}
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setError(""); // 전역 에러 초기화
+                    if (emailVerified) {
+                      handleChangeEmail();
+                    } else if (isCodeSent) {
+                      handleResendEmailCode();
+                    } else {
+                      handleSendEmailCode();
+                    }
+                  }}
+                  disabled={
+                    isLoading ||
+                    success ||
+                    (emailVerified
+                      ? false
+                      : emailStatus !== "valid" ||
+                        isSendingCode ||
+                        (isCodeSent && remainingSeconds > 0))
+                  }
+                  className="shrink-0"
+                  variant="outline"
+                >
+                  {emailVerified ? (
+                    "변경"
+                  ) : isSendingCode ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      발송 중...
+                    </>
+                  ) : isCodeSent && remainingSeconds > 0 ? (
+                    `재발송 (${Math.floor(remainingSeconds / 60)}:${String(
+                      remainingSeconds % 60
+                    ).padStart(2, "0")})`
+                  ) : isCodeSent ? (
+                    "재발송"
+                  ) : (
+                    "코드 발송"
+                  )}
+                </Button>
+              </div>
+              {emailMessage && (
+                <p
+                  className={`text-xs ${
+                    emailStatus === "valid"
+                      ? "text-green-600 dark:text-green-400"
+                      : emailStatus === "invalid"
+                      ? "text-destructive"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {emailVerified
+                    ? "이메일 인증이 완료되었습니다."
+                    : emailMessage}
+                </p>
+              )}
+            </div>
+
+            {/* 이메일 인증 코드 입력 */}
+            {isCodeSent && !emailVerified && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Label htmlFor="email-code">인증 코드</Label>
+                  {codeExpiresIn > 0 && (
+                    <span
+                      className={`text-xs whitespace-nowrap ${
+                        codeExpiresIn <= 60
+                          ? "text-destructive"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      유효 시간 {Math.floor(codeExpiresIn / 60)}:
+                      {String(codeExpiresIn % 60).padStart(2, "0")}
+                    </span>
+                  )}
+                  {/* 시도 횟수 표시 - 항상 표시하되 attempts가 0이면 0/5로 표시 */}
+                  <span
+                    className={`text-xs whitespace-nowrap ${
+                      attempts >= maxAttempts
+                        ? "text-destructive font-semibold"
+                        : attempts >= maxAttempts - 1
+                        ? "text-orange-500"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    시도 횟수: {attempts}/{maxAttempts}
+                  </span>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <Input
+                    id="email-code"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="6자리 인증 코드 입력"
+                    value={emailCode}
+                    onChange={(e) => setEmailCode(e.target.value)}
+                    onKeyDown={(e) => {
+                      // 숫자, 백스페이스, Delete, 화살표 키, Tab 등은 허용
+                      if (
+                        !/[0-9]/.test(e.key) &&
+                        ![
+                          "Backspace",
+                          "Delete",
+                          "ArrowLeft",
+                          "ArrowRight",
+                          "Tab",
+                          "Home",
+                          "End",
+                        ].includes(e.key) &&
+                        !(e.ctrlKey || e.metaKey) // Ctrl+C, Ctrl+V 등은 허용
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    onPaste={(e) => {
+                      e.preventDefault();
+                      const pastedText = e.clipboardData.getData("text");
+                      const numbersOnly = pastedText.replace(/[^0-9]/g, "");
+                      setEmailCode(numbersOnly);
+                    }}
+                    disabled={isLoading || success || isVerifying}
+                    className="rounded focus-visible:ring-0"
+                    maxLength={6}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setError(""); // 전역 에러 초기화
+                      handleVerifyEmailCode();
+                    }}
+                    disabled={
+                      isLoading ||
+                      success ||
+                      !emailCode ||
+                      isVerifying ||
+                      emailCode.length < 4
+                    }
+                    className="shrink-0"
+                    variant="outline"
+                  >
+                    {isVerifying ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        확인 중...
+                      </>
+                    ) : (
+                      "인증 확인"
+                    )}
+                  </Button>
+                </div>
+                {/* 발송/재발송 성공 메시지 표시 */}
+                {codeSentMessage && !emailCodeMessage && (
+                  <p className="text-xs text-green-600 dark:text-green-400">
+                    {codeSentMessage}
+                  </p>
+                )}
+                {/* 검증 결과 메시지 */}
+                {emailVerified ? (
+                  <p className="text-xs text-green-600 dark:text-green-400">
+                    이메일 인증이 완료되었습니다.
+                  </p>
+                ) : emailCodeMessage ? (
+                  <p className="text-xs text-destructive">{emailCodeMessage}</p>
+                ) : null}
+              </div>
+            )}
+
+            <div className="space-y-2">
               <Label htmlFor="pw">비밀번호</Label>
               <Input
                 id="pw"
@@ -386,7 +640,7 @@ export default function SignupPage() {
 
             <Button
               type="submit"
-              className=" w-full rounded bg-accent text-accent-foreground hover:bg-accent/90"
+              className=" w-full rounded bg-accent text-accent-foreground hover:bg-accent/90 hover:scale-105"
               disabled={
                 !termsAgreed ||
                 isLoading ||
@@ -395,6 +649,9 @@ export default function SignupPage() {
                 usernameStatus !== "available" ||
                 nick.length == 0 ||
                 nickStatus !== "available" ||
+                email.length == 0 ||
+                emailStatus !== "valid" ||
+                !emailVerified ||
                 pw.length == 0 ||
                 confirmPw.length == 0 ||
                 passwordMatchStatus !== "match"

@@ -41,16 +41,15 @@ const userApi = {
     return response.data;
   },
   // 이메일 인증 요청
-  requestEmailVerification: async (email: string) => {
-    const response = await apiClient.post("/api/user/email/request", {
+  sendEmailVerification: async (email: string) => {
+    const response = await apiClient.post("/api/user/email/send", {
       email,
     });
     return response.data;
   },
   // 이메일 인증 코드 검증
-  verifyEmailCode: async (email: string, code: string) => {
+  verifyEmailCode: async (code: string) => {
     const response = await apiClient.post("/api/user/email/verify", {
-      email,
       code,
     });
     return response.data;

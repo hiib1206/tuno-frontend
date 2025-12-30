@@ -1,8 +1,14 @@
 import { IsActive, Role } from "./Common";
 
+// AuthProvider 타입 정의 (선택적)
+export interface AuthProvider {
+  provider: string; // 'local' | 'naver' | 'kakao' | 'google'
+  createdAt: Date;
+}
+
 export class User {
   id: number;
-  username: string;
+  username?: string | null; // ✅ nullable로 변경
   pw?: string;
   nick: string;
   email?: string;
@@ -15,11 +21,12 @@ export class User {
   createdAt?: Date;
   updatedAt?: Date;
   isActive?: IsActive;
+  authProviders?: AuthProvider[]; // ✅ 추가
 
   constructor(
     id: number,
-    username: string,
     nick: string,
+    username?: string | null, // ✅ nullable로 변경, 순서 조정
     pw?: string,
     email?: string,
     emailVerifiedAt?: Date,
@@ -30,10 +37,11 @@ export class User {
     profileImageUpdatedAt?: Date,
     createdAt?: Date,
     updatedAt?: Date,
-    isActive?: IsActive
+    isActive?: IsActive,
+    authProviders?: AuthProvider[] // ✅ 추가
   ) {
     this.id = id;
-    this.username = username;
+    this.username = username; // ✅ nullable
     this.pw = pw;
     this.nick = nick;
     this.email = email;
@@ -46,13 +54,14 @@ export class User {
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
     this.isActive = isActive;
+    this.authProviders = authProviders; // ✅ 추가
   }
 
   static fromMap(map: Record<string, any>): User {
     return new User(
       map.id,
-      map.username,
       map.nick,
+      map.username ?? null, // ✅ nullable 처리
       map.pw ?? undefined,
       map.email ?? undefined,
       map.emailVerifiedAt
@@ -79,14 +88,24 @@ export class User {
           ? new Date(map.updatedAt)
           : map.updatedAt
         : undefined,
-      map.isActive ?? undefined
+      map.isActive ?? undefined,
+      // ✅ authProviders 추가
+      map.authProviders
+        ? map.authProviders.map((ap: any) => ({
+            provider: ap.provider,
+            createdAt:
+              typeof ap.createdAt === "string"
+                ? new Date(ap.createdAt)
+                : ap.createdAt,
+          }))
+        : undefined
     );
   }
 
   toMap(): Record<string, any> {
     return {
       id: this.id,
-      username: this.username,
+      username: this.username, // ✅ nullable
       pw: this.pw,
       nick: this.nick,
       email: this.email,
@@ -99,6 +118,7 @@ export class User {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       isActive: this.isActive,
+      authProviders: this.authProviders, // ✅ 추가
     };
   }
 

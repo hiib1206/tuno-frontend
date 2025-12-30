@@ -23,6 +23,7 @@ export function ProfileSettings() {
   const { user, me, uploadProfileImage } = useAuthStore();
   const [isEditingNick, setIsEditingNick] = useState(false);
   const [nickValue, setNickValue] = useState("");
+  // 이메일 관련
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [emailValue, setEmailValue] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
@@ -32,6 +33,10 @@ export function ProfileSettings() {
   const [emailError, setEmailError] = useState("");
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [resendCooldown, setResendCooldown] = useState<number | null>(null);
+  const [attempts, setAttempts] = useState<number | null>(null);
+  const [maxAttempts, setMaxAttempts] = useState<number | null>(null);
+
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [imageError, setImageError] = useState("");
   // ref는 React에서 DOM 요소에 직접 접근할 때 사용. useRef로 생성한 ref 객체를 연결
@@ -81,6 +86,24 @@ export function ProfileSettings() {
     return () => clearInterval(interval);
   }, [expiresAt]);
 
+  // 재발송 쿨타임 카운트다운
+  useEffect(() => {
+    if (resendCooldown === null || resendCooldown <= 0) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev === null || prev <= 0) {
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [resendCooldown]);
+
   // 닉네임 체크 훅 사용
   const { nickStatus, nickMessage } = useNicknameCheck(nickValue, {
     currentNick: user?.nick,
@@ -97,6 +120,16 @@ export function ProfileSettings() {
     return `${minutes}분 ${secs.toString().padStart(2, "0")}초`;
   };
 
+  // 재발송 쿨타임 포맷팅 함수
+  const formatCooldownTime = (seconds: number | null): string => {
+    if (seconds === null || seconds <= 0) {
+      return "";
+    }
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs.toString().padStart(2, "0")}`;
+  };
+
   const handleCancelNickEdit = () => {
     setNickValue(user?.nick || "");
     setIsEditingNick(false);
@@ -109,11 +142,17 @@ export function ProfileSettings() {
     setIsSendingCode(true);
     setEmailError("");
     try {
-      const response = await userApi.requestEmailVerification(emailValue);
-      if (response?.data?.expiresAt) {
-        setExpiresAt(response.data.expiresAt);
-      }
+      await userApi.sendEmailVerification(emailValue);
+      // 백엔드에서 expiresAt을 반환하지 않으므로 클라이언트에서 계산 (5분 유효기간)
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 5 * 60 * 1000); // 5분 후
+      setExpiresAt(expiresAt.toISOString());
       setIsCodeSent(true);
+      // 재발송 쿨타임 시작 (90초)
+      setResendCooldown(90);
+      // 시도 횟수 초기화 (0/5)
+      setAttempts(0);
+      setMaxAttempts(5);
     } catch (err: any) {
       if (err.response?.status === 400 && err.response?.data?.message) {
         setEmailError(err.response?.data?.message);
@@ -136,6 +175,10 @@ export function ProfileSettings() {
     setIsSendingCode(false);
     setExpiresAt(null);
     setRemainingTime(null);
+    setResendCooldown(null);
+    // 시도 횟수 초기화
+    setAttempts(null);
+    setMaxAttempts(null);
   };
 
   const handleResendVerificationCode = async () => {
@@ -145,15 +188,24 @@ export function ProfileSettings() {
     setIsSendingCode(true);
     setEmailError("");
     try {
-      const response = await userApi.resendEmailVerification(emailValue);
-      if (response?.data?.expiresAt) {
-        setExpiresAt(response.data.expiresAt);
-      }
+      await userApi.resendEmailVerification(emailValue);
+      // 백엔드에서 expiresAt을 반환하지 않으므로 클라이언트에서 계산 (5분 유효기간)
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 5 * 60 * 1000); // 5분 후
+      setExpiresAt(expiresAt.toISOString());
       setVerificationCode("");
       setIsVerifying(false);
+      // 재발송 쿨타임 시작 (90초)
+      setResendCooldown(90);
+      // 재발송 시 시도 횟수 초기화 (0/5)
+      setAttempts(0);
+      setMaxAttempts(5);
     } catch (err: any) {
-      setEmailError("인증 코드 재발송에 실패했습니다. 다시 시도해주세요.");
-      setExpiresAt(null);
+      if (err.response?.status === 400 && err.response?.data?.message) {
+        setEmailError(err.response?.data?.message);
+      } else {
+        setEmailError("인증 코드 재발송에 실패했습니다. 다시 시도해주세요.");
+      }
     } finally {
       setIsSendingCode(false);
     }
@@ -166,17 +218,30 @@ export function ProfileSettings() {
     setIsVerifying(true);
     setEmailError("");
     try {
-      await userApi.verifyEmailCode(emailValue, verificationCode);
+      await userApi.verifyEmailCode(verificationCode);
       setIsVerifying(false);
       setIsCodeSent(false);
       setVerificationCode("");
       setIsEditingEmail(false);
       setExpiresAt(null);
       setRemainingTime(null);
+      // 인증 성공 시 시도 횟수 초기화
+      setAttempts(null);
+      setMaxAttempts(null);
       me();
     } catch (err: any) {
       if (err.response?.status === 400 && err.response?.data?.message) {
-        setEmailError(err.response?.data?.message);
+        const errorMessage = err.response?.data?.message;
+        const attemptsData = err.response?.data?.data?.attempts;
+        const maxAttemptsData = err.response?.data?.data?.maxAttempts;
+
+        // 백엔드에서 시도 횟수 정보가 오면 업데이트
+        if (attemptsData !== undefined && maxAttemptsData !== undefined) {
+          setAttempts(attemptsData);
+          setMaxAttempts(maxAttemptsData);
+        }
+
+        setEmailError(errorMessage);
       } else {
         setEmailError("인증 코드가 올바르지 않습니다. 다시 확인해주세요.");
       }
@@ -462,7 +527,8 @@ export function ProfileSettings() {
                       disabled={
                         !emailValue ||
                         emailValue === user?.email ||
-                        isSendingCode
+                        isSendingCode ||
+                        (resendCooldown !== null && resendCooldown > 0)
                       }
                     >
                       {isSendingCode ? (
@@ -470,6 +536,8 @@ export function ProfileSettings() {
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           재발송 중...
                         </>
+                      ) : resendCooldown !== null && resendCooldown > 0 ? (
+                        `재발송(${formatCooldownTime(resendCooldown)})`
                       ) : (
                         "재발송"
                       )}
@@ -503,11 +571,24 @@ export function ProfileSettings() {
             {isEditingEmail && emailError && (
               <p className="text-sm text-destructive">{emailError}</p>
             )}
+            {isEditingEmail &&
+              emailError &&
+              attempts !== null &&
+              maxAttempts !== null && (
+                <p className="text-xs text-muted-foreground">
+                  시도 횟수: {attempts}/{maxAttempts}
+                </p>
+              )}
             {isEditingEmail && isCodeSent && !isSendingCode && (
               <div className="space-y-2">
                 {!emailError && (
                   <p className="text-sm text-accent">
                     인증 코드를 이메일로 전송했습니다.
+                  </p>
+                )}
+                {!emailError && attempts !== null && maxAttempts !== null && (
+                  <p className="text-xs text-muted-foreground">
+                    시도 횟수: {attempts}/{maxAttempts}
                   </p>
                 )}
                 <div className="flex flex-col gap-2 lg:flex-row">
