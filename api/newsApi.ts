@@ -35,6 +35,13 @@ export interface GetNewsByTopicParams {
   limit?: number; // 1~10, 기본값 10
 }
 
+// 뉴스 검색 파라미터 타입
+export interface GetNewsSearchParams {
+  q: string; // 검색어 (1~200자, 필수)
+  cursor?: string; // 페이지네이션 커서
+  limit?: number; // 1~10, 기본값 10
+}
+
 // 뉴스 이미지 추출 작업 요청 타입
 export interface CreateNewsJobParams {
   urls: string[]; // Google News RSS URL 배열 (1~20개)
@@ -98,8 +105,12 @@ export function streamNewsImages(
   });
 
   // 연결 에러 (네트워크 문제 등)
+  // 주의: EventSource는 자동으로 재연결을 시도하므로
+  // onerror에서 close()를 호출하면 안 됩니다.
+  // completed 이벤트를 받을 때까지 연결을 유지해야 합니다.
   eventSource.onerror = () => {
-    eventSource.close();
+    // close() 제거 - completed 이벤트를 받을 때까지 연결 유지
+    // EventSource가 자동으로 재연결을 시도하도록 함
   };
 
   return eventSource;
@@ -141,6 +152,32 @@ const newsApi = {
     const url = `/api/news/${encodeURIComponent(topicId)}${
       queryString ? `?${queryString}` : ""
     }`;
+
+    const response = await apiClient.get(url);
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: {
+        news: response.data.data.news,
+        nextCursor: response.data.data.nextCursor,
+        hasNextPage: response.data.data.hasNextPage,
+      },
+    };
+  },
+
+  // 뉴스 검색 (커서 기반 페이지네이션)
+  searchNews: async ({
+    q,
+    cursor,
+    limit,
+  }: GetNewsSearchParams): Promise<NewsResponse> => {
+    const queryParams = new URLSearchParams();
+    queryParams.append("q", q.trim()); // 검색어는 필수, 앞뒤 공백 제거
+    if (cursor) queryParams.append("cursor", cursor);
+    if (limit) queryParams.append("limit", String(limit));
+
+    const queryString = queryParams.toString();
+    const url = `/api/news/search?${queryString}`;
 
     const response = await apiClient.get(url);
     return {

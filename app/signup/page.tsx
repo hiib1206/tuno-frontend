@@ -20,7 +20,6 @@ import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { useNicknameCheck } from "@/hooks/useNicknameCheck";
 import { getRedirectUrl, withRedirect } from "@/lib/utils";
 import {
-  ArrowLeft,
   CheckCircle2,
   Loader2,
   UserCheck,
@@ -223,14 +222,7 @@ export default function SignupPage() {
   return (
     <div className="bg-background-2 flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md">
-        {/* Back to Home */}
-        <Link
-          href="/"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          홈으로 돌아가기
-        </Link>
+        {/* (홈으로 돌아가기 링크 제거) */}
 
         <Card className="p-8 border-none bg-background-1">
           {/* Logo */}

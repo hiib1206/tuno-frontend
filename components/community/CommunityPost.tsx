@@ -1,11 +1,14 @@
 "use client";
 
+import { LoginRequestModal } from "@/components/modals/LoginRequestModal";
 import { Button } from "@/components/ui/button";
 import { PostListItem } from "@/lib/community";
 import { cn, formatRelativeTime } from "@/lib/utils";
+import { useAuthStore } from "@/stores/authStore";
 import { PostCategoryLabels } from "@/types/Common";
 import { Eye, Heart, MessageSquare, Plus } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 interface CommunityPostProps {
   title?: string;
@@ -18,6 +21,17 @@ export function CommunityPost({
   posts = [],
   className,
 }: CommunityPostProps) {
+  const { user } = useAuthStore();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const handleWriteClick = () => {
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    window.open("/community/posts/write", "_blank");
+  };
+
   return (
     <div
       className={cn(
@@ -28,23 +42,18 @@ export function CommunityPost({
       {/* 제목 섹션 */}
       <div className="mb-3 flex flex-row items-center justify-between gap-2 gap-0">
         <h2 className="px-1 text-lg sm:text-xl font-semibold">{title}</h2>
-        <Link
-          href="/community/posts/write"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Button
+          variant="accent"
+          size="sm"
+          className="w-full sm:w-auto flex flex-col"
+          onClick={handleWriteClick}
         >
-          <Button
-            variant="accent"
-            size="sm"
-            className="w-full sm:w-auto flex flex-col"
-          >
-            <div className="h-4"></div>
-            <div className="flex items-center gap-1">
-              <Plus className="h-4 w-4" />
-              <span>글쓰기</span>
-            </div>
-          </Button>
-        </Link>
+          <div className="h-4"></div>
+          <div className="flex items-center gap-1">
+            <Plus className="h-4 w-4" />
+            <span>글쓰기</span>
+          </div>
+        </Button>
       </div>
 
       {/* 포스트 리스트 */}
@@ -58,22 +67,17 @@ export function CommunityPost({
             <p className="text-muted-foreground">
               지금 첫 이야기를 시작해보세요!
             </p>
-            <Link
-              href="/community/posts/write"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Button
+              variant="accent-outline"
+              size="default"
+              className="mt-4 group relative overflow-hidden hover:shadow-xl transition-all duration-300 font-semibold"
+              onClick={handleWriteClick}
             >
-              <Button
-                variant="accent-outline"
-                size="default"
-                className="mt-4 group relative overflow-hidden hover:shadow-xl transition-all duration-300 font-semibold"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Plus className="h-8 w-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
-                  <span className="text-base">글 쓰러 가기</span>
-                </div>
-              </Button>
-            </Link>
+              <div className="flex items-center gap-2.5">
+                <Plus className="h-8 w-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
+                <span className="text-base">글 쓰러 가기</span>
+              </div>
+            </Button>
           </div>
         </div>
       ) : (
@@ -146,6 +150,10 @@ export function CommunityPost({
           </div>
         </div>
       )}
+      <LoginRequestModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </div>
   );
 }

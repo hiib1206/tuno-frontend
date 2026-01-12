@@ -151,3 +151,47 @@ export function getRedirectUrl(
   // serchParams.get("redirect") 값을 decodeURIComponent 합니다. (디코딩 해준다는 것)
   return searchParams.get("redirect");
 }
+
+/**
+ * 프로바이더 이름을 한글로 변환합니다.
+ * @param provider - 프로바이더 코드 ('naver', 'kakao', 'google')
+ * @returns 한글 프로바이더 이름
+ */
+export function getProviderDisplayName(provider: string): string {
+  const providerMap: Record<string, string> = {
+    naver: "네이버",
+    kakao: "카카오",
+    google: "구글",
+  };
+  return providerMap[provider] || provider;
+}
+
+/**
+ * 사용자의 소셜 로그인 프로바이더 정보를 가져옵니다.
+ * @param user - User 객체 (username과 authProviders 속성을 가진 객체)
+ * @returns 소셜 프로바이더 한글 이름 또는 null (일반 사용자인 경우)
+ */
+export function getSocialProviderName(
+  user: {
+    username?: string | null;
+    authProviders?: Array<{ provider: string }>;
+  } | null
+): string | null {
+  if (!user) return null;
+
+  if (user.username) {
+    return null; // username이 있으면 일반 사용자
+  }
+
+  if (user.authProviders && user.authProviders.length > 0) {
+    // 'local'이 아닌 프로바이더 찾기
+    const socialProvider = user.authProviders.find(
+      (ap) => ap.provider !== "local"
+    );
+    if (socialProvider) {
+      return getProviderDisplayName(socialProvider.provider);
+    }
+  }
+
+  return null;
+}

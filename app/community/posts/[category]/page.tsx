@@ -89,8 +89,8 @@ export default function CategoryPostsPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[300px]">
-        <LoadingState />
+      <div className="flex flex-col items-center justify-center min-h-[500px]">
+        <LoadingState lottieFile="/lottie/paper-plane.json" />
       </div>
     );
   }

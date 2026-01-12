@@ -245,7 +245,7 @@ export default function MyLikes() {
       </h2>
 
       {loading ? (
-        <div className="py-48">
+        <div className="py-35">
           <LoadingState message="좋아요한 게시글을 불러오는 중..." />
         </div>
       ) : error ? (
@@ -253,13 +253,6 @@ export default function MyLikes() {
           <ErrorState
             message={error ?? "좋아요한 게시글을 불러오는데 실패했습니다."}
           />
-        </div>
-      ) : posts.length === 0 ? (
-        <div className="text-center">
-          <div className="h-px border-t border-border-2" />
-          <p className="py-12 text-muted-foreground">
-            좋아요한 게시글이 없습니다.
-          </p>
         </div>
       ) : (
         <div className="min-h-[600px] mt-2">

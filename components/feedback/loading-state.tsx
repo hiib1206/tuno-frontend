@@ -1,6 +1,9 @@
-import { SegmentedSpinner } from "@/components/loading";
+"use client";
+
 import { cn } from "@/lib/utils";
+import Lottie from "lottie-react";
 import { LucideIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface LoadingStateProps {
   icon?: LucideIcon;
@@ -8,15 +11,28 @@ interface LoadingStateProps {
   message?: string;
   messageClassName?: string;
   className?: string;
+  lottieFile?: string;
+  lottieClassName?: string;
 }
 
 export function LoadingState({
   icon: Icon,
   iconClassName,
-  message = "조금만 기다려 주세요..!",
+  message,
   messageClassName,
   className,
+  lottieFile = "/lottie/paper-plane.json",
+  lottieClassName,
 }: LoadingStateProps) {
+  const [animationData, setAnimationData] = useState<any>(null);
+
+  useEffect(() => {
+    fetch(lottieFile)
+      .then((res) => res.json())
+      .then((data) => setAnimationData(data))
+      .catch();
+  }, [lottieFile]);
+
   return (
     <div
       className={cn(
@@ -29,9 +45,10 @@ export function LoadingState({
           className={cn("w-14 h-14 text-muted-foreground", iconClassName)}
         />
       ) : (
-        <SegmentedSpinner
-          className={cn("w-14 h-14", iconClassName)}
-          strokeClassName="stroke-muted-foreground"
+        <Lottie
+          animationData={animationData}
+          loop={true}
+          className={cn("w-50 h-50", lottieClassName)}
         />
       )}
       <div className={cn("text-muted-foreground", messageClassName)}>

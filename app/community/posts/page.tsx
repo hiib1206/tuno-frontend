@@ -70,7 +70,7 @@ export default function PostsPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[300px] gap-4">
+      <div className="flex flex-col items-center justify-center min-h-[500px] gap-4">
         <LoadingState />
       </div>
     );

@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getOrCreateDeviceId, getRedirectUrl, withRedirect } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
-import { ArrowLeft, LogIn } from "lucide-react";
+import { LogIn } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -152,15 +152,6 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background-2 p-4">
       <div className="w-full max-w-md">
-        {/* Back to Home */}
-        <Link
-          href="/"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          홈으로 돌아가기
-        </Link>
-
         <Card className="p-8 border-none bg-background-1">
           {/* Logo */}
           <div className="mb-8 flex items-center justify-center">

@@ -28,16 +28,16 @@ export function CommunityHeader() {
   return (
     <header className="">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="relative flex items-center justify-between h-20">
           {/* 좌측: Tuno 로고 */}
-          <Link href="/community" className="flex-shrink-0">
+          <Link href="/community" className="flex-shrink-0 z-10">
             <BrandText className="text-2xl">Tuno</BrandText>
           </Link>
 
-          {/* 검색창 */}
+          {/* 검색창 - 절대 위치로 중앙 배치 */}
           <form
             onSubmit={handleSearch}
-            className="flex-1 max-w-md mx-6 hidden sm:block"
+            className="absolute left-1/2 -translate-x-1/2 w-full max-w-md px-4 hidden sm:block"
           >
             <div className="relative">
               <Search className="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-accent-text" />
@@ -59,7 +59,7 @@ export function CommunityHeader() {
           </div>
 
           {/* 우측: 프로필 또는 로그인/회원가입 */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 z-10">
             {isAuthLoading ? (
               <div className="w-10 h-10" /> // 마운트 전 또는 인증 로딩 중에는 공간만 유지
             ) : user ? (

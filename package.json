@@ -1,5 +1,5 @@
 {
-  "name": "ai-traider-next",
+  "name": "tuno-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -54,6 +54,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
+    "culori": "^4.0.2",
     "date-fns": "4.1.0",
     "embla-carousel-react": "8.5.1",
     "expo": "latest",
@@ -63,6 +64,8 @@
     "framer-motion": "^12.23.24",
     "immer": "latest",
     "input-otp": "1.4.1",
+    "lightweight-charts": "^5.1.0",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.454.0",
     "next": "16.0.7",
     "next-themes": "latest",
@@ -85,6 +88,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
     "@tailwindcss/typography": "^0.5.19",
+    "@types/culori": "^4.0.1",
     "@types/node": "^22",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19",

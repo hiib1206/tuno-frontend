@@ -2,21 +2,40 @@
 
 import { subMenuConfig } from "@/lib/community";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/authStore";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 
-const navItems = [
+const baseNavItems = [
   { label: "투자 분석", href: "/analysis" },
   { label: "뉴스", href: "/community/news" },
   { label: "소통해요", href: "/community/posts" },
   { label: "고객 센터", href: "/community/support" },
+];
+
+const authOnlyNavItems = [
   { label: "마이페이지", href: "/community/mypage/posts" },
 ];
 
 export function CommunityNav() {
   const pathname = usePathname();
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
+
+  // 인증 상태 가져오기
+  const user = useAuthStore((state) => state.user);
+  const isAuthLoading = useAuthStore((state) => state.isAuthLoading);
+
+  // 로그인 상태에 따라 navItems 동적 생성
+  const navItems = useMemo(() => {
+    if (isAuthLoading) {
+      // 로딩 중에는 기본 메뉴만 표시
+      return baseNavItems;
+    }
+    return user
+      ? [...baseNavItems, ...authOnlyNavItems] // 로그인 시 마이페이지 포함
+      : baseNavItems; // 비로그인 시 제외
+  }, [user, isAuthLoading]);
 
   // navItems와 subMenuConfig를 연결하여 동적으로 allSubMenus 생성
   const allSubMenus = useMemo(() => {
@@ -25,7 +44,7 @@ export function CommunityNav() {
       href: item.href,
       items: subMenuConfig[item.href],
     }));
-  }, []);
+  }, [navItems]);
 
   // 메가메뉴를 표시할지 여부 (하위 메뉴가 하나라도 있으면 표시)
   const shouldShowMegaMenu = useMemo(() => {
@@ -73,6 +92,8 @@ export function CommunityNav() {
             onMouseEnter={() => setHoveredMenu(hoveredMenu)}
             onMouseLeave={() => setHoveredMenu(null)}
           >
+            {/* 보이지 않는 상단 패딩 영역 - nav와 메가메뉴 사이의 다리 역할 */}
+            <div className="h-2 -mt-2" />
             <div
               className="grid"
               style={{

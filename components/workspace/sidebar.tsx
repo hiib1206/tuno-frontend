@@ -18,7 +18,6 @@ import {
   BarChart3,
   ChevronDown,
   ChevronUp,
-  History,
   LayoutDashboard,
   LineChart,
   LogOut,
@@ -27,6 +26,7 @@ import {
   Newspaper,
   Settings,
   Sun,
+  User2,
   Users,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -81,10 +81,10 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       active: pathname === "/analysis/individual",
     },
     {
-      label: "히스토리",
-      icon: History,
-      href: "/history",
-      active: pathname === "/history",
+      label: "My",
+      icon: User2,
+      href: "/my",
+      active: pathname === "/my",
     },
     {
       label: "뉴스",
@@ -101,7 +101,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-background-2 transition-all duration-300 relative",
+        "flex flex-col h-full bg-background-1 transition-all duration-300 relative",
         isOpen ? "w-64" : "w-16"
       )}
     >
@@ -121,16 +121,16 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
               variant="ghost"
               size="icon"
               onClick={onToggle}
-              className="absolute top-5 right-2 z-10 hover:bg-background-1 [&_svg]:!w-5 [&_svg]:!h-5"
+              className="absolute top-2 right-2 z-10 hover:bg-background-1 [&_svg]:!w-5 [&_svg]:!h-5"
             >
               <ArrowLeft />
             </Button>
           )}
 
-          {/* 로고 영역 */}
-          <div className="px-3">
-            <BrandText className="text-2xl">Tuno</BrandText>
-          </div>
+          {/* 로고 영역 (클릭 시 분석 페이지로 이동) */}
+          <Link href="/analysis" className="px-3 inline-block">
+            <BrandText className="text-2xl cursor-pointer">Tuno</BrandText>
+          </Link>
         </div>
       </div>
 
@@ -153,8 +153,8 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap",
                   route.active
-                    ? "bg-background-1 text-accent-text"
-                    : "text-foreground/60 hover:text-foreground hover:bg-background-1"
+                    ? "bg-background-2 text-accent-text"
+                    : "text-foreground/60 hover:text-foreground hover:bg-background-2"
                 )}
               >
                 <route.icon className="w-5 h-5 flex-shrink-0" />
@@ -211,7 +211,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
       {/* User 프로필 영역 - 열린 상태일 때만 표시 (하단 고정, 스크롤되지 않음) */}
       {isOpen && (
-        <div className="flex-shrink-0 py-1 px-2 border-t border-sidebar-border">
+        <div className="flex-shrink-0 py-1 px-2 border-t border-border-2">
           {user && (
             <DropdownMenu
               open={isDropdownOpen}

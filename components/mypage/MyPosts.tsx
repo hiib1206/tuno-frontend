@@ -251,19 +251,12 @@ export default function MyPosts() {
       <h2 className="mb-6 text-lg sm:text-xl font-semibold">나의 게시글</h2>
 
       {loading ? (
-        <div className="py-48">
+        <div className="py-35">
           <LoadingState message="게시글을 불러오는 중..." />
         </div>
       ) : error ? (
         <div className="py-48">
           <ErrorState message={error ?? "게시글을 불러오는데 실패했습니다."} />
-        </div>
-      ) : posts.length === 0 ? (
-        <div className="text-center">
-          <div className="h-px border-t border-border-2" />
-          <p className="py-12 text-muted-foreground">
-            작성한 게시글이 없습니다.
-          </p>
         </div>
       ) : (
         <div className="min-h-[600px] mt-2">

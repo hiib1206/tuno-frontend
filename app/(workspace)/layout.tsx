@@ -1,8 +1,9 @@
 "use client";
 
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
+import StockSearchBar from "@/components/workspace/StockSearchBar";
 import { Sidebar } from "@/components/workspace/sidebar";
-import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -11,20 +12,27 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  useRequireAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  // 사이드바 관련
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [userClosedSidebar, setUserClosedSidebar] = useState(false); // 사용자가 수동으로 닫았는지 추적
 
   // 화면 크기 감지 및 반응형 처리
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 1024; // lg breakpoint
+      const wasMobile = isMobile;
       setIsMobile(mobile);
-      // 모바일에서는 기본적으로 사이드바 닫기
-      if (mobile) {
+      // 모바일/데스크톱 전환 시에만 사이드바 상태 변경
+      if (mobile && !wasMobile) {
+        // 데스크톱 -> 모바일: 사이드바 닫기
         setIsSidebarOpen(false);
-      } else {
-        setIsSidebarOpen(true);
+        setUserClosedSidebar(false);
+      } else if (!mobile && wasMobile) {
+        // 모바일 -> 데스크톱: 사용자가 닫지 않았다면 열기
+        if (!userClosedSidebar) {
+          setIsSidebarOpen(true);
+        }
       }
     };
 
@@ -47,7 +55,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="flex h-screen w-full bg-background-1 overflow-hidden relative">
+    <div className="flex h-screen w-full bg-background-2 overflow-hidden relative">
       {/* 모바일 오버레이 */}
       {isMobile && isSidebarOpen && (
         <div
@@ -78,10 +86,11 @@ export default function DashboardLayout({
 
       {/* 메인 컨텐츠 */}
       <main className="flex-1 overflow-y-auto relative w-full lg:w-auto">
-        {/* 모바일 햄버거 메뉴 버튼 */}
-        {isMobile && !isSidebarOpen && (
-          <div className="sticky top-0 z-30 lg:hidden bg-background border-b border-border">
-            <div className="flex items-center gap-2 px-4 py-3">
+        {/* 헤더 */}
+        <div className="sticky top-0 z-30 bg-background-2">
+          <div className="flex items-center gap-2 px-4 py-3 lg:px-6">
+            {/* 모바일: 햄버거 메뉴 */}
+            {isMobile && !isSidebarOpen && (
               <Button
                 variant="ghost"
                 size="icon"
@@ -90,11 +99,29 @@ export default function DashboardLayout({
               >
                 <Menu />
               </Button>
-              <h2 className="text-lg font-semibold">Prophet AI</h2>
+            )}
+
+            {/* 좌측 여백 (데스크톱에서 검색창 가운데 정렬을 위해) */}
+            <div className="flex-1 hidden sm:block"></div>
+
+            {/* 검색창과 데스크톱 */}
+            <div className="flex items-center gap-3 w-full max-w-md hidden sm:flex">
+              <StockSearchBar />
+              <ThemeToggle />
+            </div>
+
+            {/* 우측 여백 (데스크톱에서 검색창 가운데 정렬을 위해) */}
+            <div className="flex-1 hidden sm:flex justify-end"></div>
+
+            {/* 모바일: 검색 입력란과 관심 종목 버튼 */}
+            <div className="sm:hidden flex items-center gap-2 flex-1">
+              <StockSearchBar />
+              <ThemeToggle />
             </div>
           </div>
-        )}
-        <div className="relative z-10 h-full">{children}</div>
+        </div>
+
+        <div className="relative z-10">{children}</div>
       </main>
     </div>
   );

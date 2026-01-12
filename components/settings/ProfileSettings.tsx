@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useNicknameCheck } from "@/hooks/useNicknameCheck";
 import { useToast } from "@/hooks/useToast";
-import { cn } from "@/lib/utils";
+import { cn, getSocialProviderName } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import {
   CheckCircle2,
@@ -14,6 +14,7 @@ import {
   Mail,
   Phone,
   User,
+  UserRoundPen,
   XCircle,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -129,6 +130,8 @@ export function ProfileSettings() {
     const secs = seconds % 60;
     return `${minutes}:${secs.toString().padStart(2, "0")}`;
   };
+
+  const socialProviderName = getSocialProviderName(user);
 
   const handleCancelNickEdit = () => {
     setNickValue(user?.nick || "");
@@ -377,10 +380,32 @@ export function ProfileSettings() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="nick">닉네임</Label>
+          <Label htmlFor="username">아이디</Label>
           <div className="flex flex-col gap-2 lg:flex-row">
             <div className="relative w-full">
               <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="username"
+                type="text"
+                value={
+                  user?.username
+                    ? user.username
+                    : socialProviderName
+                    ? `${socialProviderName} 로그인 사용자`
+                    : "아이디를 입력해주세요"
+                }
+                className="pl-9"
+                disabled
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="nick">닉네임</Label>
+          <div className="flex flex-col gap-2 lg:flex-row">
+            <div className="relative w-full">
+              <UserRoundPen className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="nick"
                 type="text"

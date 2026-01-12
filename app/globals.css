@@ -53,15 +53,18 @@
   --radius: 1rem; /* rounded-2xl */
 
   /* Chart Colors */
-  --chart-1: oklch(0.85 0.22 130);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --chart-green: #10b981;
+  --chart-up: #ef4444; /* 한국 기준 상승 캔들 (빨간색) */
+  --chart-down: #3b82f6; /* 한국 기준 하락 캔들 (파란색) */
+  --chart-line: #e5e5e5; /* 차트 라인 (연한 회색) */
+  --chart-text: #707070; /* 차트 텍스트 (회색 계열) */
 
   --sidebar: oklch(0.95 0 260);
   --sidebar-foreground: oklch(0.15 0 0);
   --sidebar-border: oklch(0.9 0 0);
+
+  --skeleton-1: oklch(0.98 0 0);
+  --skeleton-2: oklch(0.96 0 0);
 }
 
 .dark {
@@ -70,20 +73,20 @@
   --background-1: oklch(0.25 0 0);
   --background-2: oklch(0.22 0 0);
   --background-3: oklch(0.18 0 0);
-  --foreground: oklch(0.98 0 0);
-  --foreground-white: oklch(0.98 0 0);
+  --foreground: oklch(0.94 0 0);
+  --foreground-white: oklch(0.94 0 0);
 
   --card: oklch(0.22 0 0);
-  --card-foreground: oklch(0.98 0 0);
+  --card-foreground: oklch(0.94 0 0);
 
   --popover: oklch(0.22 0 0);
-  --popover-foreground: oklch(0.98 0 0);
+  --popover-foreground: oklch(0.94 0 0);
 
-  --primary: oklch(0.98 0 0);
+  --primary: oklch(0.94 0 0);
   --primary-foreground: oklch(0.15 0 0);
 
   --secondary: oklch(0.22 0 0);
-  --secondary-foreground: oklch(0.98 0 0);
+  --secondary-foreground: oklch(0.94 0 0);
 
   --muted: oklch(0.22 0 0);
   --muted-2: oklch(0.22 0 0);
@@ -101,7 +104,7 @@
   --accent-20: oklch(0.7 0.18 149.7 / 0.2);
 
   --destructive: oklch(0.65 0.25 25.331);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive-foreground: oklch(0.94 0 0);
 
   --border: oklch(0.35 0 0);
   --border-2: oklch(0.35 0 0);
@@ -109,15 +112,18 @@
   --ring: oklch(0.9 0 0);
 
   /* Chart Colors */
-  --chart-1: oklch(0.85 0.22 130);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --chart-green: #10b981;
+  --chart-up: #0ecb81; /* 바이낸스 기준 상승 캔들 (초록색) */
+  --chart-down: #f6465d; /* 바이낸스 기준 하락 캔들 (빨간색) */
+  --chart-line: #4a4a4a; /* 차트 라인 (다크모드용 회색) */
+  --chart-text: #707070; /* 차트 텍스트 (다크모드용 밝은 회색) */
 
   --sidebar: oklch(0.12 0 0);
   --sidebar-foreground: oklch(0.98 0 0);
   --sidebar-border: oklch(0.25 0 0);
+
+  --skeleton-1: oklch(0.22 0 0);
+  --skeleton-2: oklch(0.24 0 0);
 }
 
 @theme inline {
@@ -165,20 +171,23 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
+  --color-chart-green: var(--chart-green);
+  --color-chart-up: var(--chart-up);
+  --color-chart-down: var(--chart-down);
+  --color-chart-line: var(--chart-line);
+  --color-chart-text: var(--chart-text);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-border: var(--sidebar-border);
+
+  --color-skeleton-1: var(--skeleton-1);
+  --color-skeleton-2: var(--skeleton-2);
 }
 
 @layer base {
@@ -316,12 +325,23 @@ Skeleton Gradient Animation
   }
 }
 
-.skeleton-gradient {
+.skeleton-gradient-image {
   background: linear-gradient(
     90deg,
-    var(--muted-3) 0%,
-    var(--muted) 50%,
-    var(--muted-3) 100%
+    var(--skeleton-1) 0%,
+    var(--skeleton-2) 50%,
+    var(--skeleton-1) 100%
+  );
+  background-size: 200% 100%;
+  animation: gradient-slide 2s ease-in-out infinite;
+}
+
+.skeleton-gradient-loading {
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-1) 0%,
+    var(--skeleton-2) 50%,
+    var(--skeleton-1) 100%
   );
   background-size: 200% 100%;
   animation: gradient-slide 2s ease-in-out infinite;
@@ -351,4 +371,10 @@ Accordion Animation
 }
 .animate-accordion-up {
   animation: accordion-up 0.2s ease-out;
+}
+
+/* Lightweight Charts 워터마크 숨기기 */
+div[data-tv-lightweight-charts] a,
+.tv-lightweight-charts a {
+  display: none !important;
 }

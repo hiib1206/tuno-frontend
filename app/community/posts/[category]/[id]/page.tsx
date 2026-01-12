@@ -76,7 +76,7 @@ export default function PostDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[300px]">
+      <div className="flex flex-col items-center justify-center min-h-[500px]">
         <LoadingState />
       </div>
     );
@@ -276,7 +276,10 @@ export default function PostDetailPage() {
                     <>
                       <DropdownMenuItem
                         onClick={() =>
-                          window.open(`/community/posts/edit/${post.id}`, "_blank")
+                          window.open(
+                            `/community/posts/edit/${post.id}`,
+                            "_blank"
+                          )
                         }
                       >
                         <span className="text-sm px-2">수정</span>
@@ -359,4 +362,3 @@ export default function PostDetailPage() {
     </div>
   );
 }
-

@@ -1,5 +1,11 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import InquiryList from "@/components/community/InquiryList";
 
 export default function SupportPage() {
-  redirect("/community/support/faq");
+  return (
+    <div className="space-y-6">
+      <InquiryList title="문의하기" />
+    </div>
+  );
 }

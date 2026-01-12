@@ -46,7 +46,7 @@ export function ImageWithSkeleton({
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="skeleton-gradient absolute inset-0"
+            className="skeleton-gradient-image absolute inset-0"
           />
         )}
       </AnimatePresence>

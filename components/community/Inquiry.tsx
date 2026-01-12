@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { MessageSquare } from "lucide-react";
+import { HelpCircle } from "lucide-react";
 import { useState } from "react";
 
 interface InquiryComponentProps {
@@ -46,7 +46,7 @@ export default function InquiryComponent({
     >
       {/* 제목 섹션 */}
       <div className="mb-6 flex items-center gap-2">
-        <MessageSquare className="h-5 w-5 text-accent-text" />
+        <HelpCircle className="h-5 w-5 text-accent-text" />
         <h2 className="px-1 text-lg sm:text-xl font-semibold">{title}</h2>
       </div>
 
