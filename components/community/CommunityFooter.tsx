@@ -2,7 +2,7 @@ import { BrandText } from "@/components/ui/BrandText";
 
 export function CommunityFooter() {
   return (
-    <footer className=" bg-background-1 border-t border-border-2 py-8 px-4 sm:px-6 lg:px-8 mt-auto">
+    <footer className=" border-t border-border-2 bg-background-1 py-8 px-4 sm:px-6 lg:px-8 mt-auto">
       <div className="max-w-5xl mx-auto container mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-center md:text-left">

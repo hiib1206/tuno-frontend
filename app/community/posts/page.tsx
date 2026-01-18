@@ -86,7 +86,7 @@ export default function PostsPage() {
 
   return (
     <div className="space-y-6">
-      <CommunityPost title="" posts={posts} />
+      <CommunityPost title="최신 글" posts={posts} />
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (

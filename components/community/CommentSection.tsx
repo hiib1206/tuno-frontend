@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/useToast";
@@ -470,44 +469,40 @@ export function CommentSection({ postId, isLoggedIn }: CommentSectionProps) {
                       {isLoggedIn &&
                         comment.author &&
                         user?.id === Number(comment.author.id) && (
-                          <TooltipProvider>
-                            <div className="flex items-center gap-1">
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 hover:scale-110"
-                                    onClick={() =>
-                                      handleEdit(comment.id, comment.content)
-                                    }
-                                  >
-                                    <Pencil className="h-3.5 w-3.5" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>수정</p>
-                                </TooltipContent>
-                              </Tooltip>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 hover:scale-110"
-                                    onClick={() =>
-                                      handleDeleteClick(comment.id)
-                                    }
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>삭제</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </div>
-                          </TooltipProvider>
+                          <div className="flex items-center gap-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 hover:scale-110"
+                                  onClick={() =>
+                                    handleEdit(comment.id, comment.content)
+                                  }
+                                >
+                                  <Pencil className="h-3.5 w-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>수정</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 hover:scale-110"
+                                  onClick={() => handleDeleteClick(comment.id)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>삭제</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
                         )}
                     </div>
 
@@ -605,47 +600,45 @@ export function CommentSection({ postId, isLoggedIn }: CommentSectionProps) {
                                   {isLoggedIn &&
                                     reply.author &&
                                     user?.id === Number(reply.author.id) && (
-                                      <TooltipProvider>
-                                        <div className="p-0 flex items-center">
-                                          <Tooltip>
-                                            <TooltipTrigger asChild>
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="!p-1 hover:scale-110"
-                                                onClick={() =>
-                                                  handleEdit(
-                                                    reply.id,
-                                                    reply.content
-                                                  )
-                                                }
-                                              >
-                                                <Pencil className="!h-3.5 !w-3.5" />
-                                              </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                              <p>수정</p>
-                                            </TooltipContent>
-                                          </Tooltip>
-                                          <Tooltip>
-                                            <TooltipTrigger asChild>
-                                              <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                className="!p-1 hover:scale-110"
-                                                onClick={() =>
-                                                  handleDeleteClick(reply.id)
-                                                }
-                                              >
-                                                <Trash2 className="!h-3.5 !w-3.5" />
-                                              </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                              <p>삭제</p>
-                                            </TooltipContent>
-                                          </Tooltip>
-                                        </div>
-                                      </TooltipProvider>
+                                      <div className="p-0 flex items-center">
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              className="!p-1 hover:scale-110"
+                                              onClick={() =>
+                                                handleEdit(
+                                                  reply.id,
+                                                  reply.content
+                                                )
+                                              }
+                                            >
+                                              <Pencil className="!h-3.5 !w-3.5" />
+                                            </Button>
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <p>수정</p>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                            <Button
+                                              variant="destructive"
+                                              size="sm"
+                                              className="!p-1 hover:scale-110"
+                                              onClick={() =>
+                                                handleDeleteClick(reply.id)
+                                              }
+                                            >
+                                              <Trash2 className="!h-3.5 !w-3.5" />
+                                            </Button>
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <p>삭제</p>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      </div>
                                     )}
                                 </div>
                                 <p className="text-sm text-foreground whitespace-pre-wrap">

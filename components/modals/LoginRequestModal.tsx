@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface LoginRequestModalProps {
   isOpen: boolean;
@@ -23,23 +23,30 @@ export function LoginRequestModal({
 }: LoginRequestModalProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // pathname + 쿼리 파라미터를 합친 전체 URL 생성
+  const getCurrentFullPath = () => {
+    const queryString = searchParams.toString();
+    return queryString ? `${pathname}?${queryString}` : pathname;
+  };
 
   const handleLogin = () => {
-    // redirectUrl이 없으면 현재 페이지(pathname)를 기본값으로 사용
-    const target = redirectUrl || pathname;
+    // redirectUrl이 없으면 현재 전체 경로(pathname + 쿼리파라미터)를 기본값으로 사용
+    const target = redirectUrl || getCurrentFullPath();
     router.push(`/login?redirect=${encodeURIComponent(target)}`);
     onClose();
   };
 
   const handleSignup = () => {
-    const target = redirectUrl || pathname;
+    const target = redirectUrl || getCurrentFullPath();
     router.push(`/signup?redirect=${encodeURIComponent(target)}`);
     onClose();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-sm rounded-xl gap-6 pb-6">
+      <DialogContent className="sm:max-w-sm rounded-xl gap-6 pb-6 bg-background-2 text-foreground">
         <DialogHeader className="space-y-3 text-center sm:text-center">
           <DialogTitle className="text-xl">
             로그인이 필요한 서비스입니다
