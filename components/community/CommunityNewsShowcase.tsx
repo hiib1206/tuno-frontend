@@ -172,7 +172,10 @@ export function CommunityNewsShowcase({
         </div>
 
         <Button variant="accent" size="sm" asChild>
-          <Link href={moreHref}>더보기</Link>
+          <Link href={moreHref} className="flex items-center gap-1">
+            <span>더보기</span>
+            <ChevronRight className="h-4 w-4" />
+          </Link>
         </Button>
       </div>
 
