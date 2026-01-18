@@ -281,6 +281,8 @@ export function useStockChart(
           setHasMoreData(false);
         }
 
+        dataUpdateListenersRef.current.forEach((callback) => callback());
+
         return newCandles.length;
       }
 
@@ -384,6 +386,8 @@ export function useStockChart(
               maSeries.setData(data as LineData[]);
             }
           }
+
+          dataUpdateListenersRef.current.forEach((callback) => callback());
         } else {
           setFetchError("주가 데이터를 가져오는데 실패했습니다.");
         }
@@ -494,6 +498,8 @@ export function useStockChart(
     if (volumeSeriesRef.current) {
       volumeSeriesRef.current.update(todayVolume);
     }
+
+    dataUpdateListenersRef.current.forEach((callback) => callback());
   }, [stockQuote]);
 
   // === 실시간 데이터 처리 (차트 업데이트) ===

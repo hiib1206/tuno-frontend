@@ -52,7 +52,7 @@ export function PriceChart({ onReady }: Props) {
       timeScale: {
         visible: false,
         rightOffset: 10,
-        minBarSpacing: 4,
+        minBarSpacing: 1,
         maxBarSpacing: 30,
       },
       rightPriceScale: {

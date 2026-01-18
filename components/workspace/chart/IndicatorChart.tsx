@@ -48,9 +48,20 @@ export function IndicatorChart({ onReady, title = "volume" }: Props) {
         visible: true,
         secondsVisible: false,
         rightOffset: 10,
-        minBarSpacing: 4,
+        minBarSpacing: 1,
         maxBarSpacing: 30,
         borderColor: getCssVar("--chart-text"),
+      },
+      localization: {
+        timeFormatter: (time: number) => {
+          const date = new Date(time * 1000);
+          // 원하는 포맷으로 변경
+          return date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          });
+        },
       },
       rightPriceScale: {
         visible: true,
