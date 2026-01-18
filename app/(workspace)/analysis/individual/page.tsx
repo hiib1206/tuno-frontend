@@ -66,7 +66,7 @@ export default function AnalysisPage() {
   };
 
   return (
-    <div className="min-h-full p-4 max-w-[1000px] mx-auto">
+    <div className="min-h-full p-4 max-w-6xl">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

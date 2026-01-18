@@ -80,9 +80,10 @@ export default function DashboardLayout({
     }
   };
 
+
   return (
     <div className="flex h-screen w-full bg-background-2 overflow-hidden relative">
-      {/* 모바일 오버레이 */}
+      {/* 모바일 오버레이 - 사이드바 */}
       {isMobile && isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -179,7 +180,12 @@ export default function DashboardLayout({
           </div>
         </div>
 
-        <div className="relative z-10">{children}</div>
+        {/* 컨텐츠 영역 */}
+        <div className="px-4 lg:px-6 relative z-10">
+          <div className="w-full py-4">
+            {children}
+          </div>
+        </div>
       </main>
 
       {/* 로그인 요청 모달 */}

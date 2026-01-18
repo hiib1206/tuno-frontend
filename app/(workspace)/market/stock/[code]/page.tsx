@@ -3,13 +3,14 @@
 import newsApi from "@/api/newsApi";
 import stockApi from "@/api/stockApi";
 import { toast } from "@/components/ToastProvider";
-import { ErrorState } from "@/components/feedback";
+import { ErrorState, LoadingState } from "@/components/feedback";
 import { WorkspaceFeedback } from "@/components/workspace/WorkspaceFeedback";
 import { FinancialStatements } from "@/components/workspace/stock/FinancialStatements";
 import { StockInfo as StockInfoComponent } from "@/components/workspace/stock/StockInfo";
 import { StockNews } from "@/components/workspace/stock/StockNews";
 import { useNews } from "@/hooks/useNews";
 import { useStockWebSocket } from "@/hooks/useStockWebSocket";
+import { useAuthStore } from "@/stores/authStore";
 import {
   ExchangeCode,
   MarketCode,
@@ -24,6 +25,7 @@ import { useEffect, useState } from "react";
 export default function StockPage() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const { isAuthLoading } = useAuthStore();
 
   const code = params.code as string;
   const market = searchParams.get("market") as MarketCode | null;
@@ -65,6 +67,9 @@ export default function StockPage() {
   });
 
   useEffect(() => {
+    // 인증 로딩 중이면 기다림
+    if (isAuthLoading) return;
+
     const fetchStockInfo = async () => {
       if (!market || !exchange) {
         setError("잘못된 접근입니다. 올바른 링크로 접근해주세요.");
@@ -92,7 +97,7 @@ export default function StockPage() {
     };
 
     fetchStockInfo();
-  }, [code, market, exchange]);
+  }, [code, market, exchange, isAuthLoading]);
 
   useEffect(() => {
     const fetchStockQuote = async () => {
@@ -137,18 +142,17 @@ export default function StockPage() {
   if (!stockInfo) {
     return (
       <WorkspaceFeedback>
-        <div></div>
-        {/* <LoadingState
-          lottieFile="/lottie/search-loading.json"
+        <LoadingState
+          lottieFile="/lottie/paper-plane.json"
           lottieClassName="h-80 w-80"
-        /> */}
+        />
       </WorkspaceFeedback>
     );
   }
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-5xl mx-auto space-y-2">
+    <div className="min-h-screen max-w-6xl mx-auto">
+      <div className="space-y-2">
         {/* 종목 기본 정보 및 차트 */}
         <StockInfoComponent
           stockQuote={stockQuote}

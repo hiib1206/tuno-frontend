@@ -20,6 +20,7 @@ import {
   ChevronUp,
   LayoutDashboard,
   LineChart,
+  LogIn,
   LogOut,
   Menu,
   Moon,
@@ -56,7 +57,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/");
+    // 로그아웃 후 현재 페이지에 그대로 유지
   };
 
   const currentTab = searchParams?.get("tab") || "news";
@@ -212,7 +213,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       {/* User 프로필 영역 - 열린 상태일 때만 표시 (하단 고정, 스크롤되지 않음) */}
       {isOpen && (
         <div className="flex-shrink-0 py-1 px-2 border-t border-border-2">
-          {user && (
+          {user ? (
             <DropdownMenu
               open={isDropdownOpen}
               onOpenChange={setIsDropdownOpen}
@@ -288,6 +289,25 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                 </DropdownMenuItemDestructive>
               </DropdownMenuContent>
             </DropdownMenu>
+          ) : (
+            <div className="py-4">
+              <Link
+                href={`/login?redirect=${encodeURIComponent(
+                  searchParams.toString()
+                    ? `${pathname}?${searchParams.toString()}`
+                    : pathname
+                )}`}
+                className="w-full"
+              >
+                <Button
+                  variant="default-accent"
+                  className="w-full flex items-center gap-2 justify-center"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>로그인</span>
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
       )}

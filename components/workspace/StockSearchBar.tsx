@@ -217,14 +217,14 @@ export default function StockSearchBar() {
           // onBlur는 외부 클릭 처리(useEffect)로 대체하여 링크 클릭 등을 허용
           onKeyDown={handleKeyDown}
           className={cn(
-            "h-9 w-full rounded-full border-accent focus:ring-0 bg-background pl-12",
+            "h-9 w-full rounded-full border-accent bg-background-1 focus:ring-0 pl-12",
             isOpen ? "rounded-b-none rounded-t-md" : "rounded-full"
           )}
         />
       </form>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 bg-background border-r border-l border-b border-border rounded-b-lg rounded-t-none shadow-lg z-50 overflow-hidden">
+        <div className="absolute left-0 right-0 bg-background-1 border-r border-l border-b border-border rounded-b-lg rounded-t-none shadow-lg z-50 overflow-hidden">
           {/* 로딩 상태 (검색 중일 때만) */}
           {!showRecent && isLoading && results.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground ">
@@ -234,7 +234,7 @@ export default function StockSearchBar() {
             <>
               <ul
                 ref={listRef}
-                className="max-h-79 overflow-y-auto bg-background-1"
+                className="max-h-84.5 overflow-y-auto bg-background-1"
                 onMouseLeave={() => setSelectedIndex(-1)}
               >
                 {displayList.map((stock, index) => (
@@ -243,10 +243,11 @@ export default function StockSearchBar() {
                     onMouseDown={() => handleSelect(stock)}
                     onMouseEnter={() => setSelectedIndex(index)}
                     className={cn(
-                      "px-4 py-1.5 group cursor-pointer transition-colors border-b last:border-0 border-border/50",
+                      "px-4 py-2 group cursor-pointer transition-colors border-b last:border-0 border-border/50",
                       index === selectedIndex
                         ? "bg-accent/10"
-                        : "hover:bg-accent/10"
+                        : "hover:bg-accent/10",
+                      index === 0 ? "pt-3" : ""
                     )}
                   >
                     <div className="flex items-center justify-between">
@@ -269,6 +270,10 @@ export default function StockSearchBar() {
                       </div>
                       {showRecent && (
                         <button
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
                           onClick={(e) => removeRecentSearch(e, stock)}
                           className="py-3 pl-3 rounded-full text-muted-foreground hover:text-foreground hover:scale-120 cursor-pointer"
                         >

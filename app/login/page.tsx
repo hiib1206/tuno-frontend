@@ -309,7 +309,7 @@ export default function LoginPage() {
           </p>
         </Card>
 
-        <p className="mt-8 text-center text-xs text-muted-foreground">
+        <p className="mt-4 text-center text-xs text-muted-foreground">
           로그인함으로써 InvestAI의{" "}
           <Link href="/terms" className="hover:underline">
             이용약관
