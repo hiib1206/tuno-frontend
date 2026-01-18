@@ -7,6 +7,7 @@ import {
   StockQuote,
   StockSearchQueryParams,
   StockSearchResult,
+  WatchlistItem,
 } from "@/types/Stock";
 import apiClient from "./apiClient";
 
@@ -82,6 +83,54 @@ type StockQuoteResult = {
   data: StockQuote | null;
 };
 
+// 관심종목 토글 응답 타입
+type WatchlistToggleResult = {
+  success: boolean;
+  message: string;
+  data: {
+    isInWatchlist: boolean;
+  } | null;
+};
+
+// 관심종목 목록 조회 쿼리 파라미터 타입
+type WatchlistQueryParams = {
+  exchange?: ExchangeCode; // 거래소 코드로 필터링 (선택)
+};
+
+// 관심종목 목록 조회 응답 타입
+type WatchlistResult = {
+  success: boolean;
+  message: string;
+  data: {
+    count: number;
+    items: WatchlistItem[];
+  } | null;
+};
+
+// 관심종목 순서 변경 요청 타입
+type WatchlistOrderItem = {
+  exchange: ExchangeCode;
+  code: string;
+};
+
+// 관심종목 순서 변경 응답 타입
+type WatchlistOrderResult = {
+  success: boolean;
+  message: string;
+  data: {
+    count: number;
+  } | null;
+};
+
+// 전체 관심종목 삭제 응답 타입
+type WatchlistDeleteResult = {
+  success: boolean;
+  message: string;
+  data: {
+    deletedCount: number;
+  } | null;
+};
+
 const stockApi = {
   // 종목 정보 조회 (국내/해외 통합)
   getStockInfo: async (
@@ -155,6 +204,66 @@ const stockApi = {
         count: number;
         results: StockSearchResult[];
       } | null,
+    };
+  },
+
+  // 관심종목 토글 (추가/제거)
+  toggleWatchlist: async (
+    code: string,
+    exchange: ExchangeCode
+  ): Promise<WatchlistToggleResult> => {
+    const response = await apiClient.post(
+      `/api/stock/${code}/watchlist`,
+      {},
+      {
+        params: { exchange },
+      }
+    );
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: response.data.data as { isInWatchlist: boolean } | null,
+    };
+  },
+
+  // 관심종목 목록 조회
+  getWatchlist: async (
+    params?: WatchlistQueryParams
+  ): Promise<WatchlistResult> => {
+    const response = await apiClient.get("/api/stock/watchlist", {
+      params,
+    });
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: response.data.data as {
+        count: number;
+        items: WatchlistItem[];
+      } | null,
+    };
+  },
+
+  // 관심종목 순서 변경
+  updateWatchlistOrder: async (
+    order: WatchlistOrderItem[]
+  ): Promise<WatchlistOrderResult> => {
+    const response = await apiClient.patch("/api/stock/watchlist/order", {
+      order,
+    });
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: response.data.data as { count: number } | null,
+    };
+  },
+
+  // 전체 관심종목 삭제
+  deleteWatchlist: async (): Promise<WatchlistDeleteResult> => {
+    const response = await apiClient.delete("/api/stock/watchlist");
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: response.data.data as { deletedCount: number } | null,
     };
   },
 };

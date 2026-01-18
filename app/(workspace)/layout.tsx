@@ -1,9 +1,18 @@
 "use client";
 
+import { LoginRequestModal } from "@/components/modals/LoginRequestModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
-import StockSearchBar from "@/components/workspace/StockSearchBar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Sidebar } from "@/components/workspace/sidebar";
+import StockSearchBar from "@/components/workspace/StockSearchBar";
+import { WatchlistPanel } from "@/components/workspace/WatchlistPanel";
+import { useAuthStore } from "@/stores/authStore";
+import { useWatchlistStore } from "@/stores/watchlistStore";
 import { Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -12,10 +21,27 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { user } = useAuthStore();
+  const { fetchWatchlist, reset: resetWatchlist } = useWatchlistStore();
+  const isLoggedIn = !!user;
+  
   const [isMobile, setIsMobile] = useState(false);
   // 사이드바 관련
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userClosedSidebar, setUserClosedSidebar] = useState(false); // 사용자가 수동으로 닫았는지 추적
+  
+  // 로그인 요청 모달
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // 로그인 시 관심종목 초기 로드, 로그아웃 시 초기화
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchWatchlist();
+    } else {
+      resetWatchlist();
+    }
+  }, [isLoggedIn, fetchWatchlist, resetWatchlist]);
+  
 
   // 화면 크기 감지 및 반응형 처리
   useEffect(() => {
@@ -104,16 +130,44 @@ export default function DashboardLayout({
             {/* 좌측 여백 (데스크톱에서 검색창 가운데 정렬을 위해) */}
             <div className="flex-1 hidden sm:block"></div>
 
-            {/* 검색창과 데스크톱 */}
-            <div className="flex items-center gap-3 w-full max-w-md hidden sm:flex">
+            {/* 검색창과 관심종목 */}
+            <div className="flex items-center w-full max-w-md hidden sm:flex">
               <StockSearchBar />
-              <ThemeToggle />
+              {isLoggedIn ? (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="default-accent"
+                      className="shrink-0 hover:scale-100"
+                      aria-label="관심종목"
+                    >
+                      관심종목
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-72 p-0 animate-in slide-in-from-top-2 fade-in-0 duration-200"
+                    align="end"
+                    sideOffset={6}
+                  >
+                    <WatchlistPanel />
+                  </PopoverContent>
+                </Popover>
+              ) : (
+                <Button
+                  variant="default-accent"
+                  className="shrink-0 gap-1.5 hover:scale-100"
+                  aria-label="관심종목"
+                  onClick={() => setIsLoginModalOpen(true)}
+                >
+                  관심종목
+                </Button>
+              )}
             </div>
 
             {/* 우측 여백 (데스크톱에서 검색창 가운데 정렬을 위해) */}
             <div className="flex-1 hidden sm:flex justify-end"></div>
 
-            {/* 모바일: 검색 입력란과 관심 종목 버튼 */}
+            {/* 모바일: 검색 입력란 */}
             <div className="sm:hidden flex items-center gap-2 flex-1">
               <StockSearchBar />
               <ThemeToggle />
@@ -123,6 +177,12 @@ export default function DashboardLayout({
 
         <div className="relative z-10">{children}</div>
       </main>
+
+      {/* 로그인 요청 모달 */}
+      <LoginRequestModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </div>
   );
 }

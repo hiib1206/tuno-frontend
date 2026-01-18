@@ -48,6 +48,7 @@ export type StockInfo = {
   nameEn: string | null; // 영문 종목명 (국내 주식은 null)
   listedAt: string | null; // 상장일자 (YYYYMMDD 형식, 해외 주식은 null)
   isNxtInMaster: boolean; // 넥스트 마스터 파일에 있는 종목인지 여부
+  isInWatchlist?: boolean; // 종목 관심 여부
 };
 
 /** 종목 상태 구분 */
@@ -160,5 +161,16 @@ export type StockSearchResult = {
   nameKo: string;
   nameEn: string | null;
   listedAt: string | null; // YYYYMMDD or null
+  isNxtInMaster: boolean | null;
+};
+
+// 관심종목 아이템 타입
+export type WatchlistItem = {
+  market: MarketCode;
+  exchange: ExchangeCode;
+  code: string;
+  nameKo: string;
+  nameEn: string | null;
+  listedAt: string | null;
   isNxtInMaster: boolean | null;
 };
