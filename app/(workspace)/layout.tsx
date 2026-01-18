@@ -115,6 +115,11 @@ export default function DashboardLayout({
         {/* 헤더 */}
         <div className="sticky top-0 z-30 bg-background-2">
           <div className="flex items-center gap-2 px-4 py-3 lg:px-6">
+            {/* 테마 토글 - 가장 왼쪽 (모바일에서 숨김) */}
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
+
             {/* 모바일: 햄버거 메뉴 */}
             {isMobile && !isSidebarOpen && (
               <Button
@@ -170,7 +175,6 @@ export default function DashboardLayout({
             {/* 모바일: 검색 입력란 */}
             <div className="sm:hidden flex items-center gap-2 flex-1">
               <StockSearchBar />
-              <ThemeToggle />
             </div>
           </div>
         </div>

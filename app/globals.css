@@ -6,6 +6,7 @@
 
 :root {
   --font-sans: var(--font-instrument-sans), "sans-serif";
+  --font-bungee: var(--font-bungee-shade), "sans-serif";
 
   /* Light Mode Colors */
   --background: oklch(1 0 0);
@@ -21,7 +22,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0 0);
 
-  --primary: oklch(0.15 0 0);
+  --primary: oklch(0.22 0 0);
   --primary-foreground: oklch(0.99 0 0);
 
   --secondary: oklch(0.97 0 0);
@@ -107,7 +108,7 @@
   --destructive-foreground: oklch(0.94 0 0);
 
   --border: oklch(0.35 0 0);
-  --border-2: oklch(0.35 0 0);
+  --border-2: oklch(0.3 0 0);
   --input: oklch(0.35 0 0);
   --ring: oklch(0.9 0 0);
 
@@ -219,6 +220,12 @@
 
   input[type="search"]::-moz-search-clear-button {
     display: none;
+  }
+}
+
+@layer utilities {
+  .font-bungee {
+    font-family: var(--font-bungee);
   }
 }
 

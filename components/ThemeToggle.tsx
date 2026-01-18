@@ -19,14 +19,16 @@ export function ThemeToggle() {
   const isDark = theme === "dark";
 
   return (
-    <div className="flex items-center gap-1">
+    <button
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className="flex items-center gap-1 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded-md p-1 -ml-1"
+      aria-label="Toggle Dark Mode"
+    >
       <Moon className={`h-5 w-5 text-muted-foreground`} />
-      <button
-        onClick={() => setTheme(isDark ? "light" : "dark")}
-        className={`border-accent relative w-10 h-5 rounded-full transition-colors duration-300 focus:outline-none focus:ring-1 focus:ring-ring
+      <div
+        className={`border-accent relative w-10 h-5 rounded-full transition-colors duration-300
           ${isDark ? "bg-accent border-accent" : "bg-muted-3 border-accent"}
         `}
-        aria-label="Toggle Dark Mode"
       >
         <span
           className={`
@@ -34,7 +36,7 @@ export function ThemeToggle() {
             ${isDark ? "translate-x-4" : "translate-x-0"}
           `}
         />
-      </button>
-    </div>
+      </div>
+    </button>
   );
 }

@@ -1,13 +1,21 @@
 import { AuthProvider } from "@/components/AuthProvider";
 import { Toaster } from "@/components/ToastProvider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import type { Metadata } from "next";
-import { Instrument_Sans } from "next/font/google";
+import { Bungee_Shade, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-instrument-sans",
+});
+
+const bungeeShade = Bungee_Shade({
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+  variable: "--font-bungee-shade",
 });
 
 export const metadata: Metadata = {
@@ -44,20 +52,22 @@ export default function RootLayout({
       lang="ko"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={instrumentSans.variable}
+      className={`${instrumentSans.variable} ${bungeeShade.variable}`}
     >
-      <body className={`font-sans antialiased`}>
+      <body className={`font-sans antialiased bg-background-2`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange={false}
         >
-          <AuthProvider />
-          {children}
-          <Toaster />
-          {/* <Analytics는 vercel에 정보 보내서 분석하는 서비스이므로 일단 주석처리 */}
-          {/* <Analytics /> */}
+          <TooltipProvider>
+            <AuthProvider />
+            {children}
+            <Toaster />
+            {/* <Analytics는 vercel에 정보 보내서 분석하는 서비스이므로 일단 주석처리 */}
+            {/* <Analytics /> */}
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
