@@ -2,11 +2,17 @@
 
 import { LoginRequestModal } from "@/components/modals/LoginRequestModal";
 import { Button } from "@/components/ui/button";
-import { PostListItem } from "@/lib/community";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { PostListItem, PostSortOption } from "@/lib/community";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { PostCategoryLabels } from "@/types/Common";
-import { Eye, Heart, MessageSquare, Plus } from "lucide-react";
+import { ArrowUpDown, Eye, Heart, MessageSquare, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -14,12 +20,22 @@ interface CommunityPostProps {
   title?: string;
   posts?: PostListItem[];
   className?: string;
+  showWriteButton?: boolean;
+  showSort?: boolean;
+  sortOptions?: PostSortOption[];
+  currentSort?: string;
+  onSortChange?: (sortOption: PostSortOption) => void;
 }
 
 export function CommunityPost({
   title = "글 목록",
   posts = [],
   className,
+  showWriteButton = true,
+  showSort = false,
+  sortOptions = [],
+  currentSort = "latest",
+  onSortChange,
 }: CommunityPostProps) {
   const { user } = useAuthStore();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -40,20 +56,57 @@ export function CommunityPost({
       )}
     >
       {/* 제목 섹션 */}
-      <div className="mb-3 flex flex-row items-center justify-between gap-2 gap-0">
+      <div className="mb-3 flex flex-row items-center justify-between gap-2">
         <h2 className="px-1 text-lg sm:text-xl font-semibold">{title}</h2>
-        <Button
-          variant="accent"
-          size="sm"
-          className="w-full sm:w-auto flex flex-col"
-          onClick={handleWriteClick}
-        >
-          <div className="h-4"></div>
-          <div className="flex items-center gap-1">
-            <Plus className="h-4 w-4" />
-            <span>글쓰기</span>
-          </div>
-        </Button>
+        {showWriteButton && (
+          <Button
+            variant="accent"
+            size="sm"
+            className="w-full sm:w-auto flex flex-col"
+            onClick={handleWriteClick}
+          >
+            <div className="h-4"></div>
+            <div className="flex items-center gap-1">
+              <Plus className="h-4 w-4" />
+              <span>글쓰기</span>
+            </div>
+          </Button>
+        )}
+        {showSort && sortOptions.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="default"
+                size="xxs"
+                className="flex items-center gap-1"
+              >
+                <ArrowUpDown className="h-2.5 w-2.5" />
+                <span>
+                  {sortOptions.find((opt) => opt.value === currentSort)?.label}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              sideOffset={0}
+              onCloseAutoFocus={(e) => e.preventDefault()}
+              className="w-auto min-w-[6rem]"
+            >
+              {sortOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.value}
+                  onClick={() => onSortChange?.(option)}
+                  className={cn(
+                    "cursor-pointer text-xs hover:text-accent-text",
+                    currentSort === option.value && "text-accent-text"
+                  )}
+                >
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {/* 포스트 리스트 */}
@@ -61,23 +114,28 @@ export function CommunityPost({
         <div className="text-center space-y-4">
           <div className="h-px border-t border-border/60" />
 
-          {/* <p className="py-4 text-muted-foreground">{emptyMessage}</p> */}
           <div className="flex flex-col items-center gap-2 pt-6">
-            <p className="text-muted-foreground">이 공간은 아직 비어 있어요.</p>
-            <p className="text-muted-foreground">
-              지금 첫 이야기를 시작해보세요!
-            </p>
-            <Button
-              variant="accent-outline"
-              size="default"
-              className="mt-4 group relative overflow-hidden hover:shadow-xl transition-all duration-300 font-semibold"
-              onClick={handleWriteClick}
-            >
-              <div className="flex items-center gap-2.5">
-                <Plus className="h-8 w-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
-                <span className="text-base">글 쓰러 가기</span>
-              </div>
-            </Button>
+            {showWriteButton ? (
+              <>
+                <p className="text-muted-foreground">이 공간은 아직 비어 있어요.</p>
+                <p className="text-muted-foreground">
+                  지금 첫 이야기를 시작해보세요!
+                </p>
+                <Button
+                  variant="accent-outline"
+                  size="default"
+                  className="mt-4 group relative overflow-hidden hover:shadow-xl transition-all duration-300 font-semibold"
+                  onClick={handleWriteClick}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Plus className="h-8 w-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
+                    <span className="text-base">글 쓰러 가기</span>
+                  </div>
+                </Button>
+              </>
+            ) : (
+              <p className="text-muted-foreground py-4">검색 결과가 없습니다.</p>
+            )}
           </div>
         </div>
       ) : (

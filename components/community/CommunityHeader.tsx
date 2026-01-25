@@ -7,7 +7,7 @@ import { withRedirect } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { Search } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Input } from "../ui/input";
 
@@ -15,14 +15,18 @@ export function CommunityHeader() {
   const { user, isAuthLoading } = useAuthStore();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
 
   // Next.js hook은 서버와 클라이언트에서 동일한 값을 보장합니다
   const currentUrl =
     pathname + (searchParams.toString() ? `?${searchParams.toString()}` : "");
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSearch = (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/community/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   return (
@@ -40,10 +44,16 @@ export function CommunityHeader() {
             className="absolute left-1/2 -translate-x-1/2 w-full max-w-md px-4 hidden sm:block"
           >
             <div className="relative">
-              <Search className="absolute right-5 top-1/2 -translate-y-1/2 h-4 w-4 text-accent-text" />
+              <button
+                type="button"
+                onClick={() => handleSearch()}
+                className="absolute right-5 top-1/2 -translate-y-1/2 cursor-pointer hover:scale-110 transition-transform"
+              >
+                <Search className="h-4 w-4 text-accent-text" />
+              </button>
               <Input
                 type="search"
-                placeholder="게시글, 뉴스 검색..."
+                placeholder="글, 뉴스 검색..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-9 pl-6 pr-10 w-full rounded-full border-accent focus:ring-0"
@@ -53,7 +63,10 @@ export function CommunityHeader() {
 
           {/* 모바일 검색 아이콘 */}
           <div className="sm:hidden">
-            <button className="p-2 hover:bg-background-2 rounded-md transition-colors">
+            <button
+              onClick={() => router.push("/community/search")}
+              className="p-2 hover:bg-background-2 rounded-md transition-colors"
+            >
               <Search className="h-5 w-5" />
             </button>
           </div>

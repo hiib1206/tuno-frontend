@@ -84,9 +84,9 @@ export function CommunityPostList({ className }: CommunityPostListProps) {
       )}
     >
       {/* 상단 헤더 */}
-      <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between">
         {/* 왼쪽: 필터 탭 */}
-        <div className="flex items-center overflow-x-auto w-full sm:w-auto">
+        <div className="flex items-center overflow-x-auto w-full sm:w-auto gap-1">
           {filterOptions.map((option) => (
             <button
               key={option.value}

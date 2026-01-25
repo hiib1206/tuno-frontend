@@ -42,7 +42,7 @@ export function CommunityNewsShowcase({
   fetchFn,
   topicId = NEWS_TOPICS.headline,
   autoFetch = true,
-  enableImageExtraction = false,
+  enableImageExtraction = true,
 }: CommunityNewsShowcaseProps) {
   const safeLimit = Math.min(10, Math.max(1, limit));
   const safeFeaturedCount = Math.min(featuredCount, safeLimit);
