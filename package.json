@@ -59,6 +59,8 @@
     "cmdk": "1.0.4",
     "culori": "^4.0.2",
     "date-fns": "4.1.0",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.6",
     "embla-carousel-react": "8.5.1",
     "expo": "latest",
     "expo-asset": "latest",
