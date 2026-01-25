@@ -28,8 +28,7 @@ import {
   Newspaper,
   Settings,
   Sun,
-  User2,
-  Users,
+  Users
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -77,7 +76,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       active: pathname === "/analysis/quant",
     },
     {
-      label: "주가 분석",
+      label: "차트 분석",
       icon: LineChart,
       href: "/analysis/individual",
       active: pathname === "/analysis/individual",
@@ -87,12 +86,6 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       icon: Layers,
       href: "/market/theme",
       active: pathname === "/market/theme",
-    },
-    {
-      label: "My",
-      icon: User2,
-      href: "/my",
-      active: pathname === "/my",
     },
     {
       label: "뉴스",
