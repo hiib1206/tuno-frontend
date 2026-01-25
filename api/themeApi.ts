@@ -1,4 +1,4 @@
-import { SpecialTheme, SpecialThemeGubun } from "@/types/Theme";
+import { SpecialTheme, SpecialThemeGubun, ThemeStockInfo, ThemeStock } from "@/types/Theme";
 import apiClient from "./apiClient";
 
 // 특이테마 조회 쿼리 파라미터 타입
@@ -13,6 +13,16 @@ type SpecialThemeResult = {
   data: {
     top: SpecialTheme[]; // 상위 15개 테마
     bottom: SpecialTheme[]; // 하위 15개 테마
+  } | null;
+};
+
+// 테마 종목 조회 응답 타입
+type ThemeStocksResult = {
+  success: boolean;
+  message: string;
+  data: {
+    info: ThemeStockInfo;
+    stocks: ThemeStock[];
   } | null;
 };
 
@@ -33,13 +43,26 @@ const themeApi = {
       } | null,
     };
   },
+
+  // 테마 종목 조회
+  getThemeStocks: async (tmcode: string): Promise<ThemeStocksResult> => {
+    const response = await apiClient.get(`/api/theme/${tmcode}/stocks`);
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: response.data.data as {
+        info: ThemeStockInfo;
+        stocks: ThemeStock[];
+      } | null,
+    };
+  },
 };
 
 export default themeApi;
 
 // 타입 export
 export type {
-  SpecialTheme, SpecialThemeGubun,
-  SpecialThemeQueryParams, SpecialThemeResult
+  SpecialTheme, SpecialThemeGubun, ThemeStockInfo, ThemeStock,
+  SpecialThemeQueryParams, SpecialThemeResult, ThemeStocksResult
 };
 
