@@ -14,6 +14,8 @@ interface UseNewsOptions {
   enableImageExtraction?: boolean;
   /** 자동 초기 로드 여부 */
   autoFetch?: boolean;
+  /** 상태 리셋 및 재요청을 위한 키 (변경 시 초기화됨) */
+  key?: string;
 }
 
 interface UseNewsReturn {
@@ -43,6 +45,7 @@ export function useNews(
     enablePagination = false,
     enableImageExtraction = true,
     autoFetch = true,
+    key,
   } = options || {};
 
   // 기본 상태
@@ -178,12 +181,18 @@ export function useNews(
     }
   }, [enablePagination, nextCursor, loadingMore, hasNextPage, fetchNews]);
 
-  // 초기 로드
+  // 초기 로드 (key가 변경되면 상태 초기화 후 재요청)
   useEffect(() => {
     if (autoFetch) {
+      // key가 변경되면 상태 초기화
+      setNews([]);
+      setNextCursor(null);
+      setHasNextPage(false);
+      setFailedImageUrls(new Set());
       fetchNews();
     }
-  }, [autoFetch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoFetch, key]);
 
   // 컴포넌트 언마운트 시 모든 EventSource 정리
   useEffect(() => {
