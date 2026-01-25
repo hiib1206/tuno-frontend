@@ -24,12 +24,12 @@ export default function DashboardLayout({
   const { user } = useAuthStore();
   const { fetchWatchlist, reset: resetWatchlist } = useWatchlistStore();
   const isLoggedIn = !!user;
-  
+
   const [isMobile, setIsMobile] = useState(false);
   // 사이드바 관련
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userClosedSidebar, setUserClosedSidebar] = useState(false); // 사용자가 수동으로 닫았는지 추적
-  
+
   // 로그인 요청 모달
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -41,7 +41,7 @@ export default function DashboardLayout({
       resetWatchlist();
     }
   }, [isLoggedIn, fetchWatchlist, resetWatchlist]);
-  
+
 
   // 화면 크기 감지 및 반응형 처리
   useEffect(() => {
@@ -112,9 +112,9 @@ export default function DashboardLayout({
       </div>
 
       {/* 메인 컨텐츠 */}
-      <main className="flex-1 overflow-y-auto relative w-full lg:w-auto">
+      <main className="flex-1 flex flex-col overflow-hidden relative w-full lg:w-auto">
         {/* 헤더 */}
-        <div className="sticky top-0 z-30 bg-background-2">
+        <div className="flex-shrink-0 z-30 bg-background-2">
           <div className="flex items-center gap-2 px-4 py-3 lg:px-6">
             {/* 테마 토글 - 가장 왼쪽 (모바일에서 숨김) */}
             <div className="hidden sm:block">
@@ -181,10 +181,8 @@ export default function DashboardLayout({
         </div>
 
         {/* 컨텐츠 영역 */}
-        <div className="px-4 lg:px-6 relative z-10">
-          <div className="w-full py-4">
-            {children}
-          </div>
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 lg:px-6 py-4 relative z-10">
+          {children}
         </div>
       </main>
 
