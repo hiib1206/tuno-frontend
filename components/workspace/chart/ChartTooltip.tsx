@@ -35,20 +35,20 @@ export function ChartTooltip({ data }: ChartTooltipProps) {
       )}
     >
       {/* 헤더: 날짜 + 토글 */}
-      <div className="flex items-center justify-between">
-        <div className="font-semibold text-foreground">{data.date}</div>
-        <button
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          aria-label={open ? "툴팁 닫기" : "툴팁 열기"}
-          title={open ? "닫기" : "열기"}
-          className="ml-2 text-muted-foreground/80 hover:text-foreground text-sm"
-        >
-          {open ? "▾" : "▸"}
-        </button>
-      </div>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-label={open ? "툴팁 닫기" : "툴팁 열기"}
+        title={open ? "닫기" : "열기"}
+        className="w-full flex items-center gap-2 text-left"
+      >
+        <span className="text-muted-foreground/80 text-xs">
+          {open ? "▼" : "▶"}
+        </span>
+        <span className="font-semibold text-foreground">{data.date}</span>
+      </button>
 
-      {/* 내용: 열렸을 때만 표시 */}
+      {/* 내용: 열려졌을 때만 표시 */}
       {open && (
         <>
           {/* 가격 정보 */}

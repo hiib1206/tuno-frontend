@@ -12,13 +12,15 @@ import {
 } from "lightweight-charts";
 import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
+import { PriceBandPrimitive } from "./primitives/PriceBandPrimitive";
 
 type Props = {
   // onReady: 차트가 준비되면 호출되는 콜백 함수로 차트와 시리즈 인스턴스를 전달
   onReady?: (
     chart: IChartApi,
     series: ISeriesApi<"Candlestick">,
-    maSeries: Map<number, ISeriesApi<"Line">>
+    maSeries: Map<number, ISeriesApi<"Line">>,
+    priceBandPrimitive: PriceBandPrimitive
   ) => void;
 };
 
@@ -27,6 +29,7 @@ export function PriceChart({ onReady }: Props) {
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const maSeriesRef = useRef<Map<number, ISeriesApi<"Line">>>(new Map());
+  const priceBandPrimitiveRef = useRef<PriceBandPrimitive | null>(null);
   const { resolvedTheme } = useTheme();
 
   // 차트는 한 번만 생성
@@ -37,6 +40,7 @@ export function PriceChart({ onReady }: Props) {
     const initialHeight = ref.current.clientHeight;
 
     const chart = createChart(ref.current, {
+      autoSize: true,
       height: initialHeight,
       layout: {
         background: { type: ColorType.Solid, color: "rgba(0, 0, 0, 0)" },
@@ -51,7 +55,7 @@ export function PriceChart({ onReady }: Props) {
       },
       timeScale: {
         visible: false,
-        rightOffset: 10,
+        rightOffset: 20,
         minBarSpacing: 1,
         maxBarSpacing: 30,
       },
@@ -102,18 +106,24 @@ export function PriceChart({ onReady }: Props) {
       maSeries.set(config.period, lineSeries);
     }
 
+    // 가격 밴드 프리미티브 생성 및 연결
+    const priceBandPrimitive = new PriceBandPrimitive();
+    candlestickSeries.attachPrimitive(priceBandPrimitive);
+
     chartRef.current = chart;
     seriesRef.current = candlestickSeries;
     maSeriesRef.current = maSeries;
+    priceBandPrimitiveRef.current = priceBandPrimitive;
 
     // 차트와 시리즈 인스턴스를 부모에게 전달
-    onReady?.(chart, candlestickSeries, maSeries);
+    onReady?.(chart, candlestickSeries, maSeries, priceBandPrimitive);
 
     return () => {
       chart.remove();
       chartRef.current = null;
       seriesRef.current = null;
       maSeriesRef.current = new Map();
+      priceBandPrimitiveRef.current = null;
     };
   }, [onReady]);
 
@@ -149,26 +159,6 @@ export function PriceChart({ onReady }: Props) {
       });
     });
   }, [resolvedTheme]);
-
-  // 차트 리사이즈 처리
-  useEffect(() => {
-    if (!chartRef.current || !ref.current) return;
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        if (width > 0 && height > 0) {
-          chartRef.current?.resize(width, height);
-        }
-      }
-    });
-
-    resizeObserver.observe(ref.current);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
 
   return <div ref={ref} className="w-full h-full" />;
 }

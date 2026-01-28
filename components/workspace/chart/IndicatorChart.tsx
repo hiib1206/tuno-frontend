@@ -32,6 +32,7 @@ export function IndicatorChart({ onReady, title = "volume" }: Props) {
     const initialHeight = ref.current.clientHeight;
 
     const chart = createChart(ref.current, {
+      autoSize: true,
       height: initialHeight,
       layout: {
         background: { type: ColorType.Solid, color: "rgba(0, 0, 0, 0)" },
@@ -47,7 +48,7 @@ export function IndicatorChart({ onReady, title = "volume" }: Props) {
       timeScale: {
         visible: true,
         secondsVisible: false,
-        rightOffset: 10,
+        rightOffset: 20,
         minBarSpacing: 1,
         maxBarSpacing: 30,
         borderColor: getCssVar("--chart-text"),
@@ -118,26 +119,6 @@ export function IndicatorChart({ onReady, title = "volume" }: Props) {
       });
     });
   }, [resolvedTheme]);
-
-  // 차트 리사이즈 처리
-  useEffect(() => {
-    if (!chartRef.current || !ref.current) return;
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        if (width > 0 && height > 0) {
-          chartRef.current?.resize(width, height);
-        }
-      }
-    });
-
-    resizeObserver.observe(ref.current);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
 
   return (
     <div className="relative w-full h-full z-0">
