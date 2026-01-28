@@ -4,6 +4,7 @@ import {
   FinancialSummary,
   MarketCode,
   StockInfo,
+  StockOrderbookData,
   StockQuote,
   StockSearchQueryParams,
   StockSearchResult,
@@ -129,6 +130,18 @@ type WatchlistDeleteResult = {
   data: {
     deletedCount: number;
   } | null;
+};
+
+// 호가 조회 쿼리 파라미터 타입
+type OrderbookQueryParams = {
+  market_division_code: "J" | "NX" | "UN"; // J: KRX, NX: NXT, UN: 통합
+};
+
+// 호가 조회 응답 타입
+type OrderbookResult = {
+  success: boolean;
+  message: string;
+  data: StockOrderbookData | null;
 };
 
 const stockApi = {
@@ -264,6 +277,21 @@ const stockApi = {
       success: response.data.success,
       message: response.data.message,
       data: response.data.data as { deletedCount: number } | null,
+    };
+  },
+
+  // 호가 조회
+  getOrderbook: async (
+    code: string,
+    params: OrderbookQueryParams
+  ): Promise<OrderbookResult> => {
+    const response = await apiClient.get(`/api/stock/${code}/orderbook`, {
+      params,
+    });
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: response.data.data as StockOrderbookData | null,
     };
   },
 };

@@ -1,4 +1,11 @@
-import { SnapbackResult } from "@/types/Inference";
+import {
+  InferenceHistoryItem,
+  InferenceModelType,
+  InferenceStatus,
+  parseInferenceHistoryItem,
+  parseSnapbackResult,
+  SnapbackResult,
+} from "@/types/Inference";
 import apiClient from "./apiClient";
 
 export interface SnapbackRequest {
@@ -13,6 +20,33 @@ export interface SnapbackResponse {
   data: SnapbackResult;
 }
 
+// AI 추론 이력 조회
+export interface InferenceHistoryQueryParams {
+  cursor?: string;
+  limit?: number;
+  model_type?: InferenceModelType;
+  ticker?: string;
+  days?: number;
+  status?: InferenceStatus;
+}
+
+export interface InferenceHistoryResponse {
+  success: boolean;
+  message: string;
+  data: {
+    items: InferenceHistoryItem[];
+    nextCursor: string | null;
+    hasNext: boolean;
+  } | null;
+}
+
+// AI 추론 이력 단건 조회
+export interface InferenceHistoryItemResponse {
+  success: boolean;
+  message: string;
+  data: InferenceHistoryItem | null;
+}
+
 const inferenceApi = {
   snapback: async (params: SnapbackRequest): Promise<SnapbackResponse> => {
     const body: SnapbackRequest = {
@@ -24,7 +58,36 @@ const inferenceApi = {
       success: response.data.success,
       statusCode: response.data.statusCode,
       message: response.data.message,
-      data: response.data.data as SnapbackResult,
+      data: parseSnapbackResult(response.data.data),
+    };
+  },
+
+  // AI 추론 이력 조회
+  getHistory: async (
+    params?: InferenceHistoryQueryParams
+  ): Promise<InferenceHistoryResponse> => {
+    const response = await apiClient.get("/api/inference/history", { params });
+    const rawData = response.data.data;
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: rawData
+        ? {
+            items: rawData.items.map(parseInferenceHistoryItem),
+            nextCursor: rawData.nextCursor,
+            hasNext: rawData.hasNext,
+          }
+        : null,
+    };
+  },
+
+  // AI 추론 이력 단건 조회
+  getHistoryById: async (id: string): Promise<InferenceHistoryItemResponse> => {
+    const response = await apiClient.get(`/api/inference/history/${id}`);
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: response.data.data ? parseInferenceHistoryItem(response.data.data) : null,
     };
   },
 };

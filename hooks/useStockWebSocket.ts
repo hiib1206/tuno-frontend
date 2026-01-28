@@ -68,13 +68,15 @@ export function useStockWebSocket(
   const connect = useCallback(() => {
     if (!enabled || !stockCode) return;
 
-    // 연결 시작 시 의도적 종료 플래그 리셋
-    intentionalCloseRef.current = false;
-
-    // 기존 연결 정리
+    // 기존 연결 정리 (의도적 종료로 표시하여 onclose에서 재연결 방지)
     if (wsRef.current) {
+      intentionalCloseRef.current = true;
       wsRef.current.close();
+      wsRef.current = null;
     }
+
+    // 새 연결 시작 시 의도적 종료 플래그 리셋
+    intentionalCloseRef.current = false;
 
     try {
       const ws = new WebSocket(WS_URL);
@@ -143,11 +145,17 @@ export function useStockWebSocket(
       };
 
       ws.onerror = () => {
+        // 현재 활성 연결이 아니면 무시
+        if (wsRef.current !== ws) return;
+
         setError("실시간 데이터 수신 중 오류가 발생했습니다.");
         setIsConnected(false);
       };
 
       ws.onclose = () => {
+        // 현재 활성 연결이 아니면 무시 (이전 연결의 onclose 이벤트)
+        if (wsRef.current !== ws) return;
+
         setIsConnected(false);
 
         // 의도적 종료가 아닐 때만 자동 재연결 (최대 시도 횟수 제한)

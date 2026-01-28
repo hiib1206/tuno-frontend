@@ -48,3 +48,43 @@ export type ThemeStock = {
   marketcap: number; // 시가총액 (백만단위)
   exchange?: string | null; // 거래소 코드 (KP, KQ 등)
 };
+
+// 특이테마 데이터 변환 (문자열 -> 숫자)
+export const parseSpecialTheme = (raw: Record<string, unknown>): SpecialTheme => ({
+  tmname: String(raw.tmname),
+  totcnt: Number(raw.totcnt),
+  upcnt: Number(raw.upcnt),
+  dncnt: Number(raw.dncnt),
+  uprate: Number(raw.uprate),
+  diffVol: Number(raw.diffVol),
+  avgdiff: Number(raw.avgdiff),
+  chgdiff: Number(raw.chgdiff),
+  tmcode: String(raw.tmcode),
+});
+
+// 테마 종목 정보 변환 (문자열 -> 숫자)
+export const parseThemeStockInfo = (raw: Record<string, unknown>): ThemeStockInfo => ({
+  upcnt: Number(raw.upcnt),
+  tmcnt: Number(raw.tmcnt),
+  uprate: Number(raw.uprate),
+  tmname: String(raw.tmname),
+});
+
+// 테마 종목 데이터 변환 (문자열 -> 숫자)
+export const parseThemeStock = (raw: Record<string, unknown>): ThemeStock => ({
+  hname: String(raw.hname),
+  price: Number(raw.price),
+  sign: String(raw.sign),
+  change: Number(raw.change),
+  diff: Number(raw.diff),
+  volume: Number(raw.volume),
+  jniltime: Number(raw.jniltime),
+  shcode: String(raw.shcode),
+  yeprice: Number(raw.yeprice),
+  open: Number(raw.open),
+  high: Number(raw.high),
+  low: Number(raw.low),
+  value: Number(raw.value),
+  marketcap: Number(raw.marketcap),
+  exchange: raw.exchange ? String(raw.exchange) : null,
+});

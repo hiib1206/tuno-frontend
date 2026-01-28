@@ -6,23 +6,23 @@ interface WatchlistStore {
   items: WatchlistItem[];
   isLoading: boolean;
   error: string | null;
-  
+
   // 관심종목 목록 조회
   fetchWatchlist: () => Promise<void>;
-  
+
   // 관심종목 토글 (추가/제거)
   toggleWatchlist: (code: string, exchange: ExchangeCode) => Promise<boolean>;
-  
+
   // 관심종목 순서 변경 (드래그 앤 드롭)
   updateOrder: (newItems: WatchlistItem[]) => void;
   updateOrderWithApi: (newItems: WatchlistItem[]) => Promise<boolean>;
-  
+
   // 전체 삭제
   removeAll: () => Promise<boolean>;
-  
+
   // 특정 종목이 관심종목인지 확인
   isInWatchlist: (code: string, exchange: ExchangeCode) => boolean;
-  
+
   // 초기화 (로그아웃 시)
   reset: () => void;
 }
@@ -82,7 +82,7 @@ export const useWatchlistStore = create<WatchlistStore>()((set, get) => ({
 
   updateOrderWithApi: async (newItems: WatchlistItem[]) => {
     const previousItems = get().items;
-    
+
     // 낙관적 업데이트
     set({ items: newItems });
 
