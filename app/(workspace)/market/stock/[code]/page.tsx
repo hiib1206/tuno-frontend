@@ -19,6 +19,7 @@ import {
   StockRealtimeData,
   TR_ID,
 } from "@/types/Stock";
+import { Building2, FileWarning } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -159,6 +160,29 @@ export default function StockPage() {
           stockInfo={stockInfo}
           realtimeData={realtimeData}
         />
+
+        <div className="bg-background-1 rounded-sm p-6 min-h-[180px] flex flex-col">
+          <div className="flex items-center gap-2 mb-6">
+            <Building2 className="h-5 w-5 text-accent-text" />
+            <h3 className="text-base font-semibold text-foreground">
+              기업개요
+            </h3>
+          </div>
+          {stockInfo.summary ? (
+            <ul className="space-y-2 text-base text-foreground leading-relaxed list-disc list-inside">
+              {stockInfo.summary.split("\n").filter(Boolean).map((line, idx) => (
+                <li key={idx}>{line}</li>
+              ))}
+            </ul>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center gap-2">
+              <FileWarning className="h-10 w-10 text-muted-foreground" />
+              <p className="text-base text-muted-foreground">
+                해당 종목의 정보는 제공되지 않습니다.
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* 재무재표와 뉴스 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 h-auto lg:h-[850px] min-h-0">

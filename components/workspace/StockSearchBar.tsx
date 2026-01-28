@@ -3,13 +3,15 @@
 import stockApi from "@/api/stockApi";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import {
+  loadRecentSearches,
+  removeRecentSearch,
+  saveRecentSearch,
+} from "@/lib/stockSearchHistory";
 import { ExchangeCode, StockSearchResult } from "@/types/Stock";
 import { Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-
-const MAX_RECENT_SEARCHES = 10;
-const RECENT_SEARCHES_KEY = "recentStockSearches";
 
 export default function StockSearchBar() {
   const [query, setQuery] = useState("");
@@ -30,14 +32,7 @@ export default function StockSearchBar() {
 
   // 초기 로드 시 로컬 스토리지에서 최근 검색어 불러오기
   useEffect(() => {
-    const saved = localStorage.getItem(RECENT_SEARCHES_KEY);
-    if (saved) {
-      try {
-        setRecentSearches(JSON.parse(saved));
-      } catch (error) {
-        console.error("Failed to parse recent searches:", error);
-      }
-    }
+    setRecentSearches(loadRecentSearches());
   }, []);
 
   // 외부 클릭 시 닫기
@@ -106,34 +101,22 @@ export default function StockSearchBar() {
     }
   }, [selectedIndex]);
 
-  const saveRecentSearch = (stock: StockSearchResult) => {
-    let newRecent = [
-      stock,
-      ...recentSearches.filter(
-        (item) => item.code !== stock.code || item.market !== stock.market
-      ),
-    ];
-    if (newRecent.length > MAX_RECENT_SEARCHES) {
-      newRecent = newRecent.slice(0, MAX_RECENT_SEARCHES);
-    }
-    setRecentSearches(newRecent);
-    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(newRecent));
+  const handleSaveRecentSearch = (stock: StockSearchResult) => {
+    const next = saveRecentSearch(stock, recentSearches);
+    setRecentSearches(next);
   };
 
-  const removeRecentSearch = (
+  const handleRemoveRecentSearch = (
     e: React.MouseEvent,
     stock: StockSearchResult
   ) => {
     e.stopPropagation(); // 부모의 onClick(선택) 이벤트 방지
-    const newRecent = recentSearches.filter(
-      (item) => item.code !== stock.code || item.market !== stock.market
-    );
-    setRecentSearches(newRecent);
-    localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(newRecent));
+    const next = removeRecentSearch(stock, recentSearches);
+    setRecentSearches(next);
   };
 
   const handleSelect = (stock: StockSearchResult) => {
-    saveRecentSearch(stock);
+    handleSaveRecentSearch(stock);
     router.push(
       `/market/stock/${stock.code}?market=${stock.market}&exchange=${stock.exchange}`
     );
@@ -274,7 +257,7 @@ export default function StockSearchBar() {
                             e.preventDefault();
                             e.stopPropagation();
                           }}
-                          onClick={(e) => removeRecentSearch(e, stock)}
+                          onClick={(e) => handleRemoveRecentSearch(e, stock)}
                           className="py-3 pl-3 rounded-full text-muted-foreground hover:text-foreground hover:scale-120 cursor-pointer"
                         >
                           <X className="h-3 w-3" />

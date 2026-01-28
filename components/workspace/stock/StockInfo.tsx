@@ -187,7 +187,7 @@ export function StockInfo({
                   disabled={isToggling}
                   className={cn(
                     "transition-colors hover:opacity-80 flex-shrink-0 p-0 has-[>svg]:p-0",
-                    isWatchList && "text-yellow-500 hover:text-yellow-500",
+                    isWatchList && "text-watchlist hover:text-watchlist-hover",
                     !isWatchList && "text-muted-foreground"
                   )}
                 >

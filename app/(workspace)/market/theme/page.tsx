@@ -63,9 +63,10 @@ export default function ThemePage() {
   }
 
   return (
-    <div className="md:w-full xl:w-[70vw] mx-auto min-h-full xl:h-full flex flex-col xl:flex-row gap-2">
+    <div className="xl:flex xl:items-center xl:min-h-full">
+      <div className="w-full xl:w-[70vw] xl:h-[1024px] mx-auto flex flex-col xl:flex-row gap-2">
       {/* 트리맵 */}
-      <div className="h-[500px] md:h-[700px] xl:h-full xl:flex-1 shrink-0">
+      <div className="h-[500px] xl:h-full xl:flex-1 shrink-0">
         {loading ? (
           <ThemeTreemapSkeleton />
         ) : (
@@ -74,21 +75,22 @@ export default function ThemePage() {
       </div>
 
       {/* 종목 리스트 + 뉴스 리스트 */}
-      <div className="flex flex-col md:flex-row xl:contents gap-2">
-        <div className="h-[500px] md:flex-1 xl:w-90 xl:h-full xl:flex-none">
+      <div className="flex flex-col xl:flex-row xl:contents gap-2">
+        <div className="h-[500px] xl:w-90 xl:h-full xl:flex-none">
           {loading || !selectedTmcode ? (
             <ThemeStockListSkeleton />
           ) : (
             <ThemeStockList tmcode={selectedTmcode} />
           )}
         </div>
-        <div className="h-full md:flex-1 md:h-[500px] xl:w-90 xl:h-full xl:flex-none">
+        <div className="h-[500px] xl:w-90 xl:h-full xl:flex-none">
           {loading || !selectedTheme ? (
             <ThemeNewsListSkeleton />
           ) : (
             <ThemeNewsList tmname={selectedTheme.tmname} />
           )}
         </div>
+      </div>
       </div>
     </div>
   );

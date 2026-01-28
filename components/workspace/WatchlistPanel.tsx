@@ -82,7 +82,7 @@ function SortableItem({ item, getStockUrl, isDraggingActive, onRemove }: Sortabl
   };
 
   return (
-    <li ref={setNodeRef} style={style} className="border-b border-border-2">
+    <li ref={setNodeRef} style={style} className="border-b border-border-2 last:border-b-0">
       <div
         {...attributes}
         {...listeners}
@@ -212,7 +212,7 @@ export function WatchlistPanel({ className }: WatchlistPanelProps) {
       <div className="px-4 py-3 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+            <Star className="w-4 h-4 text-watchlist fill-watchlist" />
             <span className="font-semibold text-sm">관심종목</span>
           </div>
           <div className="flex items-center gap-2">
@@ -234,7 +234,7 @@ export function WatchlistPanel({ className }: WatchlistPanelProps) {
       </div>
 
       {/* 종목 리스트 */}
-      <div className="flex-1 overflow-y-auto max-h-200">
+      <div className="flex-1 overflow-y-auto max-h-200 rounded-b-md">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
             <p className="text-sm text-muted-foreground">로딩 중...</p>

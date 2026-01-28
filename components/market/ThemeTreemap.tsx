@@ -11,7 +11,10 @@ interface ThemeTreemapProps {
   onRefresh?: () => void;
 }
 
+type SortType = "count" | "change";
+
 export function ThemeTreemap({ data, onSelectTheme, onRefresh }: ThemeTreemapProps) {
+  const [sortType, setSortType] = useState<SortType>("count");
   const [chartColors, setChartColors] = useState({
     up: "",
     down: "",
@@ -45,7 +48,7 @@ export function ThemeTreemap({ data, onSelectTheme, onRefresh }: ThemeTreemapPro
 
   // hex를 rgba로 변환 + 어둡게 조절
   // darkenPercent: 0 = 원본, 20 = 20% 어둡게
-  const adjustColor = (hex: string, opacity: number, darkenPercent: number = 5): string => {
+  const adjustColor = (hex: string, opacity: number, darkenPercent: number = 15): string => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     if (!result) return hex;
     const factor = 1 - darkenPercent / 100;
@@ -61,8 +64,18 @@ export function ThemeTreemap({ data, onSelectTheme, onRefresh }: ThemeTreemapPro
   };
 
   const option = useMemo(() => {
-    // 최대 종목수 계산 (동적 비율용)
-    const maxValue = Math.max(...data.map((d) => d.totcnt));
+    // 정렬 기준에 따른 value 계산
+    const getValue = (theme: SpecialTheme): number => {
+      if (sortType === "count") {
+        return theme.totcnt;
+      } else {
+        // 등락률 기준: 절대값 사용 + 최소값 보장 (너무 작은 블록 방지)
+        return Math.max(Math.abs(theme.avgdiff), 0.1);
+      }
+    };
+
+    // 최대값 계산 (동적 비율용)
+    const maxValue = Math.max(...data.map((d) => getValue(d)));
 
     // 상승/하락 최대 등락률 계산
     const upThemes = data.filter((d) => d.avgdiff >= 0);
@@ -82,12 +95,12 @@ export function ThemeTreemap({ data, onSelectTheme, onRefresh }: ThemeTreemapPro
       // 3단계 opacity
       if (ratio > 0.66) return 1.0;
       if (ratio > 0.33) return 0.9;
-      return 0.8;
+      return 0.7;
     };
 
     const treemapData = data.map((theme) => ({
       name: theme.tmname,
-      value: theme.totcnt,
+      value: getValue(theme),
       avgdiff: theme.avgdiff,
       totcnt: theme.totcnt,
       upcnt: theme.upcnt,
@@ -198,8 +211,8 @@ export function ThemeTreemap({ data, onSelectTheme, onRefresh }: ThemeTreemapPro
           labelLayout: (params: any) => {
             const area = params.rect.width * params.rect.height;
 
-            // 면적이 10000px² 미만이면 라벨 숨김
-            if (area < 10000) {
+            // 면적이 12000px² 미만이면 라벨 숨김
+            if (area < 12000) {
               return { x: -9999, y: -9999 };
             }
 
@@ -219,7 +232,7 @@ export function ThemeTreemap({ data, onSelectTheme, onRefresh }: ThemeTreemapPro
         },
       ],
     };
-  }, [data, chartColors]);
+  }, [data, chartColors, sortType]);
 
   const onEvents = {
     click: (params: any) => {
@@ -237,14 +250,37 @@ export function ThemeTreemap({ data, onSelectTheme, onRefresh }: ThemeTreemapPro
           <h2 className="text-lg font-bold text-foreground">주요 테마</h2>
           <span className="text-xs text-muted-foreground">※ 실시간 정보는 제공되지 않습니다</span>
         </div>
-        {onRefresh && (
-          <button
-            onClick={onRefresh}
-            className="p-2 hover:bg-background-2 rounded-md transition-colors text-foreground-2 hover:text-foreground"
-          >
-            <RotateCw className="w-4 h-4" />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* 정렬 기준 선택 */}
+          <div className="flex rounded overflow-hidden border border-border">
+            <button
+              onClick={() => setSortType("count")}
+              className={`px-3 py-1 text-xs transition-colors ${sortType === "count"
+                ? "bg-accent text-accent-foreground"
+                : "bg-background-2 text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              종목수
+            </button>
+            <button
+              onClick={() => setSortType("change")}
+              className={`px-3 py-1 text-xs transition-colors ${sortType === "change"
+                ? "bg-accent text-accent-foreground"
+                : "bg-background-2 text-muted-foreground hover:text-foreground"
+                }`}
+            >
+              등락률
+            </button>
+          </div>
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              className="p-2 hover:bg-background-2 rounded-md transition-colors text-foreground-2 hover:text-foreground"
+            >
+              <RotateCw className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 트리맵 */}
