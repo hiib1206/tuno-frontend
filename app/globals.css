@@ -39,6 +39,7 @@
   --accent-foreground: oklch(0.96 0 0);
   --accent-text: oklch(0.65 0.18 149.7);
   --accent-hover: oklch(0.7 0.18 149.7);
+  --accent-gradient: oklch(0.5 0.18 149.7);
   --accent-05: oklch(0.7 0.18 149.7 / 0.05);
   --accent-10: oklch(0.7 0.18 149.7 / 0.1);
   --accent-20: oklch(0.7 0.18 149.7 / 0.2);
@@ -60,12 +61,20 @@
   --chart-line: #e5e5e5; /* 차트 라인 (연한 회색) */
   --chart-text: #707070; /* 차트 텍스트 (회색 계열) */
 
+  /* Watchlist Star */
+  --watchlist: #eab308; /* yellow-500 */
+  --watchlist-hover: #facc15; /* yellow-400 */
+
   --sidebar: oklch(0.95 0 260);
   --sidebar-foreground: oklch(0.15 0 0);
   --sidebar-border: oklch(0.9 0 0);
 
   --skeleton-1: oklch(0.98 0 0);
   --skeleton-2: oklch(0.96 0 0);
+  --skeleton-3: oklch(0.92 0 0);
+
+  --ai-loader-background: oklch(1 0 0);
+  --ai-loader-ring: oklch(0.98 0 0);
 }
 
 .dark {
@@ -100,6 +109,7 @@
   --accent-foreground: oklch(0.12 0 0);
   --accent-text: oklch(0.65 0.18 150);
   --accent-hover: oklch(0.8 0.25 150);
+  --accent-gradient: oklch(0.8 0.18 150);
   --accent-05: oklch(0.7 0.18 149.7 / 0.05);
   --accent-10: oklch(0.7 0.18 149.7 / 0.1);
   --accent-20: oklch(0.7 0.18 149.7 / 0.2);
@@ -114,10 +124,14 @@
 
   /* Chart Colors */
   --chart-green: #10b981;
-  --chart-up: #0ecb81; /* 바이낸스 기준 상승 캔들 (초록색) */
-  --chart-down: #f6465d; /* 바이낸스 기준 하락 캔들 (빨간색) */
-  --chart-line: #4a4a4a; /* 차트 라인 (다크모드용 회색) */
+  --chart-up: #0db97a; /* 바이낸스 기준 상승 캔들 (초록색) */
+  --chart-down: #e75763; /* 바이낸스 기준 하락 캔들 (빨간색) */
+  --chart-line: #303030; /* 차트 라인 (다크모드용 회색) */
   --chart-text: #707070; /* 차트 텍스트 (다크모드용 밝은 회색) */
+
+  /* Watchlist Star */
+  --watchlist: #eab308; /* yellow-500 */
+  --watchlist-hover: #facc15; /* yellow-400 */
 
   --sidebar: oklch(0.12 0 0);
   --sidebar-foreground: oklch(0.98 0 0);
@@ -125,6 +139,10 @@
 
   --skeleton-1: oklch(0.22 0 0);
   --skeleton-2: oklch(0.24 0 0);
+  --skeleton-3: oklch(0.28 0 0);
+
+  --ai-loader-background: oklch(0.3 0 0);
+  --ai-loader-ring: oklch(0.25 0 0);
 }
 
 @theme inline {
@@ -160,6 +178,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-text: var(--accent-text);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-gradient: var(--accent-gradient);
   --color-accent-05: var(--accent-05);
   --color-accent-10: var(--accent-10);
   --color-accent-20: var(--accent-20);
@@ -183,12 +202,19 @@
   --color-chart-line: var(--chart-line);
   --color-chart-text: var(--chart-text);
 
+  --color-watchlist: var(--watchlist);
+  --color-watchlist-hover: var(--watchlist-hover);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-border: var(--sidebar-border);
 
   --color-skeleton-1: var(--skeleton-1);
   --color-skeleton-2: var(--skeleton-2);
+  --color-skeleton-3: var(--skeleton-3);
+
+  --color-ai-loader-background: var(--ai-loader-background);
+  --color-ai-loader-ring: var(--ai-loader-ring);
 }
 
 @layer base {
@@ -354,6 +380,17 @@ Skeleton Gradient Animation
   animation: gradient-slide 2s ease-in-out infinite;
 }
 
+.skeleton-gradient-contrast {
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-2) 0%,
+    var(--skeleton-3) 50%,
+    var(--skeleton-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: gradient-slide 2s ease-in-out infinite;
+}
+
 /* ================================
 Accordion Animation
    ================================ */
@@ -385,3 +422,41 @@ div[data-tv-lightweight-charts] a,
 .tv-lightweight-charts a {
   display: none !important;
 }
+
+
+/* Hide scrollbars but keep scrolling */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom Scrollbar */
+.scrollbar-thin {
+  /* Firefox + 최신 Chrome/Edge */
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-foreground) transparent;
+}
+
+/* Chrome, Safari, Edge */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--muted-3);
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+

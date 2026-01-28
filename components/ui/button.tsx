@@ -34,6 +34,7 @@ const buttonVariants = cva(
         login: "bg-transparent text-foreground hover:bg-transparent",
       },
       size: {
+        none: "",
         xxs: "h-6 px-2 text-xs has-[>svg]:px-1.5",
         xs: "h-7 px-2.5 text-sm has-[>svg]:px-2",
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
