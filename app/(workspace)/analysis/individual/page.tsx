@@ -1,5 +1,5 @@
-"use client";
+import { redirect } from "next/navigation";
 
 export default function AnalysisIndividualPage() {
-  return <div>AnalysisIndividualPage</div>;
+  redirect("/analysis/individual/snapback");
 }

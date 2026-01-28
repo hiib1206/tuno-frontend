@@ -12,7 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import aiLogoAnimation from "@/public/lottie/ai-logo.json";
 import { useAuthStore } from "@/stores/authStore";
+import Lottie from "lottie-react";
 import {
   ArrowLeft,
   BarChart3,
@@ -74,12 +76,14 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       icon: BarChart3,
       href: "/analysis/quant",
       active: pathname === "/analysis/quant",
+      hasAi: true,
     },
     {
       label: "차트 분석",
       icon: LineChart,
       href: "/analysis/individual",
       active: pathname === "/analysis/individual",
+      hasAi: true,
     },
     {
       label: "테마",
@@ -122,7 +126,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
           variant="ghost"
           size="icon"
           onClick={onToggle}
-          className="w-10 h-10 flex-shrink-0 rounded-md hover:bg-background-1 [&_svg]:!w-5 [&_svg]:!h-5"
+          className={cn("w-10 h-10 flex-shrink-0 rounded-md hover:bg-background-1 [&_svg]:!w-5 [&_svg]:!h-5", isOpen ? "" : "pr-2")}
         >
           {isOpen ? <ArrowLeft /> : <Menu />}
         </Button>
@@ -144,7 +148,18 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     : "text-foreground/60 hover:text-foreground hover:bg-background-2"
                 )}
               >
-                <route.icon className="w-5 h-5 flex-shrink-0 ml-[10px]" />
+                <div className="relative ml-[10px]">
+                  <route.icon className="w-5 h-5 flex-shrink-0" />
+                  {route.hasAi && (
+                    <div className="absolute -top-2 -left-2 w-4.5 h-4.5">
+                      <Lottie
+                        animationData={aiLogoAnimation}
+                        loop
+                        className="w-full h-full"
+                      />
+                    </div>
+                  )}
+                </div>
                 <span
                   className={cn(
                     "whitespace-nowrap transition-all duration-300 overflow-hidden",
