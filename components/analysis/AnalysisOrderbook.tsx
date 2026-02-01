@@ -18,8 +18,8 @@ export function AnalysisOrderbook({
   realtimeData,
   isLoading,
 }: AnalysisOrderbookProps) {
-  // 현재가 (실시간 데이터 우선)
-  const currentPrice = realtimeData?.STCK_PRPR ?? stockQuote?.currentPrice ?? 0;
+  // 현재가 (실시간 데이터 우선, 0값은 유효하지 않으므로 fallback)
+  const currentPrice = realtimeData?.STCK_PRPR || stockQuote?.currentPrice || 0;
   const prevClose = stockQuote?.previousClose ?? 0;
   const priceChange = currentPrice - prevClose;
   const isUp = priceChange >= 0;

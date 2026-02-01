@@ -257,22 +257,34 @@ export function useStockChart(
 
         // 차트에 전체 데이터 다시 설정
         if (candleSeriesRef.current) {
-          candleSeriesRef.current.setData(mergedPriceData);
+          try {
+            candleSeriesRef.current.setData(mergedPriceData);
+          } catch {
+            // 차트가 이미 dispose된 경우 무시
+          }
         }
 
         if (volumeSeriesRef.current) {
-          const coloredVolumeData = applyVolumeColors(
-            mergedVolumeData,
-            mergedPriceData
-          );
-          volumeSeriesRef.current.setData(coloredVolumeData);
+          try {
+            const coloredVolumeData = applyVolumeColors(
+              mergedVolumeData,
+              mergedPriceData
+            );
+            volumeSeriesRef.current.setData(coloredVolumeData);
+          } catch {
+            // 차트가 이미 dispose된 경우 무시
+          }
         }
 
         // 이동평균선 데이터 설정
         for (const [period, data] of maData) {
           const maSeries = maSeriesRef.current.get(period);
           if (maSeries && data.length > 0) {
-            maSeries.setData(data as LineData[]);
+            try {
+              maSeries.setData(data as LineData[]);
+            } catch {
+              // 차트가 이미 dispose된 경우 무시
+            }
           }
         }
 
@@ -305,21 +317,29 @@ export function useStockChart(
       requestAnimationFrame(() => {
         if (!volumeSeriesRef.current) return;
 
-        const coloredVolumeData = applyVolumeColors(
-          loadedDataRef.current.volumeData,
-          loadedDataRef.current.priceData
-        );
-        volumeSeriesRef.current.setData(coloredVolumeData);
+        try {
+          const coloredVolumeData = applyVolumeColors(
+            loadedDataRef.current.volumeData,
+            loadedDataRef.current.priceData
+          );
+          volumeSeriesRef.current.setData(coloredVolumeData);
+        } catch {
+          // 차트가 이미 dispose된 경우 무시
+        }
       });
     });
   }, [resolvedTheme]);
 
   // === 초기 데이터 로드 ===
   useEffect(() => {
+    let isMounted = true;
+
     const fetchInitialData = async () => {
       if (!code || !market || !exchange) {
-        setFetchError("잘못된 요청입니다.");
-        setIsLoading(false);
+        if (isMounted) {
+          setFetchError("잘못된 요청입니다.");
+          setIsLoading(false);
+        }
         return;
       }
 
@@ -335,6 +355,9 @@ export function useStockChart(
           interval,
           limit,
         });
+
+        // 컴포넌트가 언마운트되었으면 상태 업데이트 스킵
+        if (!isMounted) return;
 
         if (response.success && response.data) {
           const candles = response.data.candles;
@@ -371,19 +394,31 @@ export function useStockChart(
 
           // 시리즈가 이미 등록되어 있으면 데이터 설정
           if (candleSeriesRef.current) {
-            candleSeriesRef.current.setData(priceData);
+            try {
+              candleSeriesRef.current.setData(priceData);
+            } catch {
+              // 차트가 이미 dispose된 경우 무시
+            }
           }
 
           if (volumeSeriesRef.current) {
-            const coloredVolumeData = applyVolumeColors(volumeData, priceData);
-            volumeSeriesRef.current.setData(coloredVolumeData);
+            try {
+              const coloredVolumeData = applyVolumeColors(volumeData, priceData);
+              volumeSeriesRef.current.setData(coloredVolumeData);
+            } catch {
+              // 차트가 이미 dispose된 경우 무시
+            }
           }
 
           // 이동평균선 데이터 설정
           for (const [period, data] of maData) {
             const maSeries = maSeriesRef.current.get(period);
             if (maSeries && data.length > 0) {
-              maSeries.setData(data as LineData[]);
+              try {
+                maSeries.setData(data as LineData[]);
+              } catch {
+                // 차트가 이미 dispose된 경우 무시
+              }
             }
           }
 
@@ -392,13 +427,21 @@ export function useStockChart(
           setFetchError("주가 데이터를 가져오는데 실패했습니다.");
         }
       } catch (err) {
-        setFetchError("주가 데이터를 가져오는 중 오류가 발생했습니다.");
+        if (isMounted) {
+          setFetchError("주가 데이터를 가져오는 중 오류가 발생했습니다.");
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchInitialData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [code, market, exchange, interval, limit]);
 
   // === stockQuote 데이터로 당일 캔들 추가/업데이트 ===
@@ -479,7 +522,11 @@ export function useStockChart(
         // 차트 시리즈에 업데이트
         const maSeries = maSeriesRef.current.get(config.period);
         if (maSeries) {
-          maSeries.update(maPoint);
+          try {
+            maSeries.update(maPoint);
+          } catch {
+            // 차트가 이미 dispose된 경우 무시
+          }
         }
       }
     }
@@ -492,11 +539,19 @@ export function useStockChart(
 
     // 차트 시리즈에 업데이트
     if (candleSeriesRef.current) {
-      candleSeriesRef.current.update(todayCandle);
+      try {
+        candleSeriesRef.current.update(todayCandle);
+      } catch {
+        // 차트가 이미 dispose된 경우 무시
+      }
     }
 
     if (volumeSeriesRef.current) {
-      volumeSeriesRef.current.update(todayVolume);
+      try {
+        volumeSeriesRef.current.update(todayVolume);
+      } catch {
+        // 차트가 이미 dispose된 경우 무시
+      }
     }
 
     dataUpdateListenersRef.current.forEach((callback) => callback());
@@ -504,8 +559,9 @@ export function useStockChart(
 
   // === 실시간 데이터 처리 (차트 업데이트) ===
   const updateRealtimeData = useCallback((data: StockRealtimeData) => {
-    // 차트 시리즈가 준비되지 않았으면 무시
+    // 차트 시리즈가 준비되지 않았거나 현재가가 0이면 무시
     if (!candleSeriesRef.current) return;
+    if (!data.STCK_PRPR) return;
 
     const todayTime = dateStrToTimestamp(data.BSOP_DATE);
     const newPrice = data.STCK_PRPR;
@@ -533,16 +589,25 @@ export function useStockChart(
       close: newPrice,
     };
 
-    candleSeriesRef.current.update(todayCandleData);
+    try {
+      candleSeriesRef.current.update(todayCandleData);
+    } catch {
+      // 차트가 이미 dispose된 경우 무시
+      return;
+    }
 
     // 거래량 업데이트
     if (volumeSeriesRef.current) {
       const isUp = newPrice >= todayOpen;
-      volumeSeriesRef.current.update({
-        time: todayTime,
-        value: newVolume,
-        color: isUp ? getCssVar("--chart-up") : getCssVar("--chart-down"),
-      });
+      try {
+        volumeSeriesRef.current.update({
+          time: todayTime,
+          value: newVolume,
+          color: isUp ? getCssVar("--chart-up") : getCssVar("--chart-down"),
+        });
+      } catch {
+        // 차트가 이미 dispose된 경우 무시
+      }
     }
 
     // 이동평균선 업데이트 (오늘 종가 기준으로 재계산)
@@ -603,7 +668,11 @@ export function useStockChart(
 
         // 차트 시리즈 업데이트
         if (maSeries) {
-          maSeries.update(maDataPoint);
+          try {
+            maSeries.update(maDataPoint);
+          } catch {
+            // 차트가 이미 dispose된 경우 무시
+          }
         }
       }
     }

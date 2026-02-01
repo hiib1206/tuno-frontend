@@ -9,6 +9,7 @@ import {
   loadTrendLines,
   saveTrendLines,
 } from "@/lib/chartStorage";
+import { getCssVar } from "@/lib/chartUtils";
 import { cn } from "@/lib/utils";
 import { SnapbackPoint, SnapbackSupport } from "@/types/Inference";
 import {
@@ -780,9 +781,9 @@ export function CandleChart({
       priceChart.applyOptions({
         crosshair: {
           horzLine: {
-            color: "#707070",
+            color: getCssVar("--chart-text"),
             style: 3, // LargeDashed (기본값)
-            labelBackgroundColor: "#707070",
+            labelBackgroundColor: getCssVar("--chart-text"),
           },
         },
       });
@@ -942,9 +943,9 @@ export function CandleChart({
         crosshair: {
           horzLine: {
             visible: true,
-            color: "#707070",
+            color: getCssVar("--chart-text"),
             style: 3,
-            labelBackgroundColor: "#707070",
+            labelBackgroundColor: getCssVar("--chart-text"),
           },
           vertLine: { visible: true },
         },
@@ -1224,9 +1225,9 @@ export function CandleChart({
         crosshair: {
           horzLine: {
             visible: true,
-            color: "#707070",
+            color: getCssVar("--chart-text"),
             style: 3,
-            labelBackgroundColor: "#707070",
+            labelBackgroundColor: getCssVar("--chart-text"),
           },
           vertLine: { visible: true },
         },

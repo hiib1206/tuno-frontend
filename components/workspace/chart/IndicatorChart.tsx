@@ -44,6 +44,14 @@ export function IndicatorChart({ onReady, title = "volume" }: Props) {
       },
       crosshair: {
         mode: CrosshairMode.Normal,
+        horzLine: {
+          color: getCssVar("--chart-text"),
+          labelBackgroundColor: getCssVar("--chart-text"),
+        },
+        vertLine: {
+          color: getCssVar("--chart-text"),
+          labelBackgroundColor: getCssVar("--chart-text"),
+        },
       },
       timeScale: {
         visible: true,
@@ -51,7 +59,7 @@ export function IndicatorChart({ onReady, title = "volume" }: Props) {
         rightOffset: 20,
         minBarSpacing: 1,
         maxBarSpacing: 30,
-        borderColor: getCssVar("--chart-text"),
+        borderColor: getCssVar("--chart-line"),
       },
       localization: {
         timeFormatter: (time: number) => {
@@ -66,7 +74,7 @@ export function IndicatorChart({ onReady, title = "volume" }: Props) {
       },
       rightPriceScale: {
         visible: true,
-        borderColor: getCssVar("--chart-text"),
+        borderColor: getCssVar("--chart-line"),
         textColor: getCssVar("--chart-text"),
         entireTextOnly: true,
         scaleMargins: {
@@ -108,11 +116,21 @@ export function IndicatorChart({ onReady, title = "volume" }: Props) {
             vertLines: { color: getCssVar("--chart-line") },
             horzLines: { visible: false },
           },
+          crosshair: {
+            horzLine: {
+              color: getCssVar("--chart-text"),
+              labelBackgroundColor: getCssVar("--chart-text"),
+            },
+            vertLine: {
+              color: getCssVar("--chart-text"),
+              labelBackgroundColor: getCssVar("--chart-text"),
+            },
+          },
           timeScale: {
-            borderColor: getCssVar("--chart-text"),
+            borderColor: getCssVar("--chart-line"),
           },
           rightPriceScale: {
-            borderColor: getCssVar("--chart-text"),
+            borderColor: getCssVar("--chart-line"),
             textColor: getCssVar("--chart-text"),
           },
         });

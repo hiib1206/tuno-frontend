@@ -1,9 +1,9 @@
 import {
-  ISeriesPrimitive,
-  SeriesAttachedParameter,
-  IPrimitivePaneView,
   IPrimitivePaneRenderer,
+  IPrimitivePaneView,
+  ISeriesPrimitive,
   PrimitivePaneViewZOrder,
+  SeriesAttachedParameter,
 } from "lightweight-charts";
 
 
@@ -40,6 +40,15 @@ export const SUPPORT_LINE_COLORS = [
   "rgba(244, 114, 182, 0.6)",
 ];
 
+// 애니메이션 설정
+const ANIM_DURATION = 900; // 밴드당 애니메이션 길이 (ms)
+const ANIM_STAGGER = 500;  // 밴드 간 등장 딜레이 (ms)
+
+// ease-out cubic: 처음 빠르고 끝에서 감속
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3);
+}
+
 // 렌더링 데이터 (hitTest용 가격 정보 포함)
 interface BandRenderData {
   upperY: number;
@@ -50,6 +59,7 @@ interface BandRenderData {
   centerPrice: number;
   color: string;
   label?: string;
+  progress: number; // 0~1 애니메이션 진행도
 }
 
 // Renderer: 실제 캔버스에 그리는 클래스
@@ -67,10 +77,18 @@ class PriceBandRenderer implements IPrimitivePaneRenderer {
       const pixelRatio = scope.horizontalPixelRatio;
 
       for (const band of this._data) {
+        const p = band.progress;
+        if (p <= 0) continue; // 아직 등장 전
+
         // 좌표를 bitmap 좌표계로 변환
-        const upperY = Math.round(band.upperY * pixelRatio);
-        const lowerY = Math.round(band.lowerY * pixelRatio);
-        const centerY = Math.round(band.centerY * pixelRatio);
+        const rawUpperY = Math.round(band.upperY * pixelRatio);
+        const rawLowerY = Math.round(band.lowerY * pixelRatio);
+        const rawCenterY = Math.round(band.centerY * pixelRatio);
+
+        // 밴드 확장 애니메이션: 중심에서 상하로 벌어짐
+        const upperY = Math.round(rawCenterY + (rawUpperY - rawCenterY) * p);
+        const lowerY = Math.round(rawCenterY + (rawLowerY - rawCenterY) * p);
+        const centerY = rawCenterY;
         const height = lowerY - upperY;
 
         // 색상에서 RGB 추출 (rgba(r, g, b, a) 형식)
@@ -79,29 +97,27 @@ class PriceBandRenderer implements IPrimitivePaneRenderer {
         const g = rgbaMatch ? rgbaMatch[2] : "165";
         const b = rgbaMatch ? rgbaMatch[3] : "250";
 
-        // 밴드 영역 (상하단도 보이고 중심이 더 진한 그라데이션)
+        // 밴드 영역 (opacity도 progress에 따라 페이드인)
         const gradient = ctx.createLinearGradient(0, upperY, 0, lowerY);
-        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.10)`);   // 상단: 살짝 연하게
-        gradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, 0.30)`); // 중심: 더 진하게
-        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.10)`);   // 하단: 살짝 연하게
+        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${0.10 * p})`);
+        gradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${0.30 * p})`);
+        gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, ${0.10 * p})`);
 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, upperY, width, height);
 
-        // 중심선 (실선)
-        const lineColor = `rgba(${r}, ${g}, ${b}, 0.6)`;
-        ctx.strokeStyle = lineColor;
+        // 중심선 (opacity 페이드인)
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.6 * p})`;
         ctx.lineWidth = pixelRatio;
         ctx.beginPath();
         ctx.moveTo(0, centerY);
         ctx.lineTo(width, centerY);
         ctx.stroke();
 
-        // 라벨 (밴드 위쪽 바깥)
+        // 라벨 (opacity 페이드인)
         if (band.label) {
-          const labelColor = `rgba(${r}, ${g}, ${b}, 0.9)`;
           ctx.font = `bold ${10 * pixelRatio}px sans-serif`;
-          ctx.fillStyle = labelColor;
+          ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.9 * p})`;
           ctx.textAlign = "left";
           ctx.textBaseline = "bottom";
           ctx.fillText(band.label, 8 * pixelRatio, upperY - 2 * pixelRatio);
@@ -142,17 +158,54 @@ export class PriceBandPrimitive implements ISeriesPrimitive {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _series: SeriesAttachedParameter<any>["series"] | null = null;
   private _requestUpdate?: () => void;
+  private _animStartTime: number | null = null;
+  private _animFrameId: number = 0;
 
-  // 밴드 데이터 설정
+  // 밴드 데이터 설정 (애니메이션 시작)
   setBands(bands: PriceBand[]) {
     this._bands = bands;
-    this._requestUpdate?.();
+    this._startAnimation();
   }
 
   // 밴드 데이터 초기화
   clearBands() {
+    this._stopAnimation();
     this._bands = [];
     this._requestUpdate?.();
+  }
+
+  private _startAnimation() {
+    this._stopAnimation();
+    this._animStartTime = performance.now();
+    this._animate();
+  }
+
+  private _stopAnimation() {
+    if (this._animFrameId) {
+      cancelAnimationFrame(this._animFrameId);
+      this._animFrameId = 0;
+    }
+    this._animStartTime = null;
+  }
+
+  private _animate() {
+    this._requestUpdate?.();
+
+    if (this._animStartTime === null) return;
+
+    const elapsed = performance.now() - this._animStartTime;
+    const totalDuration =
+      ANIM_DURATION + ANIM_STAGGER * Math.max(0, this._bands.length - 1);
+
+    if (elapsed < totalDuration) {
+      this._animFrameId = requestAnimationFrame(() => this._animate());
+    } else {
+      // 애니메이션 완료
+      this._animFrameId = 0;
+      this._animStartTime = null;
+      // 최종 상태 한 번 더 갱신 (progress=1 보장)
+      this._requestUpdate?.();
+    }
   }
 
   // lightweight-charts에서 호출하는 메서드들
@@ -163,6 +216,7 @@ export class PriceBandPrimitive implements ISeriesPrimitive {
   }
 
   detached() {
+    this._stopAnimation();
     this._series = null;
     this._requestUpdate = undefined;
   }
@@ -177,9 +231,17 @@ export class PriceBandPrimitive implements ISeriesPrimitive {
       return;
     }
 
+    // 애니메이션 경과 시간 계산
+    const elapsed =
+      this._animStartTime !== null
+        ? performance.now() - this._animStartTime
+        : Infinity; // 애니메이션 완료 → progress=1
+
     const renderData: BandRenderData[] = [];
 
-    for (const band of this._bands) {
+    for (let i = 0; i < this._bands.length; i++) {
+      const band = this._bands[i];
+
       // upperPrice/lowerPrice가 있으면 직접 사용, 없으면 range로 계산
       const upperPrice =
         band.upperPrice ?? band.price * (1 + (band.range ?? 0.025));
@@ -192,6 +254,12 @@ export class PriceBandPrimitive implements ISeriesPrimitive {
 
       if (upperY === null || lowerY === null || centerY === null) continue;
 
+      // 밴드별 stagger된 progress 계산
+      const bandDelay = i * ANIM_STAGGER;
+      const bandElapsed = Math.max(0, elapsed - bandDelay);
+      const rawProgress = Math.min(1, bandElapsed / ANIM_DURATION);
+      const progress = easeOutCubic(rawProgress);
+
       renderData.push({
         upperY,
         lowerY,
@@ -201,6 +269,7 @@ export class PriceBandPrimitive implements ISeriesPrimitive {
         centerPrice: band.price,
         color: band.color,
         label: band.label,
+        progress,
       });
     }
 

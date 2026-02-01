@@ -48,9 +48,11 @@ export default function StockPage() {
     trCodes: stockInfo?.isNxtInMaster ? [TR_ID.H0UNCNT0] : [TR_ID.H0STCNT0],
     onData: (trId, data) => {
       if (trId === TR_ID.H0UNCNT0 || trId === TR_ID.H0STCNT0) {
-        setRealtimeData(data as StockRealtimeData);
+        const rtData = data as StockRealtimeData;
+        // 현재가가 0인 불완전한 데이터(시간외 등) 무시
+        if (!rtData.STCK_PRPR) return;
+        setRealtimeData(rtData);
       }
-      // 다른 TR 코드 처리는 여기에 추가
     },
   });
 

@@ -3,6 +3,7 @@
 import AILoader from "@/components/loading/AiLoader";
 import { LoginRequestModal } from "@/components/modals/LoginRequestModal";
 import { cn } from "@/lib/utils";
+import { getExchangeName } from "@/lib/stock";
 import { useAuthStore } from "@/stores/authStore";
 import { useWatchlistStore } from "@/stores/watchlistStore";
 import {
@@ -147,10 +148,11 @@ export function AnalysisStockHeader({
 
 
   // 실시간 데이터 우선 사용, 없으면 REST API 데이터 사용
-  const currentPrice = realtimeData?.STCK_PRPR ?? stockQuote?.currentPrice ?? 0;
-  const open = realtimeData?.STCK_OPRC ?? stockQuote?.open ?? 0;
-  const high = realtimeData?.STCK_HGPR ?? stockQuote?.high ?? 0;
-  const low = realtimeData?.STCK_LWPR ?? stockQuote?.low ?? 0;
+  // || 사용: 0값도 유효하지 않은 가격으로 처리하여 stockQuote로 fallback
+  const currentPrice = realtimeData?.STCK_PRPR || stockQuote?.currentPrice || 0;
+  const open = realtimeData?.STCK_OPRC || stockQuote?.open || 0;
+  const high = realtimeData?.STCK_HGPR || stockQuote?.high || 0;
+  const low = realtimeData?.STCK_LWPR || stockQuote?.low || 0;
   const volume = realtimeData?.ACML_VOL ?? stockQuote?.volume ?? 0;
   const tradingValue =
     realtimeData?.ACML_TR_PBMN ?? stockQuote?.tradingValue ?? 0;
@@ -182,17 +184,6 @@ export function AnalysisStockHeader({
       return (unit / 10000).toFixed(1) + "조";
     }
     return Math.floor(unit).toLocaleString() + "억";
-  };
-
-  const getExchangeName = (exchange: ExchangeCode): string => {
-    const exchangeMap: Record<ExchangeCode, string> = {
-      KP: "KOSPI",
-      KQ: "KOSDAQ",
-      NAS: "NASDAQ",
-      NYS: "NYSE",
-      AMS: "AMEX",
-    };
-    return exchangeMap[exchange];
   };
 
   // statusCode 배지 스타일

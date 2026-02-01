@@ -52,6 +52,14 @@ export function PriceChart({ onReady }: Props) {
       },
       crosshair: {
         mode: CrosshairMode.Normal,
+        horzLine: {
+          color: getCssVar("--chart-text"),
+          labelBackgroundColor: getCssVar("--chart-text"),
+        },
+        vertLine: {
+          color: getCssVar("--chart-text"),
+          labelBackgroundColor: getCssVar("--chart-text"),
+        },
       },
       timeScale: {
         visible: false,
@@ -61,7 +69,7 @@ export function PriceChart({ onReady }: Props) {
       },
       rightPriceScale: {
         visible: true,
-        borderColor: getCssVar("--chart-text"),
+        borderColor: getCssVar("--chart-line"),
         textColor: getCssVar("--chart-text"),
         entireTextOnly: true,
         scaleMargins: {
@@ -144,8 +152,18 @@ export function PriceChart({ onReady }: Props) {
             vertLines: { color: getCssVar("--chart-line") },
             horzLines: { color: getCssVar("--chart-line") },
           },
+          crosshair: {
+            horzLine: {
+              color: getCssVar("--chart-text"),
+              labelBackgroundColor: getCssVar("--chart-text"),
+            },
+            vertLine: {
+              color: getCssVar("--chart-text"),
+              labelBackgroundColor: getCssVar("--chart-text"),
+            },
+          },
           rightPriceScale: {
-            borderColor: getCssVar("--chart-text"),
+            borderColor: getCssVar("--chart-line"),
             textColor: getCssVar("--chart-text"),
           },
         });
