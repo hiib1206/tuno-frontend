@@ -4,6 +4,7 @@ import {
   InferenceStatus,
   parseInferenceHistoryItem,
   parseSnapbackResult,
+  QuantSignalResult,
   SnapbackResult,
 } from "@/types/Inference";
 import apiClient from "./apiClient";
@@ -18,6 +19,21 @@ export interface SnapbackResponse {
   statusCode: number;
   message: string;
   data: SnapbackResult;
+}
+
+export interface QuantSignalRequest {
+  ticker: string;
+  date?: string;
+}
+
+// Quant Signal 추론 요청 응답 (202 Accepted - 비동기)
+export interface QuantSignalResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    historyId: string;
+  };
 }
 
 // AI 추론 이력 조회
@@ -59,6 +75,22 @@ const inferenceApi = {
       statusCode: response.data.statusCode,
       message: response.data.message,
       data: parseSnapbackResult(response.data.data),
+    };
+  },
+
+  quantSignal: async (
+    params: QuantSignalRequest
+  ): Promise<QuantSignalResponse> => {
+    const body: QuantSignalRequest = {
+      ticker: params.ticker,
+      ...(params.date ? { date: params.date } : {}),
+    };
+    const response = await apiClient.post("/api/inference/quant-signal", body);
+    return {
+      success: response.data.success,
+      statusCode: response.data.statusCode,
+      message: response.data.message,
+      data: response.data.data,
     };
   },
 

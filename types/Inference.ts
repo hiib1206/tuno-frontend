@@ -118,8 +118,73 @@ export function parseSnapbackResult(
   };
 }
 
+// Quant Signal 타입
+export type QuantSignalType = "BUY" | "HOLD" | "SELL";
+
+export interface QuantSignalIndicators {
+  trendMa60120: number; // 0: 역배열, 1: 정배열
+  trendStrength: number;
+  maDiff60: number;
+  momentum20D: number;
+  momentum60D: number;
+  rsi14: number;
+  macdHistSlope: number;
+  atrPct: number;
+  volatilityRegime: number;
+  bbPosition: number;
+  relativeStrength20D: number;
+  relativeStrength60D: number;
+  beta: number;
+  defensiveStrength: number; // 0 or 1
+  marketStress: number; // 0 or 1
+  amountRatio: number;
+  amountTrend: number;
+  mfi: number;
+}
+
+export interface QuantSignalReason {
+  summary: string;
+  detail: string;
+  /** 영향 방향: "up" = 상승 방향 영향, "down" = 하락 방향 영향 */
+  direction: "up" | "down";
+  /** 영향 강도: 1 = 약한(<5%), 2 = 보통(5-15%), 3 = 강한(15-30%), 4 = 매우 강한(30%+) */
+  strength: 1 | 2 | 3 | 4;
+  /** API 형식: { momentum20D: 0.3319 } 처럼 키 하나만 옴 */
+  indicator: Partial<Record<keyof QuantSignalIndicators, number>>
+}
+
+export interface QuantSignalHistoryEntry {
+  date: string;
+  signal: QuantSignalType;
+  price: number;
+}
+
+export interface QuantSignalModelInfo {
+  modelId: string;
+  runId: string;
+}
+
+export interface QuantSignalResult {
+  ticker: string;
+  name: string;
+  date: string;
+  inferredAt: string;
+  currentPrice: number;
+  signal: QuantSignalType;
+  confidence: number;
+  probabilities: {
+    sell: number;
+    hold: number;
+    buy: number;
+  };
+  indicators: QuantSignalIndicators;
+  reasons: QuantSignalReason[];
+  signalHistory: QuantSignalHistoryEntry[];
+  modelInfo: QuantSignalModelInfo;
+}
+
 // AI 추론 이력
-export type InferenceModelType = "SNAPBACK";
+export type InferenceModelType = "SNAPBACK" | "QUANT_SIGNAL";
 export type InferenceStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "CANCELED";
 
 export interface InferenceHistoryItem {

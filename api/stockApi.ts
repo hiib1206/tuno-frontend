@@ -37,6 +37,27 @@ type StockInfoResult = {
   data: StockInfo | null;
 };
 
+// 지수 캔들 데이터 조회 쿼리 파라미터 타입
+type IndexCandleQueryParams = {
+  code: string; // 업종 코드 (0001: KOSPI, 1001: KOSDAQ)
+  interval: "1d" | "1w" | "1m" | "1y"; // 봉 단위 (일, 주, 월, 년)
+  limit?: number; // 조회 건수 (1~1000)
+  from?: number; // 시작일 (Unix timestamp, 초 단위)
+  to?: number; // 종료일 (Unix timestamp, 초 단위)
+};
+
+// 지수 캔들 데이터 조회 응답 타입
+type IndexCandleResult = {
+  success: boolean;
+  message: string;
+  data: {
+    code: string;
+    interval: string;
+    count: number;
+    candles: Candle[];
+  } | null;
+};
+
 // 캔들 데이터 조회 쿼리 파라미터 타입
 type CandleQueryParams = {
   market: "KR" | "US"; // 시장 코드 (대문자)
@@ -172,6 +193,20 @@ const stockApi = {
       success: response.data.success,
       message: response.data.message,
       data: response.data.data as FinancialSummary[],
+    };
+  },
+
+  // 지수 캔들 데이터 조회
+  getIndexCandle: async (
+    params: IndexCandleQueryParams
+  ): Promise<IndexCandleResult> => {
+    const response = await apiClient.get("/api/stock/index/candle", {
+      params,
+    });
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: response.data.data,
     };
   },
 
