@@ -11,7 +11,7 @@
   /* Light Mode Colors */
   --background: oklch(1 0 0);
   --background-1: oklch(1 0 0);
-  --background-2: oklch(0.98 0 0);
+  --background-2: oklch(0.97 0 0);
   --background-3: oklch(0.98 0.01 130);
   --foreground: oklch(0.15 0 0);
   --foreground-white: oklch(98 0 0);
@@ -147,6 +147,10 @@
 
 @theme inline {
   --font-sans: var(--font-sans);
+
+  --breakpoint-3xl: 1680px;
+  --breakpoint-4xl: 1920px;
+  --breakpoint-5xl: 2560px;
 
   --color-background: var(--background);
   --color-background-1: var(--background-1);
@@ -458,5 +462,53 @@ div[data-tv-lightweight-charts] a,
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: var(--muted-foreground);
+}
+
+/* ================================
+   Radar Chart Animation
+   ================================ */
+@keyframes radar-expand {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.radar-container .recharts-radar {
+  animation: radar-expand 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: center;
+}
+
+.radar-container .recharts-polar-grid {
+  animation: radar-expand 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: center;
+}
+
+/* ================================
+   Price Flash Animation (폴링 가격 변동)
+   ================================ */
+@keyframes flash-up {
+  0% { background-color: color-mix(in srgb, var(--chart-up) 20%, transparent); }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-down {
+  0% { background-color: color-mix(in srgb, var(--chart-down) 20%, transparent); }
+  100% { background-color: transparent; }
+}
+
+.flash-up {
+  animation: flash-up 0.8s ease-out;
+}
+
+.flash-down {
+  animation: flash-down 0.8s ease-out;
 }
 

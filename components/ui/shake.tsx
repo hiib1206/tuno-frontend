@@ -13,7 +13,7 @@ const shakeVariants = {
     x: [0, -2, 2, -1, 1, 0],
     transition: {
       duration: 0.2,
-      ease: "easeInOut",
+      ease: "easeInOut" as const,
     },
   },
   initial: {
