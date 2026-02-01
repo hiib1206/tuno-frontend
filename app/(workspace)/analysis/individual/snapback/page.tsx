@@ -17,6 +17,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { CandleChart } from "@/components/workspace/chart/CandleChart";
 import { useStockWebSocket } from "@/hooks/useStockWebSocket";
+import { loadLastViewedStock, saveLastViewedStock } from "@/lib/stockLocalStorage";
 import { cn } from "@/lib/utils";
 import {
   parseSnapbackResult,
@@ -49,11 +50,24 @@ export default function AnalysisIndividualSnapbackPage() {
   const router = useRouter();
   const { isAuthLoading } = useAuthStore();
 
-  // URL에서 종목 코드/거래소/이력ID 읽기 (없으면 기본값)
-  const selectedCode = searchParams.get("code") || DEFAULT_STOCK.code;
-  const selectedExchange =
-    (searchParams.get("exchange") as ExchangeCode) || DEFAULT_STOCK.exchange;
+  // URL에서 종목 코드/거래소/이력ID 읽기
+  const codeFromUrl = searchParams.get("code");
+  const exchangeFromUrl = searchParams.get("exchange") as ExchangeCode | null;
   const historyId = searchParams.get("historyId");
+
+  // URL에 code가 없으면 lastViewedStock 또는 기본값으로 리다이렉트
+  useEffect(() => {
+    if (!codeFromUrl) {
+      const lastViewed = loadLastViewedStock("snapback");
+      const code = lastViewed?.code || DEFAULT_STOCK.code;
+      const exchange = lastViewed?.exchange || DEFAULT_STOCK.exchange;
+      router.replace(`?code=${code}&exchange=${exchange}`);
+    }
+  }, [codeFromUrl, router]);
+
+  // 실제 사용할 값 (URL에 code가 있을 때만 사용, 없으면 리다이렉트 대기)
+  const selectedCode = codeFromUrl;
+  const selectedExchange = exchangeFromUrl || DEFAULT_STOCK.exchange;
 
   const [stockInfo, setStockInfo] = useState<StockInfo | null>(null);
   const [stockQuote, setStockQuote] = useState<StockQuote | null>(null);
@@ -123,6 +137,8 @@ export default function AnalysisIndividualSnapbackPage() {
   const handleSelectStock = useCallback(
     (code: string, exchange: ExchangeCode) => {
       if (code !== selectedCode || exchange !== selectedExchange) {
+        // 마지막으로 본 종목 저장
+        saveLastViewedStock("snapback", { code, exchange });
         // URL 쿼리 파라미터 업데이트
         router.push(`?code=${code}&exchange=${exchange}`);
         // 상태 초기화
@@ -157,15 +173,18 @@ export default function AnalysisIndividualSnapbackPage() {
   );
 
   // WebSocket 연결 (체결가 + 호가)
-  useStockWebSocket(selectedCode, {
-    enabled: !!stockInfo,
+  useStockWebSocket(selectedCode ?? "", {
+    enabled: !!stockInfo && !!selectedCode,
     trCodes: stockInfo?.isNxtInMaster
       ? [TR_ID.H0UNCNT0, TR_ID.H0UNASP0]
       : [TR_ID.H0STCNT0, TR_ID.H0STASP0],
     onData: (trId, data) => {
       // 체결가 데이터
       if (trId === TR_ID.H0UNCNT0 || trId === TR_ID.H0STCNT0) {
-        setRealtimeData(data as StockRealtimeData);
+        const rtData = data as StockRealtimeData;
+        // 현재가가 0인 불완전한 데이터(시간외 등) 무시
+        if (!rtData.STCK_PRPR) return;
+        setRealtimeData(rtData);
       }
       // 호가 데이터
       if (trId === TR_ID.H0UNASP0 || trId === TR_ID.H0STASP0) {
@@ -176,6 +195,8 @@ export default function AnalysisIndividualSnapbackPage() {
 
   // 종목 정보 조회
   useEffect(() => {
+    if (!selectedCode) return; // 리다이렉트 대기
+
     const fetchStockInfo = async () => {
       try {
         const response = await stockApi.getStockInfo(selectedCode, {
@@ -198,9 +219,9 @@ export default function AnalysisIndividualSnapbackPage() {
 
   // 시세 정보 조회
   useEffect(() => {
-    const fetchStockQuote = async () => {
-      if (!stockInfo) return;
+    if (!selectedCode || !stockInfo) return;
 
+    const fetchStockQuote = async () => {
       try {
         const response = await stockApi.getStockQuote(selectedCode, {
           market_division_code: stockInfo.isNxtInMaster ? "UN" : "J",
@@ -224,9 +245,9 @@ export default function AnalysisIndividualSnapbackPage() {
 
   // 호가 정보 조회 (초기 데이터)
   useEffect(() => {
-    const fetchOrderbook = async () => {
-      if (!stockInfo) return;
+    if (!selectedCode || !stockInfo) return;
 
+    const fetchOrderbook = async () => {
       try {
         const response = await stockApi.getOrderbook(selectedCode, {
           market_division_code: stockInfo.isNxtInMaster ? "UN" : "J",
@@ -247,8 +268,8 @@ export default function AnalysisIndividualSnapbackPage() {
 
   // 분석 결과 로드 (historyId가 있으면 해당 이력, 없으면 최신 이력)
   useEffect(() => {
-    // 인증 로딩 중이면 기다림
-    if (isAuthLoading) return;
+    // 인증 로딩 중이거나 selectedCode가 없으면 대기
+    if (isAuthLoading || !selectedCode) return;
 
     const fetchResult = async () => {
       try {
@@ -280,9 +301,7 @@ export default function AnalysisIndividualSnapbackPage() {
       }
     };
 
-    if (selectedCode) {
-      fetchResult();
-    }
+    fetchResult();
   }, [selectedCode, historyId, isAuthLoading]);
 
   return (

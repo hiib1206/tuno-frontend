@@ -3,12 +3,13 @@
 import stockApi from "@/api/stockApi";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { getExchangeName } from "@/lib/stock";
 import {
   loadRecentSearches,
   removeRecentSearch,
   saveRecentSearch,
-} from "@/lib/stockSearchHistory";
-import { ExchangeCode, StockSearchResult } from "@/types/Stock";
+} from "@/lib/stockLocalStorage";
+import { StockSearchResult } from "@/types/Stock";
 import { Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -157,17 +158,6 @@ export default function StockSearchBar() {
     if (results.length > 0) {
       handleSelect(results[0]);
     }
-  };
-
-  const getExchangeName = (exchange: ExchangeCode) => {
-    const map: Record<string, string> = {
-      KP: "KOSPI",
-      KQ: "KOSDAQ",
-      NAS: "NASDAQ",
-      NYS: "NYSE",
-      AMS: "AMEX",
-    };
-    return map[exchange] ?? exchange;
   };
 
   return (

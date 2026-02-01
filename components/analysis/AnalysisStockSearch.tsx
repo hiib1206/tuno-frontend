@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import {
   loadRecentSearches,
   saveRecentSearch,
-} from "@/lib/stockSearchHistory";
+} from "@/lib/stockLocalStorage";
 import { cn } from "@/lib/utils";
 import { ExchangeCode, StockSearchResult } from "@/types/Stock";
 import { Search } from "lucide-react";

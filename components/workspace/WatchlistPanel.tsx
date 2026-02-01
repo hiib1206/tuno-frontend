@@ -1,8 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { getExchangeName } from "@/lib/stock";
 import { useWatchlistStore } from "@/stores/watchlistStore";
-import { ExchangeCode, WatchlistItem } from "@/types/Stock";
+import { WatchlistItem } from "@/types/Stock";
 import {
   closestCenter,
   DndContext,
@@ -26,18 +27,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "../ToastProvider";
 import { Button } from "../ui/button";
-
-// 거래소 라벨 매핑 (영문)
-const getExchangeName = (exchange: ExchangeCode) => {
-  const map: Record<ExchangeCode, string> = {
-    KP: "KOSPI",
-    KQ: "KOSDAQ",
-    NAS: "NASDAQ",
-    NYS: "NYSE",
-    AMS: "AMEX",
-  };
-  return map[exchange] ?? exchange;
-};
 
 // 드래그 가능한 아이템 컴포넌트
 interface SortableItemProps {
