@@ -1,0 +1,26 @@
+/* WaveAnimation 컴포넌트 애니메이션 */
+.wave-back {
+  animation: wave-to-left 2s linear infinite;
+}
+
+.wave-front {
+  animation: wave-to-right 2s linear infinite;
+}
+
+@keyframes wave-to-left {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes wave-to-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
