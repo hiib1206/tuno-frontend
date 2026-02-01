@@ -20,6 +20,7 @@ import {
   BarChart3,
   ChevronDown,
   ChevronUp,
+  ChartCandlestick,
   Layers,
   LayoutDashboard,
   LineChart,
@@ -34,7 +35,12 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  usePathname,
+  useRouter,
+  useSearchParams,
+  useSelectedLayoutSegments,
+} from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandText } from "../ui/BrandText";
 
@@ -46,6 +52,7 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const segments = useSelectedLayoutSegments();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { user, logout } = useAuthStore();
@@ -63,6 +70,12 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   };
 
   const currentTab = searchParams?.get("tab") || "news";
+  const activeMarketMenu = (() => {
+    if (segments[0] !== "market") return "none";
+    if (segments[1] === "theme") return "theme";
+    if (segments[1] === "stock") return "none";
+    return "market";
+  })();
 
   const routes = [
     {
@@ -84,12 +97,17 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       href: "/analysis/individual",
       active: pathname === "/analysis/individual",
       hasAi: true,
+    },    {
+      label: "국내 증시",
+      icon: ChartCandlestick,
+      href: "/market",
+      active: activeMarketMenu === "market",
     },
     {
       label: "테마",
       icon: Layers,
       href: "/market/theme",
-      active: pathname === "/market/theme",
+      active: activeMarketMenu === "theme",
     },
     {
       label: "뉴스",
@@ -283,3 +301,4 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
     </div>
   );
 }
+
