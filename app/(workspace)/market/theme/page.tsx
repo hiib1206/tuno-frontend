@@ -1,6 +1,5 @@
 "use client";
 
-import themeApi from "@/api/themeApi";
 import { ErrorState } from "@/components/feedback";
 import { ThemeNewsList } from "@/components/market/ThemeNewsList";
 import { ThemeNewsListSkeleton } from "@/components/market/ThemeNewsListSkeleton";
@@ -9,55 +8,56 @@ import { ThemeStockListSkeleton } from "@/components/market/ThemeStockListSkelet
 import { ThemeTreemap } from "@/components/market/ThemeTreemap";
 import { ThemeTreemapSkeleton } from "@/components/market/ThemeTreemapSkeleton";
 import { WorkspaceFeedback } from "@/components/workspace/WorkspaceFeedback";
-import { SpecialTheme } from "@/types/Theme";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMarketPolling } from "@/hooks/useMarketPolling";
+import { useThemeStore } from "@/stores/themeStore";
+import { useEffect } from "react";
 
 export default function ThemePage() {
-  const [themes, setThemes] = useState<SpecialTheme[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedTmcode, setSelectedTmcode] = useState<string | null>(null);
+  const {
+    themes,
+    selectedTheme,
+    isLoadingThemes,
+    themesError,
+    fetchThemes,
+    refreshThemes,
+    selectTheme,
+  } = useThemeStore();
 
-  const fetchThemes = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await themeApi.getSpecialThemes();
-      if (res.success && res.data) {
-        // top과 bottom 합쳐서 전체 테마 표시
-        const allThemes = [...res.data.top, ...res.data.bottom];
-        setThemes(allThemes);
-        // 종목 수 가장 많은 테마 자동 선택
-        if (allThemes.length > 0) {
-          const maxTheme = allThemes.reduce((max, theme) =>
-            theme.totcnt > max.totcnt ? theme : max
-          );
-          setSelectedTmcode(maxTheme.tmcode);
-        }
-      } else {
-        setError("테마 데이터를 불러오는데 실패했습니다.");
-      }
-    } catch {
-      setError("테마 데이터를 불러오는데 실패했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  // 테마 로드 (자동 선택 없이)
   useEffect(() => {
-    fetchThemes();
+    fetchThemes(false);
   }, [fetchThemes]);
 
-  // 선택된 테마 정보
-  const selectedTheme = useMemo(() => {
-    return themes.find((t) => t.tmcode === selectedTmcode);
-  }, [themes, selectedTmcode]);
+  // 테마 로드 완료 후 종목 수 기준 자동 선택
+  useEffect(() => {
+    if (themes.length > 0 && !selectedTheme) {
+      const maxTheme = themes.reduce((max, theme) =>
+        theme.totcnt > max.totcnt ? theme : max
+      );
+      selectTheme(maxTheme);
+    }
+  }, [themes, selectedTheme, selectTheme]);
 
-  if (error) {
+  // 트리맵에서 테마 선택
+  const handleSelectTheme = (tmcode: string) => {
+    const theme = themes.find((t) => t.tmcode === tmcode);
+    if (theme) selectTheme(theme);
+  };
+
+  // 새로고침
+  const handleRefresh = () => {
+    fetchThemes(false);
+  };
+
+  // 장중 1.5초 폴링
+  useMarketPolling(() => {
+    refreshThemes();
+  });
+
+  if (themesError) {
     return (
       <WorkspaceFeedback>
-        <ErrorState message={error} />
+        <ErrorState message={themesError} />
       </WorkspaceFeedback>
     );
   }
@@ -67,24 +67,24 @@ export default function ThemePage() {
       <div className="w-full xl:w-[70vw] xl:h-[1024px] mx-auto flex flex-col xl:flex-row gap-2">
       {/* 트리맵 */}
       <div className="h-[500px] xl:h-full xl:flex-1 shrink-0">
-        {loading ? (
+        {isLoadingThemes ? (
           <ThemeTreemapSkeleton />
         ) : (
-          <ThemeTreemap data={themes} onSelectTheme={setSelectedTmcode} onRefresh={fetchThemes} />
+          <ThemeTreemap data={themes} onSelectTheme={handleSelectTheme} onRefresh={handleRefresh} />
         )}
       </div>
 
       {/* 종목 리스트 + 뉴스 리스트 */}
       <div className="flex flex-col xl:flex-row xl:contents gap-2">
         <div className="h-[500px] xl:w-90 xl:h-full xl:flex-none">
-          {loading || !selectedTmcode ? (
+          {isLoadingThemes || !selectedTheme ? (
             <ThemeStockListSkeleton />
           ) : (
-            <ThemeStockList tmcode={selectedTmcode} />
+            <ThemeStockList />
           )}
         </div>
         <div className="h-[500px] xl:w-90 xl:h-full xl:flex-none">
-          {loading || !selectedTheme ? (
+          {isLoadingThemes || !selectedTheme ? (
             <ThemeNewsListSkeleton />
           ) : (
             <ThemeNewsList tmname={selectedTheme.tmname} />

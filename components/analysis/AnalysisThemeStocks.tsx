@@ -1,9 +1,9 @@
 "use client";
 
-import themeApi from "@/api/themeApi";
+import { useMarketPolling } from "@/hooks/useMarketPolling";
 import { cn } from "@/lib/utils";
+import { useThemeStore } from "@/stores/themeStore";
 import { ExchangeCode } from "@/types/Stock";
-import { SpecialTheme, ThemeStock } from "@/types/Theme";
 import { ChevronLeft, ChevronRight, Layers } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Skeleton } from "../ui/Skeleton";
@@ -17,13 +17,25 @@ export function AnalysisThemeStocks({
   className,
   onSelect,
 }: AnalysisThemeStocksProps) {
-  const [themes, setThemes] = useState<SpecialTheme[]>([]);
-  const [selectedTheme, setSelectedTheme] = useState<SpecialTheme | null>(null);
-  const [stocks, setStocks] = useState<ThemeStock[]>([]);
-  const [isLoadingThemes, setIsLoadingThemes] = useState(true);
-  const [isLoadingStocks, setIsLoadingStocks] = useState(false);
-  const [themesError, setThemesError] = useState<string | null>(null);
-  const [stocksError, setStocksError] = useState<string | null>(null);
+  // Zustand store에서 상태와 액션 가져오기
+  const {
+    themes,
+    selectedTheme,
+    stocks,
+    isLoadingThemes,
+    isLoadingStocks,
+    themesError,
+    stocksError,
+    fetchThemes,
+    refreshThemes,
+    selectTheme,
+  } = useThemeStore();
+
+  // 가격 변동 flash 효과
+  const [flashMap, setFlashMap] = useState<Record<string, "up" | "down">>({});
+  const prevStocksRef = useRef<Map<string, number>>(new Map());
+
+  // 스크롤 관련 상태 (UI 로직은 컴포넌트에 유지)
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -52,6 +64,42 @@ export function AnalysisThemeStocks({
     }
   };
 
+  // 컴포넌트 마운트 시 테마 로드
+  useEffect(() => {
+    fetchThemes();
+  }, [fetchThemes]);
+
+  // 장중 1.5초 폴링
+  useMarketPolling(() => {
+    refreshThemes();
+  });
+
+  // 가격 변동 감지 → flash 효과
+  useEffect(() => {
+    const prev = prevStocksRef.current;
+    const newFlash: Record<string, "up" | "down"> = {};
+
+    for (const stock of stocks) {
+      const prevPrice = prev.get(stock.shcode);
+      const curPrice = Number(stock.price);
+      if (prevPrice !== undefined && prevPrice !== curPrice) {
+        newFlash[stock.shcode] = curPrice > prevPrice ? "up" : "down";
+      }
+    }
+
+    const newMap = new Map<string, number>();
+    for (const stock of stocks) {
+      newMap.set(stock.shcode, Number(stock.price));
+    }
+    prevStocksRef.current = newMap;
+
+    if (Object.keys(newFlash).length > 0) {
+      setFlashMap(newFlash);
+      const timer = setTimeout(() => setFlashMap({}), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [stocks]);
+
   // 스크롤 이벤트 리스너
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -67,58 +115,11 @@ export function AnalysisThemeStocks({
     };
   }, [checkScrollPosition, themes]);
 
-  // 테마 종목 조회
-  const fetchThemeStocks = useCallback(async (tmcode: string) => {
-    setIsLoadingStocks(true);
-    setStocksError(null);
-    try {
-      const res = await themeApi.getThemeStocks(tmcode);
-      if (res.success && res.data) {
-        setStocks(res.data.stocks);
-      }
-    } catch {
-      setStocksError("종목을 불러오는데 실패했습니다");
-      setStocks([]);
-    } finally {
-      setIsLoadingStocks(false);
+  // 테마 선택 핸들러
+  const handleSelectTheme = (theme: typeof selectedTheme) => {
+    if (theme) {
+      selectTheme(theme);
     }
-  }, []);
-
-  // 테마 목록 조회 + 상승률 1위 자동 선택
-  const fetchThemes = useCallback(async () => {
-    setIsLoadingThemes(true);
-    setThemesError(null);
-    try {
-      const res = await themeApi.getSpecialThemes();
-      if (res.success && res.data) {
-        const allThemes = [...res.data.top, ...res.data.bottom];
-        setThemes(allThemes);
-
-        // 상승률 1위 테마 자동 선택
-        if (allThemes.length > 0) {
-          const topTheme = allThemes.reduce((max, theme) =>
-            theme.avgdiff > max.avgdiff ? theme : max
-          );
-          setSelectedTheme(topTheme);
-          fetchThemeStocks(topTheme.tmcode);
-        }
-      }
-    } catch {
-      setThemesError("테마를 불러오는데 실패했습니다");
-      setThemes([]);
-    } finally {
-      setIsLoadingThemes(false);
-    }
-  }, [fetchThemeStocks]);
-
-  useEffect(() => {
-    fetchThemes();
-  }, [fetchThemes]);
-
-  // 테마 선택 시 종목 조회
-  const handleSelectTheme = (theme: SpecialTheme) => {
-    setSelectedTheme(theme);
-    fetchThemeStocks(theme.tmcode);
   };
 
   if (isLoadingThemes) {
@@ -229,7 +230,11 @@ export function AnalysisThemeStocks({
               <li key={stock.shcode}>
                 <button
                   onClick={() => onSelect(stock.shcode, (stock.exchange as ExchangeCode) || "KP")}
-                  className="w-full flex items-center justify-between px-3 py-1.5 hover:bg-accent/10 transition-colors text-left cursor-pointer"
+                  className={cn(
+                    "w-full flex items-center justify-between px-3 py-1.5 hover:bg-accent/10 transition-colors text-left cursor-pointer",
+                    flashMap[stock.shcode] === "up" && "flash-up",
+                    flashMap[stock.shcode] === "down" && "flash-down"
+                  )}
                 >
                   <span className="font-medium text-xs text-foreground truncate min-w-0">
                     {stock.hname}

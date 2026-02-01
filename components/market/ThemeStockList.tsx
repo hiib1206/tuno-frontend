@@ -1,46 +1,44 @@
 "use client";
 
-import themeApi from "@/api/themeApi";
 import { ErrorState } from "@/components/feedback";
 import { ThemeStockListSkeleton } from "@/components/market/ThemeStockListSkeleton";
-import { ThemeStock, ThemeStockInfo } from "@/types/Theme";
+import { useThemeStore } from "@/stores/themeStore";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-interface ThemeStockListProps {
-  tmcode: string;
-}
+export function ThemeStockList() {
+  const { stocks, stockInfo, isLoadingStocks, stocksError } = useThemeStore();
 
-export function ThemeStockList({ tmcode }: ThemeStockListProps) {
-  const [info, setInfo] = useState<ThemeStockInfo | null>(null);
-  const [stocks, setStocks] = useState<ThemeStock[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [hasScroll, setHasScroll] = useState(false);
+  const [flashMap, setFlashMap] = useState<Record<string, "up" | "down">>({});
+  const prevStocksRef = useRef<Map<string, number>>(new Map());
   const listRef = useRef<HTMLDivElement>(null);
 
+  // 가격 변동 감지 → flash 효과
   useEffect(() => {
-    const fetchStocks = async () => {
-      setLoading(true);
-      setError(null);
+    const prev = prevStocksRef.current;
+    const newFlash: Record<string, "up" | "down"> = {};
 
-      try {
-        const res = await themeApi.getThemeStocks(tmcode);
-        if (res.success && res.data) {
-          setInfo(res.data.info);
-          setStocks(res.data.stocks);
-        } else {
-          setError(res.message || "종목 데이터를 불러오는데 실패했습니다.");
-        }
-      } catch {
-        setError("종목 데이터를 불러오는데 실패했습니다.");
-      } finally {
-        setLoading(false);
+    for (const stock of stocks) {
+      const prevPrice = prev.get(stock.shcode);
+      if (prevPrice !== undefined && prevPrice !== stock.price) {
+        newFlash[stock.shcode] = stock.price > prevPrice ? "up" : "down";
       }
-    };
+    }
 
-    fetchStocks();
-  }, [tmcode]);
+    // 이전 데이터 갱신
+    const newMap = new Map<string, number>();
+    for (const stock of stocks) {
+      newMap.set(stock.shcode, stock.price);
+    }
+    prevStocksRef.current = newMap;
+
+    if (Object.keys(newFlash).length > 0) {
+      setFlashMap(newFlash);
+      const timer = setTimeout(() => setFlashMap({}), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [stocks]);
 
   // 스크롤 여부 체크
   useEffect(() => {
@@ -69,28 +67,28 @@ export function ThemeStockList({ tmcode }: ThemeStockListProps) {
     return `${prefix}${numDiff.toFixed(2)}%`;
   };
 
-  if (loading) {
+  if (isLoadingStocks) {
     return <ThemeStockListSkeleton />;
   }
 
   return (
     <div className="h-full flex flex-col bg-background-1 rounded-md overflow-hidden">
-      {error ? (
+      {stocksError ? (
         <div className="flex-1 flex items-center justify-center">
-          <ErrorState message={error} />
+          <ErrorState message={stocksError} />
         </div>
       ) : (
         <>
           {/* 헤더 - 테마 정보 */}
-          {info && (
+          {stockInfo && (
             <div className="pt-4 px-4 pb-1">
-              <h2 className="text-lg mb-4 font-bold text-foreground">{info.tmname}</h2>
+              <h2 className="text-lg mb-4 font-bold text-foreground">{stockInfo.tmname}</h2>
               <div className="flex gap-2 mt-1 text-sm text-foreground-2 justify-end">
-                <span>종목 {info.tmcnt}개</span>
+                <span>종목 {stockInfo.tmcnt}개</span>
                 <span className="text-muted-foreground">·</span>
                 <div>
-                  <span className="text-chart-up">상승 {info.upcnt}개</span>
-                  <span>({info.uprate.toFixed(1)}%)</span>
+                  <span className="text-chart-up">상승 {stockInfo.upcnt}개</span>
+                  <span>({stockInfo.uprate.toFixed(1)}%)</span>
                 </div>
               </div>
             </div>
@@ -112,7 +110,7 @@ export function ThemeStockList({ tmcode }: ThemeStockListProps) {
                   pathname: `/market/stock/${stock.shcode}`,
                   query: { market: "KR", exchange: stock.exchange ?? "KP" },
                 }}
-                className="flex gap-3 p-3 border-b border-border-2 hover:bg-background-2 cursor-pointer transition-colors"
+                className={`flex gap-3 p-3 border-b border-border-2 hover:bg-background-2 cursor-pointer transition-colors ${flashMap[stock.shcode] === "up" ? "flash-up" : flashMap[stock.shcode] === "down" ? "flash-down" : ""}`}
               >
                 <span className="flex-1 font-medium text-foreground">
                   {stock.hname}
