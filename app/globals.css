@@ -448,7 +448,6 @@ div[data-tv-lightweight-charts] a,
   display: none !important;
 }
 
-
 /* Hide scrollbars but keep scrolling */
 .no-scrollbar {
   -ms-overflow-style: none;
@@ -512,17 +511,20 @@ div[data-tv-lightweight-charts] a,
   transform-origin: center;
 }
 
-/* ================================
-   Price Flash Animation (폴링 가격 변동)
-   ================================ */
-@keyframes flash-up {
-  0% { background-color: color-mix(in srgb, var(--chart-up) 20%, transparent); }
-  100% { background-color: transparent; }
+/* Page Enter Animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@keyframes flash-down {
-  0% { background-color: color-mix(in srgb, var(--chart-down) 20%, transparent); }
-  100% { background-color: transparent; }
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out both;
 }
 
 .flash-up {

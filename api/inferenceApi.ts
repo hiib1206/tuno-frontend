@@ -63,6 +63,12 @@ export interface InferenceHistoryItemResponse {
   data: InferenceHistoryItem | null;
 }
 
+// AI 추론 이력 삭제
+export interface DeleteInferenceHistoryResponse {
+  success: boolean;
+  message: string;
+}
+
 const inferenceApi = {
   snapback: async (params: SnapbackRequest): Promise<SnapbackResponse> => {
     const body: SnapbackRequest = {
@@ -120,6 +126,15 @@ const inferenceApi = {
       success: response.data.success,
       message: response.data.message,
       data: response.data.data ? parseInferenceHistoryItem(response.data.data) : null,
+    };
+  },
+
+  // AI 추론 이력 삭제 (soft delete)
+  deleteHistory: async (id: string): Promise<DeleteInferenceHistoryResponse> => {
+    const response = await apiClient.delete(`/api/inference/history/${id}`);
+    return {
+      success: response.data.success,
+      message: response.data.message,
     };
   },
 };

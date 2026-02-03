@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { cn } from "@/lib/utils";
 import {
   InferenceHistoryItem,
+  InferenceModelType,
   InferenceStatus,
   parseSnapbackResult,
   SnapbackResult,
@@ -13,18 +14,21 @@ import { ExchangeCode } from "@/types/Stock";
 import { useAuthStore } from "@/stores/authStore";
 import { formatDistanceToNowStrict } from "date-fns";
 import { ko } from "date-fns/locale";
+import { toast } from "@/hooks/useToast";
 import {
-  ChevronDown,
   Clock,
   History,
   Loader2,
   RefreshCw,
+  X,
 } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 interface AnalysisInferenceHistoryProps {
   onSelect?: (result: SnapbackResult) => void;
   onSelectHistory?: (ticker: string, exchange: ExchangeCode, historyId: string) => void;
+  modelType?: InferenceModelType;
+  showHeader?: boolean;
   className?: string;
 }
 
@@ -35,7 +39,7 @@ export interface AnalysisInferenceHistoryRef {
 export const AnalysisInferenceHistory = forwardRef<
   AnalysisInferenceHistoryRef,
   AnalysisInferenceHistoryProps
->(({ onSelect, onSelectHistory, className }, ref) => {
+>(({ onSelect, onSelectHistory, modelType = "SNAPBACK", showHeader = true, className }, ref) => {
   const { isAuthLoading } = useAuthStore();
   const [history, setHistory] = useState<InferenceHistoryItem[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
@@ -49,7 +53,7 @@ export const AnalysisInferenceHistory = forwardRef<
     setError(null);
     try {
       const response = await inferenceApi.getHistory({
-        model_type: "SNAPBACK",
+        model_type: modelType,
         limit: 10,
         cursor,
         days: 30,
@@ -68,7 +72,7 @@ export const AnalysisInferenceHistory = forwardRef<
     } finally {
       setIsLoadingHistory(false);
     }
-  }, []);
+  }, [modelType]);
 
   // ref를 통해 외부에서 refresh 호출 가능하도록
   useImperativeHandle(ref, () => ({
@@ -82,12 +86,22 @@ export const AnalysisInferenceHistory = forwardRef<
     fetchHistory();
   }, [fetchHistory, isAuthLoading]);
 
-  // 더보기
-  const handleLoadMore = () => {
-    if (nextCursor && !isLoadingHistory) {
-      fetchHistory(nextCursor);
-    }
-  };
+  // 무한 스크롤 sentinel
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNext && !isLoadingHistory && nextCursor) {
+          fetchHistory(nextCursor);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNext, isLoadingHistory, nextCursor, fetchHistory]);
 
   // 이력 아이템 클릭 (결과 보기)
   const handleHistoryClick = (item: InferenceHistoryItem) => {
@@ -98,6 +112,24 @@ export const AnalysisInferenceHistory = forwardRef<
       } else {
         onSelect?.(parseSnapbackResult(item.responseData));
       }
+    }
+  };
+
+  // 이력 삭제
+  const handleDelete = async (e: React.MouseEvent, item: InferenceHistoryItem) => {
+    e.stopPropagation();
+    // optimistic UI
+    const prevHistory = history;
+    setHistory((prev) => prev.filter((h) => h.id !== item.id));
+    try {
+      const response = await inferenceApi.deleteHistory(item.id);
+      if (!response.success) {
+        setHistory(prevHistory);
+        toast({ variant: "destructive", description: "이력 삭제에 실패했습니다." });
+      }
+    } catch {
+      setHistory(prevHistory);
+      toast({ variant: "destructive", description: "이력 삭제에 실패했습니다." });
     }
   };
 
@@ -148,19 +180,21 @@ export const AnalysisInferenceHistory = forwardRef<
   return (
     <div className={cn("flex flex-col h-full", className)}>
       {/* 이력 헤더 */}
-      <div className="px-3 py-2 border-b border-border-2 flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <History className="w-3 h-3 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">분석 이력</span>
+      {showHeader && (
+        <div className="px-3 py-2 border-b border-border-2 flex items-center justify-between">
+          <div className="flex items-center gap-1.5">
+            <History className="w-3 h-3 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">분석 이력</span>
+          </div>
+          <button
+            onClick={() => fetchHistory()}
+            disabled={isLoadingHistory}
+            className="p-1 rounded hover:bg-background-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={cn("w-3 h-3", isLoadingHistory && "animate-spin")} />
+          </button>
         </div>
-        <button
-          onClick={() => fetchHistory()}
-          disabled={isLoadingHistory}
-          className="p-1 rounded hover:bg-background-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-        >
-          <RefreshCw className={cn("w-3 h-3", isLoadingHistory && "animate-spin")} />
-        </button>
-      </div>
+      )}
 
       {/* 이력 목록 */}
       <div className="flex-1 overflow-y-auto min-h-0 scrollbar-thin">
@@ -176,13 +210,12 @@ export const AnalysisInferenceHistory = forwardRef<
         ) : (
           <div>
             {history.map((item) => (
-              <button
+              <div
                 key={item.id}
                 onClick={() => handleHistoryClick(item)}
-                disabled={item.status !== "COMPLETED" as InferenceStatus}
                 className={cn(
-                  "w-full px-3 py-1.5 text-left transition-colors",
-                  item.status === "COMPLETED" as InferenceStatus
+                  "w-full px-3 py-1.5 text-left transition-colors group",
+                  item.status === ("COMPLETED" as InferenceStatus)
                     ? "hover:bg-accent/10 cursor-pointer"
                     : "cursor-default opacity-60"
                 )}
@@ -198,7 +231,7 @@ export const AnalysisInferenceHistory = forwardRef<
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 shrink-0 ml-2">
+                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
                     <span className="text-[10px] text-muted-foreground">
                       {formatDistanceToNowStrict(item.requestedAt, {
                         addSuffix: true,
@@ -206,29 +239,26 @@ export const AnalysisInferenceHistory = forwardRef<
                       })}
                     </span>
                     {getStatusBadge(item.status)}
+                    <div className="max-w-0 overflow-hidden group-hover:max-w-[24px] transition-all duration-150">
+                      <button
+                        onClick={(e) => handleDelete(e, item)}
+                        className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:scale-110 cursor-pointer"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         )}
 
-        {/* 더보기 버튼 */}
+        {/* 무한 스크롤 sentinel */}
         {hasNext && (
-          <button
-            onClick={handleLoadMore}
-            disabled={isLoadingHistory}
-            className="w-full py-2 flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {isLoadingHistory ? (
-              <Loader2 className="w-3 h-3 animate-spin" />
-            ) : (
-              <>
-                <ChevronDown className="w-3 h-3" />
-                더보기
-              </>
-            )}
-          </button>
+          <div ref={sentinelRef} className="flex items-center justify-center py-2">
+            {isLoadingHistory && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
+          </div>
         )}
       </div>
     </div>
