@@ -10,7 +10,7 @@ export function CommunityFooter() {
               <BrandText className="text-xl">Tuno</BrandText>
             </div>
             <p className="text-muted-foreground text-sm">
-              © 2024 Tuno. All rights reserved.
+              © 2026 Tuno. All rights reserved.
             </p>
           </div>
 

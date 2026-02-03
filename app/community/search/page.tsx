@@ -115,6 +115,8 @@ export default function SearchPage() {
 
   // 뉴스 무한 스크롤 감지
   useEffect(() => {
+    if (activeTab !== "news") return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && newsHasNextPage && !newsLoadingMore) {
@@ -129,7 +131,7 @@ export default function SearchPage() {
     }
 
     return () => observer.disconnect();
-  }, [newsHasNextPage, newsLoadingMore, loadMoreNews]);
+  }, [activeTab, newsHasNextPage, newsLoadingMore, loadMoreNews]);
 
   const handlePostsPageChange = (page: number) => {
     setPostsPage(page);

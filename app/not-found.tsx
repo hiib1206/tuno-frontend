@@ -2,17 +2,13 @@
 
 import { BrandText } from "@/components/ui/BrandText";
 import { BackLink } from "@/components/ui/back-link";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
-import { Home } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function NotFound() {
@@ -76,15 +72,6 @@ export default function NotFound() {
               </span>
             </div>
           </CardContent>
-
-          <CardFooter className="flex justify-center">
-            <Button variant="outline" className="w-full sm:w-auto" asChild>
-              <Link href="/">
-                <Home className="mr-2 h-4 w-4" />
-                홈으로
-              </Link>
-            </Button>
-          </CardFooter>
         </Card>
       </div>
     </main>
