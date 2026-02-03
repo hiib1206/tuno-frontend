@@ -7,6 +7,7 @@ import {
   StockOrderbookData,
   StockQuote,
   StockSearchQueryParams,
+  IndexMinuteCandle,
   StockSearchResult,
   WatchlistItem,
 } from "@/types/Stock";
@@ -35,6 +36,20 @@ type StockInfoResult = {
   success: boolean;
   message: string;
   data: StockInfo | null;
+};
+
+// 지수 분봉 차트 조회 쿼리 파라미터 타입
+type IndexMinuteChartQueryParams = {
+  interval?: "30" | "60" | "600" | "3600"; // 시간 간격(초), 기본값 "60"
+  include_past_data?: "true" | "false"; // 과거 포함 여부, 기본값 "false"
+  exclude_after_hours?: "true" | "false"; // 시간외 제외 여부, 기본값 "false"
+};
+
+// 지수 분봉 차트 조회 응답 타입
+type IndexMinuteChartResult = {
+  success: boolean;
+  message: string;
+  data: IndexMinuteCandle[] | null;
 };
 
 // 지수 캔들 데이터 조회 쿼리 파라미터 타입
@@ -193,6 +208,22 @@ const stockApi = {
       success: response.data.success,
       message: response.data.message,
       data: response.data.data as FinancialSummary[],
+    };
+  },
+
+  // 지수 분봉 차트 조회
+  getIndexMinuteChart: async (
+    industryCode: string,
+    params?: IndexMinuteChartQueryParams
+  ): Promise<IndexMinuteChartResult> => {
+    const response = await apiClient.get(
+      `/api/stock/index/${industryCode}/minute-chart`,
+      { params }
+    );
+    return {
+      success: response.data.success,
+      message: response.data.message,
+      data: response.data.data as IndexMinuteCandle[] | null,
     };
   },
 

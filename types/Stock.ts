@@ -249,6 +249,65 @@ export type StockSearchResult = {
   isNxtInMaster: boolean | null;
 };
 
+// 국내 지수 현재가 데이터
+export interface IndexPrice {
+  currentPrice: number | null;
+  priceChange: number | null;
+  priceChangeSign: string | null;
+  priceChangeRate: number | null;
+
+  volume: number | null;
+  previousVolume: number | null;
+  tradingValue: number | null;
+  previousTradingValue: number | null;
+
+  open: number | null;
+  openVsPrevious: number | null;
+  openVsCurrentSign: string | null;
+  openChangeRate: number | null;
+
+  high: number | null;
+  highVsPrevious: number | null;
+  highVsCurrentSign: string | null;
+  highChangeRate: number | null;
+
+  low: number | null;
+  lowVsPrevClose: number | null;
+  lowVsCurrentSign: string | null;
+  lowVsPrevCloseRate: number | null;
+
+  advancingCount: number | null;
+  upperLimitCount: number | null;
+  unchangedCount: number | null;
+  decliningCount: number | null;
+  lowerLimitCount: number | null;
+
+  yearHigh: number | null;
+  yearHighVsCurrentRate: number | null;
+  yearHighDate: string | null;
+  yearLow: number | null;
+  yearLowVsCurrentRate: number | null;
+  yearLowDate: string | null;
+
+  totalAskVolume: number | null;
+  totalBidVolume: number | null;
+  askVolumeRate: number | null;
+  bidVolumeRate: number | null;
+  netBidVolume: number | null;
+}
+
+// 국내 지수 분봉 데이터
+export interface IndexMinuteCandle {
+  date: number; // YYYYMMDD → Unix timestamp(초)
+  time: string | null; // HHMMSS
+  close: number | null;
+  open: number | null;
+  high: number | null;
+  low: number | null;
+  tickVolume: number | null;
+  tradingValue: number | null;
+}
+
 // 관심종목 아이템 타입
 export type WatchlistItem = {
   market: MarketCode;
