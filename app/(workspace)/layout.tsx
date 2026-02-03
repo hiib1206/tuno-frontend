@@ -99,12 +99,11 @@ export default function DashboardLayout({
           h-full
           z-50 lg:z-auto
           transition-transform duration-300 ease-in-out
-          ${
-            isMobile
-              ? isSidebarOpen
-                ? "translate-x-0"
-                : "-translate-x-full"
-              : ""
+          ${isMobile
+            ? isSidebarOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
+            : ""
           }
         `}
       >
@@ -151,7 +150,7 @@ export default function DashboardLayout({
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
-                    className="w-72 p-0 animate-in slide-in-from-top-2 fade-in-0 duration-200"
+                    className="w-72 h-[438px] overflow-hidden p-0 animate-in slide-in-from-top-2 fade-in-0 duration-200"
                     align="end"
                     sideOffset={6}
                   >

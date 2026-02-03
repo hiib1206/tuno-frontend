@@ -94,16 +94,18 @@ function SortableItem({ item, getStockUrl, isDraggingActive, onRemove }: Sortabl
               {item.market === "KR" ? "국내" : "해외"}
             </span>
             {onRemove && (
-              <button
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onClick={handleRemove}
-                className="py-3 pl-3 rounded-full text-muted-foreground hover:text-foreground hover:scale-120 cursor-pointer shrink-0"
-              >
-                <X className="h-3 w-3" />
-              </button>
+              <div className="max-w-0 overflow-hidden group-hover:max-w-[24px] transition-all duration-150">
+                <button
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onClick={handleRemove}
+                  className="py-3 pl-3 rounded-full text-muted-foreground hover:text-foreground hover:scale-120 cursor-pointer shrink-0"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -196,7 +198,7 @@ export function WatchlistPanel({ className }: WatchlistPanelProps) {
   };
 
   return (
-    <div className={cn("flex flex-col", className)}>
+    <div className={cn("flex flex-col h-full", className)}>
       {/* 헤더 */}
       <div className="px-4 py-3 border-b border-border">
         <div className="flex items-center justify-between">
@@ -223,7 +225,7 @@ export function WatchlistPanel({ className }: WatchlistPanelProps) {
       </div>
 
       {/* 종목 리스트 */}
-      <div className="flex-1 overflow-y-auto max-h-200 rounded-b-md">
+      <div className="flex-1 min-h-0 overflow-y-auto rounded-b-md">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
             <p className="text-sm text-muted-foreground">로딩 중...</p>
