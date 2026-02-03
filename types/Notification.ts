@@ -8,14 +8,7 @@ export interface NotificationActor {
   id: string;
   username: string | null;
   nick: string;
-  profile_image_url: string | null;
-}
-
-export interface NotificationActorResponse {
-  id: string;
-  username: string | null;
-  nick: string;
-  profile_image_url: string | null;
+  profileImageUrl: string | null;
 }
 
 // 알림 data 타입 정의
@@ -52,8 +45,8 @@ export type NotificationDataMap = {
 
 export interface NotificationBase {
   id: string;
-  read_at: Date | null;
-  created_at: Date;
+  readAt: Date | null;
+  createdAt: Date;
   actor: NotificationActor | null;
 }
 
@@ -68,9 +61,9 @@ export interface NotificationBaseResponse {
   id: string;
   type: NotificationType;
   data: NotificationDataMap[NotificationType];
-  read_at: string | null;
-  created_at: string;
-  actor: NotificationActorResponse | null;
+  readAt: string | null;
+  createdAt: string;
+  actor: NotificationActor | null;
 }
 
 export type NotificationResponse = {
@@ -83,8 +76,8 @@ export type NotificationResponse = {
 export const parseNotification = (raw: NotificationResponse): Notification => {
   return {
     ...raw,
-    read_at: raw.read_at ? new Date(raw.read_at) : null,
-    created_at: new Date(raw.created_at),
+    readAt: raw.readAt ? new Date(raw.readAt) : null,
+    createdAt: new Date(raw.createdAt),
     actor: raw.actor ? { ...raw.actor } : null,
   };
 };

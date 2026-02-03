@@ -1,5 +1,6 @@
 "use client";
 
+import { NotificationBell } from "@/components/community/NotificationBell";
 import { BrandText } from "@/components/ui/BrandText";
 import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/components/UserMenu";
@@ -76,7 +77,10 @@ export function CommunityHeader() {
             {isAuthLoading ? (
               <div className="w-10 h-10" /> // 마운트 전 또는 인증 로딩 중에는 공간만 유지
             ) : user ? (
-              <UserMenu />
+              <div className="flex items-center gap-3 ">
+                <NotificationBell />
+                <UserMenu />
+              </div>
             ) : (
               <div className="flex items-center">
                 <Button variant="ghost" asChild>
