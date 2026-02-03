@@ -20,9 +20,7 @@ import {
   BarChart3,
   ChevronDown,
   ChevronUp,
-  ChartCandlestick,
   Layers,
-  LayoutDashboard,
   LineChart,
   LogIn,
   LogOut,
@@ -79,12 +77,6 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
 
   const routes = [
     {
-      label: "대시보드",
-      icon: LayoutDashboard,
-      href: "/dashboard",
-      active: pathname === "/dashboard",
-    },
-    {
       label: "퀀트 분석",
       icon: BarChart3,
       href: "/analysis/quant",
@@ -97,14 +89,9 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       href: "/analysis/individual",
       active: pathname === "/analysis/individual",
       hasAi: true,
-    },    {
-      label: "국내 증시",
-      icon: ChartCandlestick,
-      href: "/market",
-      active: activeMarketMenu === "market",
     },
     {
-      label: "테마",
+      label: "주요 테마",
       icon: Layers,
       href: "/market/theme",
       active: activeMarketMenu === "theme",
