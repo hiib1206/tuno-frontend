@@ -12,7 +12,7 @@
   --background: oklch(1 0 0);
   --background-1: oklch(1 0 0);
   --background-2: oklch(0.97 0 0);
-  --background-3: oklch(0.98 0.01 130);
+  --background-3: oklch(0.97 0 0);
   --foreground: oklch(0.15 0 0);
   --foreground-white: oklch(98 0 0);
 
@@ -91,7 +91,7 @@
   --background: oklch(0.12 0 0);
   --background-1: oklch(0.25 0 0);
   --background-2: oklch(0.22 0 0);
-  --background-3: oklch(0.18 0 0);
+  --background-3: oklch(0.22 0 0);
   --foreground: oklch(0.94 0 0);
   --foreground-white: oklch(0.94 0 0);
 
