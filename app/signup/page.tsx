@@ -261,8 +261,8 @@ export default function SignupPage() {
                     (usernameStatus === "unavailable"
                       ? "border-destructive pr-10"
                       : usernameStatus === "available"
-                      ? "border-green-500 pr-10"
-                      : undefined)
+                        ? "border-green-500 pr-10"
+                        : undefined)
                   }
                 />
                 {usernameStatus === "checking" && (
@@ -277,13 +277,12 @@ export default function SignupPage() {
               </div>
               {usernameMessage && (
                 <p
-                  className={`text-xs ${
-                    usernameStatus === "available"
+                  className={`text-xs ${usernameStatus === "available"
                       ? "text-green-600 dark:text-green-400"
                       : usernameStatus === "unavailable"
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                  }`}
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    }`}
                 >
                   {usernameMessage}
                 </p>
@@ -307,8 +306,8 @@ export default function SignupPage() {
                     (nickStatus === "unavailable"
                       ? "border-destructive pr-10"
                       : nickStatus === "available"
-                      ? "border-green-500 pr-10"
-                      : undefined)
+                        ? "border-green-500 pr-10"
+                        : undefined)
                   }
                 />
                 {nickStatus === "checking" && (
@@ -323,13 +322,12 @@ export default function SignupPage() {
               </div>
               {nickMessage && (
                 <p
-                  className={`text-xs ${
-                    nickStatus === "available"
+                  className={`text-xs ${nickStatus === "available"
                       ? "text-green-600 dark:text-green-400"
                       : nickStatus === "unavailable"
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                  }`}
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    }`}
                 >
                   {nickMessage}
                 </p>
@@ -354,10 +352,10 @@ export default function SignupPage() {
                       (emailStatus === "invalid"
                         ? "border-destructive pr-10"
                         : emailStatus === "valid" && emailVerified
-                        ? "border-green-500 pr-10"
-                        : emailStatus === "valid"
-                        ? "border-green-500"
-                        : undefined)
+                          ? "border-green-500 pr-10"
+                          : emailStatus === "valid"
+                            ? "border-green-500"
+                            : undefined)
                     }
                   />
                   {emailStatus === "valid" && emailVerified && (
@@ -385,8 +383,8 @@ export default function SignupPage() {
                     (emailVerified
                       ? false
                       : emailStatus !== "valid" ||
-                        isSendingCode ||
-                        (isCodeSent && remainingSeconds > 0))
+                      isSendingCode ||
+                      (isCodeSent && remainingSeconds > 0))
                   }
                   className="shrink-0"
                   variant="outline"
@@ -411,13 +409,12 @@ export default function SignupPage() {
               </div>
               {emailMessage && (
                 <p
-                  className={`text-xs ${
-                    emailStatus === "valid"
+                  className={`text-xs ${emailStatus === "valid"
                       ? "text-green-600 dark:text-green-400"
                       : emailStatus === "invalid"
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                  }`}
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    }`}
                 >
                   {emailVerified
                     ? "이메일 인증이 완료되었습니다."
@@ -433,11 +430,10 @@ export default function SignupPage() {
                   <Label htmlFor="email-code">인증 코드</Label>
                   {codeExpiresIn > 0 && (
                     <span
-                      className={`text-xs whitespace-nowrap ${
-                        codeExpiresIn <= 60
+                      className={`text-xs whitespace-nowrap tabular-nums ${codeExpiresIn <= 60
                           ? "text-destructive"
                           : "text-muted-foreground"
-                      }`}
+                        }`}
                     >
                       유효 시간 {Math.floor(codeExpiresIn / 60)}:
                       {String(codeExpiresIn % 60).padStart(2, "0")}
@@ -445,13 +441,12 @@ export default function SignupPage() {
                   )}
                   {/* 시도 횟수 표시 - 항상 표시하되 attempts가 0이면 0/5로 표시 */}
                   <span
-                    className={`text-xs whitespace-nowrap ${
-                      attempts >= maxAttempts
+                    className={`text-xs whitespace-nowrap tabular-nums ${attempts >= maxAttempts
                         ? "text-destructive font-semibold"
                         : attempts >= maxAttempts - 1
-                        ? "text-orange-500"
-                        : "text-muted-foreground"
-                    }`}
+                          ? "text-orange-500"
+                          : "text-muted-foreground"
+                      }`}
                   >
                     시도 횟수: {attempts}/{maxAttempts}
                   </span>
@@ -571,8 +566,8 @@ export default function SignupPage() {
                     (passwordMatchStatus === "mismatch"
                       ? "border-destructive pr-10"
                       : passwordMatchStatus === "match"
-                      ? "border-green-500 pr-10"
-                      : undefined)
+                        ? "border-green-500 pr-10"
+                        : undefined)
                   }
                 />
                 {passwordMatchStatus === "match" && (
@@ -584,13 +579,12 @@ export default function SignupPage() {
               </div>
               {passwordMatchMessage && (
                 <p
-                  className={`text-xs ${
-                    passwordMatchStatus === "match"
+                  className={`text-xs ${passwordMatchStatus === "match"
                       ? "text-green-600 dark:text-green-400"
                       : passwordMatchStatus === "mismatch"
-                      ? "text-destructive"
-                      : "text-muted-foreground"
-                  }`}
+                        ? "text-destructive"
+                        : "text-muted-foreground"
+                    }`}
                 >
                   {passwordMatchMessage}
                 </p>
@@ -653,8 +647,8 @@ export default function SignupPage() {
               {isLoading
                 ? "가입 중..."
                 : success
-                ? "회원가입 완료"
-                : "무료로 시작하기"}
+                  ? "회원가입 완료"
+                  : "무료로 시작하기"}
             </Button>
           </form>
 
@@ -700,11 +694,10 @@ export default function SignupPage() {
                 setActiveTab("terms");
                 setModalAgreed(false);
               }}
-              className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
-                activeTab === "terms"
+              className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${activeTab === "terms"
                   ? "border-b-2 border-accent text-accent"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               이용약관
             </button>
@@ -714,11 +707,10 @@ export default function SignupPage() {
                 setActiveTab("privacy");
                 setModalAgreed(false);
               }}
-              className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
-                activeTab === "privacy"
+              className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${activeTab === "privacy"
                   ? "border-b-2 border-accent text-accent"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               개인정보처리방침
             </button>

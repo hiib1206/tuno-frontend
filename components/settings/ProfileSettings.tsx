@@ -32,6 +32,7 @@ export function ProfileSettings() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [emailSuccess, setEmailSuccess] = useState("");
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
   const [resendCooldown, setResendCooldown] = useState<number | null>(null);
@@ -72,6 +73,7 @@ export function ProfileSettings() {
       if (remaining <= 0) {
         setRemainingTime(null);
         setExpiresAt(null);
+        setEmailSuccess("");
         setEmailError(
           "인증 코드 입력 시간이 초과되었습니다. 재발송을 눌러주세요."
         );
@@ -144,6 +146,7 @@ export function ProfileSettings() {
     }
     setIsSendingCode(true);
     setEmailError("");
+    setEmailSuccess("");
     try {
       await userApi.sendEmailVerification(emailValue);
       // 백엔드에서 expiresAt을 반환하지 않으므로 클라이언트에서 계산 (5분 유효기간)
@@ -151,6 +154,7 @@ export function ProfileSettings() {
       const expiresAt = new Date(now.getTime() + 5 * 60 * 1000); // 5분 후
       setExpiresAt(expiresAt.toISOString());
       setIsCodeSent(true);
+      setEmailSuccess("인증 코드를 이메일로 전송했습니다.");
       // 재발송 쿨타임 시작 (90초)
       setResendCooldown(90);
       // 시도 횟수 초기화 (0/5)
@@ -162,6 +166,7 @@ export function ProfileSettings() {
       } else {
         setEmailError("인증 코드 발송에 실패했습니다. 다시 시도해주세요.");
       }
+      setEmailSuccess("");
       setExpiresAt(null);
     } finally {
       setIsSendingCode(false);
@@ -175,6 +180,7 @@ export function ProfileSettings() {
     setVerificationCode("");
     setIsVerifying(false);
     setEmailError("");
+    setEmailSuccess("");
     setIsSendingCode(false);
     setExpiresAt(null);
     setRemainingTime(null);
@@ -190,6 +196,7 @@ export function ProfileSettings() {
     }
     setIsSendingCode(true);
     setEmailError("");
+    setEmailSuccess("");
     try {
       await userApi.resendEmailVerification(emailValue);
       // 백엔드에서 expiresAt을 반환하지 않으므로 클라이언트에서 계산 (5분 유효기간)
@@ -198,6 +205,7 @@ export function ProfileSettings() {
       setExpiresAt(expiresAt.toISOString());
       setVerificationCode("");
       setIsVerifying(false);
+      setEmailSuccess("인증 코드를 이메일로 전송했습니다.");
       // 재발송 쿨타임 시작 (90초)
       setResendCooldown(90);
       // 재발송 시 시도 횟수 초기화 (0/5)
@@ -209,6 +217,7 @@ export function ProfileSettings() {
       } else {
         setEmailError("인증 코드 재발송에 실패했습니다. 다시 시도해주세요.");
       }
+      setEmailSuccess("");
     } finally {
       setIsSendingCode(false);
     }
@@ -220,6 +229,7 @@ export function ProfileSettings() {
     }
     setIsVerifying(true);
     setEmailError("");
+    setEmailSuccess("");
     try {
       await userApi.verifyEmailCode(verificationCode);
       setIsVerifying(false);
@@ -248,6 +258,7 @@ export function ProfileSettings() {
       } else {
         setEmailError("인증 코드가 올바르지 않습니다. 다시 확인해주세요.");
       }
+      setEmailSuccess("");
       setIsVerifying(false);
     }
   };
@@ -391,8 +402,8 @@ export function ProfileSettings() {
                   user?.username
                     ? user.username
                     : socialProviderName
-                    ? `${socialProviderName} 로그인 사용자`
-                    : "아이디를 입력해주세요"
+                      ? `${socialProviderName} 로그인 사용자`
+                      : "아이디를 입력해주세요"
                 }
                 className="pl-9"
                 disabled
@@ -469,13 +480,12 @@ export function ProfileSettings() {
           </div>
           {isEditingNick && nickMessage && (
             <p
-              className={`text-xs ${
-                nickStatus === "available"
-                  ? "text-accent dark:text-accent"
-                  : nickStatus === "unavailable"
+              className={`text-xs ${nickStatus === "available"
+                ? "text-accent dark:text-accent"
+                : nickStatus === "unavailable"
                   ? "text-destructive"
                   : "text-muted-foreground"
-              }`}
+                }`}
             >
               {nickMessage}
             </p>
@@ -547,7 +557,7 @@ export function ProfileSettings() {
                       type="button"
                       variant="change"
                       size="default"
-                      className="flex-1 whitespace-nowrap"
+                      className="flex-1 whitespace-nowrap tabular-nums"
                       onClick={handleResendVerificationCode}
                       disabled={
                         !emailValue ||
@@ -593,29 +603,22 @@ export function ProfileSettings() {
                 </div>
               )}
             </div>
-            {isEditingEmail && emailError && (
-              <p className="text-sm text-destructive">{emailError}</p>
+            {isEditingEmail && isCodeSent && (
+              <div className="min-h-5">
+                {emailError ? (
+                  <p className="text-sm text-destructive">{emailError}</p>
+                ) : emailSuccess ? (
+                  <p className="text-sm text-accent">{emailSuccess}</p>
+                ) : null}
+              </div>
             )}
-            {isEditingEmail &&
-              emailError &&
-              attempts !== null &&
-              maxAttempts !== null && (
-                <p className="text-xs text-muted-foreground">
-                  시도 횟수: {attempts}/{maxAttempts}
-                </p>
-              )}
+            {isEditingEmail && attempts !== null && maxAttempts !== null && (
+              <p className="text-xs text-muted-foreground">
+                시도 횟수: {attempts}/{maxAttempts}
+              </p>
+            )}
             {isEditingEmail && isCodeSent && !isSendingCode && (
               <div className="space-y-2">
-                {!emailError && (
-                  <p className="text-sm text-accent">
-                    인증 코드를 이메일로 전송했습니다.
-                  </p>
-                )}
-                {!emailError && attempts !== null && maxAttempts !== null && (
-                  <p className="text-xs text-muted-foreground">
-                    시도 횟수: {attempts}/{maxAttempts}
-                  </p>
-                )}
                 <div className="flex flex-col gap-2 lg:flex-row">
                   <div className="relative w-full">
                     <Input
@@ -642,8 +645,8 @@ export function ProfileSettings() {
                           remainingTime <= 60
                             ? "text-destructive"
                             : remainingTime <= 180
-                            ? "text-orange-500"
-                            : "text-muted-foreground"
+                              ? "text-orange-500"
+                              : "text-muted-foreground"
                         )}
                       >
                         {formatRemainingTime(remainingTime)}
@@ -674,7 +677,12 @@ export function ProfileSettings() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="phone">전화번호</Label>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="phone">전화번호</Label>
+            <span className="text-sm font-normal text-muted-foreground">
+              (현재는 해당 기능을 사용 할 수 없습니다)
+            </span>
+          </div>
           <div className="flex flex-col gap-2 lg:flex-row">
             <div className="relative w-full">
               <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -691,6 +699,7 @@ export function ProfileSettings() {
               variant="change"
               size="default"
               className="whitespace-nowrap"
+              disabled
             >
               변경
             </Button>
