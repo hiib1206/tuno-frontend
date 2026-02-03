@@ -27,7 +27,7 @@ import {
   MouseEventParams,
   UTCTimestamp,
 } from "lightweight-charts";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { ChartDrawingToolbar, DrawingTool } from "./ChartDrawingToolbar";
 import { ChartTimeframeToolbar } from "./ChartTimeframeToolbar";
 import { ChartTooltip } from "./ChartTooltip";
@@ -71,6 +71,7 @@ type Props = {
   realtimeData?: StockRealtimeData | null;
   supportLines?: SnapbackSupport[] | null;
   basePoint?: SnapbackPoint | null;
+  toolbarExtra?: ReactNode;
   className?: string;
 };
 
@@ -321,6 +322,7 @@ export function CandleChart({
   realtimeData,
   supportLines,
   basePoint,
+  toolbarExtra,
   className,
 }: Props) {
   // 분석 결과 오버레이 표시 여부
@@ -1379,7 +1381,7 @@ export function CandleChart({
   return (
     <div className={cn("flex flex-col w-full min-w-0 h-[400px] md:h-full", className)}>
       {/* 상단 타임프레임 툴바 */}
-      <ChartTimeframeToolbar activeTimeframe="1D" />
+      <ChartTimeframeToolbar activeTimeframe="1D" extraActions={toolbarExtra} />
 
       <div className="flex flex-1 min-h-0 min-w-0">
         {/* 좌측 드로잉 툴바 */}

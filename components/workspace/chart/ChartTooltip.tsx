@@ -55,25 +55,25 @@ export function ChartTooltip({ data }: ChartTooltipProps) {
           <div className="space-y-1 text-muted-foreground">
             <div className="flex justify-between gap-4">
               <span className="text-muted-foreground/80">시가</span>
-              <span className="font-medium text-foreground">
+              <span className="tabular-nums font-medium text-foreground">
                 {data.open.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between gap-4">
               <span className="text-chart-up">고가</span>
-              <span className="font-medium text-chart-up">
+              <span className="tabular-nums font-medium text-chart-up">
                 {data.high.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between gap-4">
               <span className="text-chart-down">저가</span>
-              <span className="font-medium text-chart-down">
+              <span className="tabular-nums font-medium text-chart-down">
                 {data.low.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between gap-4">
               <span className="text-muted-foreground/80">종가</span>
-              <span className="font-medium text-foreground">
+              <span className="tabular-nums font-medium text-foreground">
                 {data.close.toLocaleString()}
               </span>
             </div>
@@ -82,12 +82,12 @@ export function ChartTooltip({ data }: ChartTooltipProps) {
               <span className="text-muted-foreground/80">등락</span>
               <div
                 className={cn(
-                  "font-medium text-foreground flex flex-col items-end",
+                  "tabular-nums font-medium text-foreground flex flex-col items-end",
                   isZero
                     ? "text-foreground"
                     : isPositive
-                    ? "text-chart-up"
-                    : "text-chart-down"
+                      ? "text-chart-up"
+                      : "text-chart-down"
                 )}
               >
                 <span>
@@ -106,7 +106,7 @@ export function ChartTooltip({ data }: ChartTooltipProps) {
           <div className="mt-1 pt-1 border-t border-border/50">
             <div className="flex justify-between gap-4">
               <span className="text-muted-foreground/80">거래량</span>
-              <span className="font-medium text-foreground">
+              <span className="tabular-nums font-medium text-foreground">
                 {data.volume.toLocaleString()}
               </span>
             </div>

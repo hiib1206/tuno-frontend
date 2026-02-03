@@ -9,8 +9,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CandleChart } from "@/components/workspace/chart/CandleChart";
-import { cn } from "@/lib/utils";
 import { getExchangeName } from "@/lib/stock";
+import { saveLastViewedStock } from "@/lib/stockLocalStorage";
+import { cn } from "@/lib/utils";
+import aiLogoAnimation from "@/public/lottie/ai-logo.json";
 import { useAuthStore } from "@/stores/authStore";
 import { useWatchlistStore } from "@/stores/watchlistStore";
 import {
@@ -20,24 +22,49 @@ import {
   StockStatusCode,
   StockStatusLabelMap,
 } from "@/types/Stock";
-import { Star, TrendingDown, TrendingUp } from "lucide-react";
-import { useState } from "react";
+import Lottie from "lottie-react";
+import { Star } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 interface StockInfoProps {
   stockQuote: StockQuote | null;
   stockInfo: StockInfoType;
   realtimeData?: StockRealtimeData | null;
+  showIndex?: boolean;
+  onToggleIndex?: () => void;
+  showChat?: boolean;
+  onToggleChat?: () => void;
 }
 
 export function StockInfo({
   stockQuote,
   stockInfo,
   realtimeData,
+  showIndex,
+  onToggleIndex,
+  showChat,
+  onToggleChat,
 }: StockInfoProps) {
+  const router = useRouter();
   const { user } = useAuthStore();
   const { isInWatchlist, toggleWatchlist } = useWatchlistStore();
   const [isToggling, setIsToggling] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isAiMenuOpen, setIsAiMenuOpen] = useState(false);
+  const aiMenuRef = useRef<HTMLDivElement>(null);
+
+  // AI 메뉴 바깥 클릭 시 닫기
+  useEffect(() => {
+    if (!isAiMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (aiMenuRef.current && !aiMenuRef.current.contains(e.target as Node)) {
+        setIsAiMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isAiMenuOpen]);
 
   // 전역 스토어에서 관심종목 여부 확인 (로그인 상태일 때만)
   const isWatchList = user ? isInWatchlist(stockInfo.code, stockInfo.exchange) : false;
@@ -57,6 +84,8 @@ export function StockInfo({
   const priceChangePercent =
     prevClose === 0 ? "0.00" : ((priceChange / prevClose) * 100).toFixed(2);
   const isUp = priceChange >= 0;
+  const priceDirectionSymbol =
+    priceChange > 0 ? "▲" : priceChange < 0 ? "▼" : "";
   const marketCap = currPrice * (stockQuote?.listedShares ?? 0);
 
   const formatNumber = (value: number) => {
@@ -108,7 +137,7 @@ export function StockInfo({
     <>
       <Card variant="workspace">
         <CardHeader>
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-1">
             <div className="flex items-start gap-6 flex-1">
               <div className="min-w-[100px]">
                 <div className="flex items-center gap-2">
@@ -120,10 +149,10 @@ export function StockInfo({
                       className={cn(
                         "inline-block px-2 py-0.5 text-[10px] sm:text-xs font-semibold rounded-md bg-destructive/20 text-destructive mb-2",
                         stockQuote.statusCode ===
-                          StockStatusCode.CREDIT_AVAILABLE &&
-                          "bg-accent/20 text-accent",
+                        StockStatusCode.CREDIT_AVAILABLE &&
+                        "bg-accent/20 text-accent",
                         stockQuote.statusCode === StockStatusCode.MARGIN_100 &&
-                          "bg-orange-500/20 text-orange-500"
+                        "bg-orange-500/20 text-orange-500"
                       )}
                     >
                       {StockStatusLabelMap[stockQuote.statusCode]}
@@ -143,21 +172,17 @@ export function StockInfo({
                   현재가
                 </span>
                 <div
-                  className={`text-xl sm:text-2xl md:text-3xl font-bold ${
-                    isUp ? "text-chart-up" : "text-chart-down"
-                  }`}
+                  className={`tabular-nums text-xl sm:text-2xl md:text-3xl font-bold ${isUp ? "text-chart-up" : "text-chart-down"
+                    }`}
                 >
                   {formatCurrency(currPrice) ?? "N/A"}원
                 </div>
                 <div
-                  className={`text-sm flex items-center gap-1 ${
-                    isUp ? "text-chart-up" : "text-chart-down"
-                  }`}
+                  className={`tabular-nums text-sm flex items-center gap-1 ${isUp ? "text-chart-up" : "text-chart-down"
+                    }`}
                 >
-                  {isUp ? (
-                    <TrendingUp className="w-4 h-4" />
-                  ) : (
-                    <TrendingDown className="w-4 h-4" />
+                  {priceDirectionSymbol && (
+                    <span className="text-xs font-medium">{priceDirectionSymbol}</span>
                   )}
                   <span>
                     {isUp ? "+" : ""}
@@ -190,6 +215,54 @@ export function StockInfo({
                 <p>{isWatchList ? "관심종목 제거" : "관심종목 추가"}</p>
               </TooltipContent>
             </Tooltip>
+
+            {/* 지수 차트 토글 */}
+            {onToggleIndex && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    onClick={onToggleIndex}
+                    aria-pressed={showIndex}
+                    className={cn(
+                      "transition-colors flex-shrink-0 px-1 py-1 text-xs font-medium",
+                      "pointer-events-none text-muted-foreground", // 모바일: 클릭/호버 불가, 회색
+                      "xl:pointer-events-auto xl:hover:opacity-80", // PC: 클릭/호버 가능
+                      showIndex && "xl:text-accent" // PC에서 활성화 시 색상 적용
+                    )}
+                  >
+                    지수차트
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{showIndex ? "지수 차트 닫기" : "지수 차트 보기"}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            {/* 종목 토론 토글 */}
+            {onToggleChat && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    onClick={onToggleChat}
+                    aria-pressed={showChat}
+                    className={cn(
+                      "transition-colors flex-shrink-0 px-1 py-1 text-xs font-medium",
+                      "pointer-events-none text-muted-foreground", // 모바일: 클릭/호버 불가, 회색
+                      "xl:pointer-events-auto xl:hover:opacity-80", // PC: 클릭/호버 가능
+                      showChat && "xl:text-accent" // PC에서 활성화 시 색상 적용
+                    )}
+                  >
+                    종목토론
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{showChat ? "종목 토론 닫기" : "종목 토론 보기"}</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
           <span className="text-xs text-muted-foreground text-right mb-1">
             ※ 차트 정보는 KRX와 NXT 통합 데이터 이므로 전일종가 · 등락률등이
@@ -206,36 +279,90 @@ export function StockInfo({
                 exchange={stockInfo.exchange}
                 stockQuote={stockQuote}
                 realtimeData={realtimeData}
+                toolbarExtra={
+                  <div ref={aiMenuRef} className="flex items-center">
+                    <div
+                      className={cn(
+                        "flex items-center gap-2 overflow-hidden transition-all duration-300 ease-in-out",
+                        isAiMenuOpen
+                          ? "max-w-[250px] opacity-100"
+                          : "max-w-0 opacity-0"
+                      )}
+                    >
+                      <span
+                        className="whitespace-nowrap text-[11px] font-semibold bg-clip-text text-transparent flex items-center gap-1.5"
+                        style={{ backgroundImage: "linear-gradient(to right, #2dd4bf, #60a5fa, #a78bfa)" }}
+                      >
+                        <button
+                          className="cursor-pointer hover:underline underline-offset-2 transition-all"
+                          onClick={() => {
+                            saveLastViewedStock("quant", {
+                              code: stockInfo.code,
+                              exchange: stockInfo.exchange,
+                            });
+                            setIsAiMenuOpen(false);
+                            router.push("/analysis/quant");
+                          }}
+                        >
+                          퀀트 분석 가기
+                        </button>
+                        <span className="text-[10px]">·</span>
+                        <button
+                          className="cursor-pointer hover:underline underline-offset-2 transition-all"
+                          onClick={() => {
+                            setIsAiMenuOpen(false);
+                            router.push(
+                              `/analysis/individual/snapback?code=${stockInfo.code}&exchange=${stockInfo.exchange}`
+                            );
+                          }}
+                        >
+                          차트 분석 가기
+                        </button>
+                      </span>
+                    </div>
+                    <button
+                      className="flex items-center justify-center w-7 h-7 rounded cursor-pointer transition-opacity hover:opacity-80"
+                      title="AI 분석"
+                      onClick={() => setIsAiMenuOpen((prev) => !prev)}
+                    >
+                      <Lottie
+                        animationData={aiLogoAnimation}
+                        loop
+                        className="w-full h-full"
+                      />
+                    </button>
+                  </div>
+                }
               />
             </div>
             <div className="flex flex-col h-[300px] md:h-[450px] w-full md:w-auto md:min-w-[150px] flex-shrink-0 py-2 px-2">
               <div className="flex-1 flex flex-row md:flex-col justify-between items-center md:items-stretch border-b border-border gap-2 md:gap-0 -mx-2 px-2">
                 <p className="text-sm text-muted-foreground">시가(원)</p>
-                <p className="text-xl sm:text-xl font-semibold text-right md:text-right">
+                <p className="tabular-nums text-xl sm:text-xl font-semibold text-right md:text-right">
                   {formatCurrency(open) ?? "N/A"}
                 </p>
               </div>
               <div className="flex-1 flex flex-row md:flex-col justify-between items-center md:items-stretch border-b border-border pt-2 gap-2 md:gap-0 -mx-2 px-2">
                 <p className="text-sm text-muted-foreground">고가(원)</p>
-                <p className="text-xl sm:text-xl font-semibold text-chart-up text-right md:text-right">
+                <p className="tabular-nums text-xl sm:text-xl font-semibold text-chart-up text-right md:text-right">
                   {formatCurrency(high) ?? "N/A"}
                 </p>
               </div>
               <div className="flex-1 flex flex-row md:flex-col justify-between items-center md:items-stretch border-b border-border pt-2 gap-2 md:gap-0 -mx-2 px-2">
                 <p className="text-sm text-muted-foreground">저가(원)</p>
-                <p className="text-xl sm:text-xl font-semibold text-chart-down text-right md:text-right">
+                <p className="tabular-nums text-xl sm:text-xl font-semibold text-chart-down text-right md:text-right">
                   {formatCurrency(low) ?? "N/A"}
                 </p>
               </div>
               <div className="flex-1 flex flex-row md:flex-col justify-between items-center md:items-stretch border-b border-border pt-2 gap-2 md:gap-0 -mx-2 px-2">
                 <p className="text-sm text-muted-foreground">전일종가(원)</p>
-                <p className="text-xl sm:text-xl font-semibold text-right md:text-right">
+                <p className="tabular-nums text-xl sm:text-xl font-semibold text-right md:text-right">
                   {formatCurrency(prevClose) ?? "N/A"}
                 </p>
               </div>
               <div className="flex-1 flex flex-row md:flex-col justify-between items-center md:items-stretch pt-2 gap-2 md:gap-0 -mx-2 px-2">
                 <p className="text-sm text-muted-foreground">시가총액(억)</p>
-                <p className="text-lg sm:text-xl font-semibold text-right md:text-right">
+                <p className="tabular-nums text-lg sm:text-xl font-semibold text-right md:text-right">
                   {formatNumber(marketCap) ?? "N/A"}
                 </p>
               </div>
@@ -246,25 +373,25 @@ export function StockInfo({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-3">
             <div className="border-r border-border pr-4">
               <p className="text-sm text-muted-foreground">거래량(주)</p>
-              <p className="text-lg font-semibold text-right">
+              <p className="tabular-nums text-lg font-semibold text-right">
                 {volume?.toLocaleString() ?? "N/A"}
               </p>
             </div>
             <div className="border-r border-border pr-4">
               <p className="text-sm text-muted-foreground">거래대금(억)</p>
-              <p className="text-lg font-semibold text-right">
+              <p className="tabular-nums text-lg font-semibold text-right">
                 {formatNumber(tradingValue) ?? "N/A"}
               </p>
             </div>
             <div className="border-r border-border pr-4">
               <p className="text-sm text-muted-foreground">52주 최고(원)</p>
-              <p className="text-lg font-semibold text-chart-up text-right">
+              <p className="tabular-nums text-lg font-semibold text-chart-up text-right">
                 {formatCurrency(stockQuote?.high52Week ?? 0) ?? "N/A"}
               </p>
             </div>
             <div className="border-r md:border-r-0 border-border pr-4 md:pr-0">
               <p className="text-sm text-muted-foreground">52주 최저(원)</p>
-              <p className="text-lg font-semibold text-chart-down text-right">
+              <p className="tabular-nums text-lg font-semibold text-chart-down text-right">
                 {formatCurrency(stockQuote?.low52Week ?? 0) ?? "N/A"}
               </p>
             </div>
@@ -274,25 +401,25 @@ export function StockInfo({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2 border-t">
             <div className="border-r border-border pr-4">
               <p className="text-sm text-muted-foreground">상장일자</p>
-              <p className="text-lg font-semibold text-right">
+              <p className="tabular-nums text-lg font-semibold text-right">
                 {formatDate(stockInfo.listedAt || "N/A")}
               </p>
             </div>
             <div className="border-r border-border pr-4">
               <p className="text-sm text-muted-foreground">상장주수(주)</p>
-              <p className="text-lg font-semibold text-right">
+              <p className="tabular-nums text-lg font-semibold text-right">
                 {stockQuote?.listedShares?.toLocaleString() ?? "N/A"}
               </p>
             </div>
             <div className="border-r border-border pr-4">
               <p className="text-sm text-muted-foreground">자본금(억)</p>
-              <p className="text-lg font-semibold text-right">
+              <p className="tabular-nums text-lg font-semibold text-right">
                 {stockQuote?.capital?.toLocaleString() ?? "N/A"}
               </p>
             </div>
             <div className="border-r md:border-r-0 border-border pr-4 md:pr-0">
               <p className="text-sm text-muted-foreground">액면가(원)</p>
-              <p className="text-lg font-semibold text-right">
+              <p className="tabular-nums text-lg font-semibold text-right">
                 {formatCurrency(stockQuote?.parValue ?? 0) ?? "N/A"}
               </p>
             </div>

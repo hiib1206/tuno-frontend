@@ -21,12 +21,14 @@ const timeframes: Timeframe[] = [
 interface ChartTimeframeToolbarProps {
   activeTimeframe: string;
   onTimeframeChange?: (timeframe: string) => void;
+  extraActions?: React.ReactNode;
   className?: string;
 }
 
 export function ChartTimeframeToolbar({
   activeTimeframe,
   onTimeframeChange,
+  extraActions,
   className,
 }: ChartTimeframeToolbarProps) {
   return (
@@ -57,8 +59,9 @@ export function ChartTimeframeToolbar({
         ))}
       </div>
 
-      {/* 매수/매도 버튼 */}
+      {/* 액션 버튼 */}
       <div className="flex items-center gap-1">
+        {extraActions}
         <button
           disabled
           className="px-2 py-0.5 text-xs rounded bg-chart-down/20 text-chart-down/40 cursor-not-allowed"
