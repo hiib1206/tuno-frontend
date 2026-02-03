@@ -75,6 +75,13 @@
 
   --ai-loader-background: oklch(1 0 0);
   --ai-loader-ring: oklch(0.98 0 0);
+
+  --al-surface: oklch(0.98 0 0);
+  --al-skeleton-1: oklch(0.96 0 0);
+  --al-skeleton-2: oklch(0.92 0 0);
+  --al-skeleton-3: oklch(0.86 0 0);
+  --al-border: oklch(0.93 0 0);
+  --al-ring: oklch(0.97 0 0);
 }
 
 .dark {
@@ -143,6 +150,13 @@
 
   --ai-loader-background: oklch(0.3 0 0);
   --ai-loader-ring: oklch(0.25 0 0);
+
+  --al-surface: oklch(0.22 0 0);
+  --al-skeleton-1: oklch(0.28 0 0);
+  --al-skeleton-2: oklch(0.33 0 0);
+  --al-skeleton-3: oklch(0.38 0 0);
+  --al-border: oklch(0.3 0 0);
+  --al-ring: oklch(0.25 0 0);
 }
 
 @theme inline {
@@ -219,6 +233,13 @@
 
   --color-ai-loader-background: var(--ai-loader-background);
   --color-ai-loader-ring: var(--ai-loader-ring);
+
+  --color-al-surface: var(--al-surface);
+  --color-al-skeleton-1: var(--al-skeleton-1);
+  --color-al-skeleton-2: var(--al-skeleton-2);
+  --color-al-skeleton-3: var(--al-skeleton-3);
+  --color-al-border: var(--al-border);
+  --color-al-ring: var(--al-ring);
 }
 
 @layer base {

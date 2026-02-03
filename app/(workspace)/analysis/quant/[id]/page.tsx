@@ -3,6 +3,7 @@
 import inferenceApi from "@/api/inferenceApi";
 import stockApi from "@/api/stockApi";
 import { ErrorState } from "@/components/feedback/error-state";
+import AiAnalysisLoader from "@/components/loading/AiLoader/AiAnalysisLoader";
 import { BenchmarkChart } from "@/components/workspace/quant/BenchmarkChart";
 import { IndicatorCards } from "@/components/workspace/quant/IndicatorCards";
 import { IndicatorRadar } from "@/components/workspace/quant/IndicatorRadar";
@@ -148,7 +149,9 @@ export default function QuantResultPage() {
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-muted-foreground">로딩 중...</p>
+        <div className="w-[420px] h-[320px]">
+          <AiAnalysisLoader />
+        </div>
       </div>
     );
   }
