@@ -58,6 +58,8 @@
   --chart-green: #10b981;
   --chart-up: #ef4444; /* 한국 기준 상승 캔들 (빨간색) */
   --chart-down: #3b82f6; /* 한국 기준 하락 캔들 (파란색) */
+  --chart-up-flash: #ef44441a;
+  --chart-down-flash: #3b82f61a;
   --chart-line: #e5e5e5; /* 차트 라인 (연한 회색) */
   --chart-text: #707070; /* 차트 텍스트 (회색 계열) */
 
@@ -133,6 +135,8 @@
   --chart-green: #10b981;
   --chart-up: #0db97a; /* 바이낸스 기준 상승 캔들 (초록색) */
   --chart-down: #e75763; /* 바이낸스 기준 하락 캔들 (빨간색) */
+  --chart-up-flash: #0db97a1a;
+  --chart-down-flash: #e757631a;
   --chart-line: #303030; /* 차트 라인 (다크모드용 회색) */
   --chart-text: #707070; /* 차트 텍스트 (다크모드용 밝은 회색) */
 
@@ -527,11 +531,11 @@ div[data-tv-lightweight-charts] a,
   animation: fade-in-up 0.5s ease-out both;
 }
 
+/* Price Flash (폴링 가격 변동) */
 .flash-up {
-  animation: flash-up 0.8s ease-out;
+  background-color: var(--chart-up-flash);
 }
 
 .flash-down {
-  animation: flash-down 0.8s ease-out;
+  background-color: var(--chart-down-flash);
 }
-

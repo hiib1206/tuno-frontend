@@ -34,6 +34,7 @@ export function AnalysisThemeStocks({
   // 가격 변동 flash 효과
   const [flashMap, setFlashMap] = useState<Record<string, "up" | "down">>({});
   const prevStocksRef = useRef<Map<string, number>>(new Map());
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 스크롤 관련 상태 (UI 로직은 컴포넌트에 유지)
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -83,7 +84,7 @@ export function AnalysisThemeStocks({
       const prevPrice = prev.get(stock.shcode);
       const curPrice = Number(stock.price);
       if (prevPrice !== undefined && prevPrice !== curPrice) {
-        newFlash[stock.shcode] = curPrice > prevPrice ? "up" : "down";
+        newFlash[stock.shcode] = Number(stock.diff) >= 0 ? "up" : "down";
       }
     }
 
@@ -94,9 +95,9 @@ export function AnalysisThemeStocks({
     prevStocksRef.current = newMap;
 
     if (Object.keys(newFlash).length > 0) {
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       setFlashMap(newFlash);
-      const timer = setTimeout(() => setFlashMap({}), 800);
-      return () => clearTimeout(timer);
+      flashTimerRef.current = setTimeout(() => setFlashMap({}), 300);
     }
   }, [stocks]);
 
@@ -231,7 +232,7 @@ export function AnalysisThemeStocks({
                 <button
                   onClick={() => onSelect(stock.shcode, (stock.exchange as ExchangeCode) || "KP")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-1.5 hover:bg-accent/10 transition-colors text-left cursor-pointer",
+                    "w-full flex items-center justify-between px-3 py-1.5 hover:bg-accent/10 text-left cursor-pointer",
                     flashMap[stock.shcode] === "up" && "flash-up",
                     flashMap[stock.shcode] === "down" && "flash-down"
                   )}
@@ -240,12 +241,12 @@ export function AnalysisThemeStocks({
                     {stock.hname}
                   </span>
                   <div className="flex items-center gap-2 ml-2 shrink-0">
-                    <span className="text-xs font-medium">
+                    <span className="tabular-nums text-xs font-medium">
                       {Number(stock.price).toLocaleString()}
                     </span>
                     <span
                       className={cn(
-                        "text-xs w-14 text-right",
+                        "tabular-nums text-xs w-14 text-right",
                         Number(stock.diff) >= 0 ? "text-chart-up" : "text-chart-down"
                       )}
                     >

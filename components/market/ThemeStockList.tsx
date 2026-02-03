@@ -12,6 +12,7 @@ export function ThemeStockList() {
   const [hasScroll, setHasScroll] = useState(false);
   const [flashMap, setFlashMap] = useState<Record<string, "up" | "down">>({});
   const prevStocksRef = useRef<Map<string, number>>(new Map());
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   // 가격 변동 감지 → flash 효과
@@ -22,11 +23,10 @@ export function ThemeStockList() {
     for (const stock of stocks) {
       const prevPrice = prev.get(stock.shcode);
       if (prevPrice !== undefined && prevPrice !== stock.price) {
-        newFlash[stock.shcode] = stock.price > prevPrice ? "up" : "down";
+        newFlash[stock.shcode] = (stock.sign === "1" || stock.sign === "2") ? "up" : "down";
       }
     }
 
-    // 이전 데이터 갱신
     const newMap = new Map<string, number>();
     for (const stock of stocks) {
       newMap.set(stock.shcode, stock.price);
@@ -34,9 +34,9 @@ export function ThemeStockList() {
     prevStocksRef.current = newMap;
 
     if (Object.keys(newFlash).length > 0) {
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       setFlashMap(newFlash);
-      const timer = setTimeout(() => setFlashMap({}), 800);
-      return () => clearTimeout(timer);
+      flashTimerRef.current = setTimeout(() => setFlashMap({}), 300);
     }
   }, [stocks]);
 
@@ -110,7 +110,7 @@ export function ThemeStockList() {
                   pathname: `/market/stock/${stock.shcode}`,
                   query: { market: "KR", exchange: stock.exchange ?? "KP" },
                 }}
-                className={`flex gap-3 p-3 border-b border-border-2 hover:bg-background-2 cursor-pointer transition-colors ${flashMap[stock.shcode] === "up" ? "flash-up" : flashMap[stock.shcode] === "down" ? "flash-down" : ""}`}
+                className={`flex gap-3 p-3 border-b border-border-2 hover:bg-background-2 cursor-pointer ${flashMap[stock.shcode] === "up" ? "flash-up" : flashMap[stock.shcode] === "down" ? "flash-down" : ""}`}
               >
                 <span className="flex-1 font-medium text-foreground">
                   {stock.hname}

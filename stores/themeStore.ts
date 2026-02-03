@@ -21,6 +21,9 @@ interface ThemeStore {
   reset: () => void;
 }
 
+// 종목 요청 카운터 — stale response 무시용
+let stocksFetchId = 0;
+
 export const useThemeStore = create<ThemeStore>()((set, get) => ({
   themes: [],
   selectedTheme: null,
@@ -91,9 +94,13 @@ export const useThemeStore = create<ThemeStore>()((set, get) => ({
           : null;
         set({ themes: allThemes, selectedTheme: updatedSelected });
 
-        // 선택된 테마의 종목도 갱신
-        if (updatedSelected) {
+        // 유저가 테마 전환 중이면 종목 갱신 건너뛰기
+        if (updatedSelected && !get().isLoadingStocks) {
+          const requestId = ++stocksFetchId;
           const stockRes = await themeApi.getThemeStocks(updatedSelected.tmcode);
+          // 응답 도착 시점에 여전히 최신 요청인지 + 테마가 안 바뀌었는지 확인
+          if (requestId !== stocksFetchId) return;
+          if (get().selectedTheme?.tmcode !== updatedSelected.tmcode) return;
           if (stockRes.success && stockRes.data) {
             set({ stocks: stockRes.data.stocks, stockInfo: stockRes.data.info });
           }
@@ -112,9 +119,12 @@ export const useThemeStore = create<ThemeStore>()((set, get) => ({
 
   // 테마 종목 조회
   fetchThemeStocks: async (tmcode: string) => {
+    const requestId = ++stocksFetchId;
     set({ isLoadingStocks: true, stocksError: null });
     try {
       const res = await themeApi.getThemeStocks(tmcode);
+      // stale response 무시 (더 새로운 요청이 발생한 경우)
+      if (requestId !== stocksFetchId) return;
       if (res.success && res.data) {
         set({
           stocks: res.data.stocks,
@@ -130,6 +140,7 @@ export const useThemeStore = create<ThemeStore>()((set, get) => ({
         });
       }
     } catch {
+      if (requestId !== stocksFetchId) return;
       set({
         stocksError: "종목을 불러오는데 실패했습니다",
         stocks: [],
