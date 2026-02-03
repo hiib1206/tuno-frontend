@@ -185,6 +185,7 @@ export default function StockSearchBar() {
             if (!isOpen) setIsOpen(true);
           }}
           onFocus={() => {
+            setRecentSearches(loadRecentSearches());
             setIsOpen(true);
           }}
           // onBlur는 외부 클릭 처리(useEffect)로 대체하여 링크 클릭 등을 허용
@@ -242,16 +243,18 @@ export default function StockSearchBar() {
                         </div>
                       </div>
                       {showRecent && (
-                        <button
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }}
-                          onClick={(e) => handleRemoveRecentSearch(e, stock)}
-                          className="py-3 pl-3 rounded-full text-muted-foreground hover:text-foreground hover:scale-120 cursor-pointer"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
+                        <div className="max-w-0 overflow-hidden group-hover:max-w-[24px] transition-all duration-150">
+                          <button
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                            onClick={(e) => handleRemoveRecentSearch(e, stock)}
+                            className="py-3 pl-3 rounded-full text-muted-foreground hover:text-foreground hover:scale-120 cursor-pointer"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
                       )}
                     </div>
                   </li>

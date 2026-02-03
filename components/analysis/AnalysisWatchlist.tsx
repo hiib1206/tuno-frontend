@@ -94,16 +94,18 @@ function SortableItem({
             <span className="text-xs px-3 py-0.5 rounded-full bg-muted text-muted-foreground shrink-0">
               {item.market === "KR" ? "국내" : "해외"}
             </span>
-            <button
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              onClick={handleRemove}
-              className="py-3 pl-3 rounded-full text-muted-foreground hover:text-foreground hover:scale-120 cursor-pointer shrink-0"
-            >
-              <X className="h-3 w-3" />
-            </button>
+            <div className="max-w-0 overflow-hidden group-hover:max-w-[24px] transition-all duration-150">
+              <button
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onClick={handleRemove}
+                className="py-3 pl-3 rounded-full text-muted-foreground hover:text-foreground hover:scale-120 cursor-pointer shrink-0"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -4,11 +4,12 @@ import stockApi from "@/api/stockApi";
 import { Input } from "@/components/ui/input";
 import {
   loadRecentSearches,
+  removeRecentSearch,
   saveRecentSearch,
 } from "@/lib/stockLocalStorage";
 import { cn } from "@/lib/utils";
 import { ExchangeCode, StockSearchResult } from "@/types/Stock";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface AnalysisStockSearchProps {
@@ -87,6 +88,13 @@ export function AnalysisStockSearch({
     onSelect(stock.code, stock.exchange);
   };
 
+  const handleRemoveRecent = (e: React.MouseEvent, stock: StockSearchResult) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const next = removeRecentSearch(stock, recentSearches);
+    setRecentSearches(next);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.nativeEvent.isComposing) return;
 
@@ -122,6 +130,7 @@ export function AnalysisStockSearch({
             placeholder="종목명 또는 코드 검색..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setRecentSearches(loadRecentSearches())}
             onKeyDown={handleKeyDown}
             className="pl-8 h-8 text-xs"
           />
@@ -153,8 +162,8 @@ export function AnalysisStockSearch({
             )}
             <ul ref={listRef} onMouseLeave={() => setSelectedIndex(-1)}>
               {displayList.map((stock, index) => (
-              <li key={`${stock.market}-${stock.code}`}>
-                <button
+              <li key={`${stock.market}-${stock.code}`} className="group">
+                <div
                   onMouseDown={() => handleSelect(stock)}
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={cn(
@@ -168,7 +177,7 @@ export function AnalysisStockSearch({
                   <span className="font-medium text-xs truncate min-w-0">
                     {stock.nameKo}
                   </span>
-                  {/* 종목코드 + 국내/해외 */}
+                  {/* 종목코드 + 국내/해외 + 삭제 */}
                   <div className="flex items-center gap-2 ml-2 shrink-0">
                     <span className="text-xs text-muted-foreground">
                       {stock.code}
@@ -176,8 +185,22 @@ export function AnalysisStockSearch({
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                       {stock.market === "KR" ? "국내" : "해외"}
                     </span>
+                    {showRecent && (
+                      <div className="max-w-0 overflow-hidden group-hover:max-w-[24px] transition-all duration-150">
+                        <button
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                          onClick={(e) => handleRemoveRecent(e, stock)}
+                          className="p-0.5 rounded text-muted-foreground hover:text-foreground hover:scale-110 cursor-pointer"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
                   </div>
-                </button>
+                </div>
               </li>
               ))}
             </ul>
