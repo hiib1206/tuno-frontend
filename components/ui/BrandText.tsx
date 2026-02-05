@@ -9,9 +9,10 @@ const playwrite = Playwrite_NO({
 interface BrandTextProps {
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
-export function BrandText({ children, className }: BrandTextProps) {
+export function BrandText({ children, className, style }: BrandTextProps) {
   return (
     <span
       className={cn(
@@ -22,6 +23,7 @@ export function BrandText({ children, className }: BrandTextProps) {
       )}
       style={{
         textShadow: "1px 0 0 currentColor, -1px 0 0 currentColor",
+        ...style,
       }}
     >
       {children}

@@ -1,23 +1,24 @@
 "use client";
 
-import FeaturesBento from "@/components/home/FeaturesBento";
+import FeatureParallaxScroll from "@/components/home/FeatureParallaxScroll";
 import Footer from "@/components/home/Footer";
-import Header from "@/components/home/Header";
-import HeroSection from "@/components/home/HeroSection";
-import HowItWorks from "@/components/home/HowItWorks";
-import MarqueeTicker from "@/components/home/MarqueeTicker";
-import TrustStats from "@/components/home/TrustStats";
+import GetStartedSection from "@/components/home/GetStartedSection";
+import PricingSection from "@/components/home/PricingSection";
+import ReviewMarquee from "@/components/home/ReviewMarquee";
+import SlidingDoorsHero from "@/components/home/SlidingDoorsHero";
+import ValueProposition from "@/components/home/ValueProposition";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-[var(--color-accent)] selection:text-[var(--color-accent-foreground)]">
-      <Header />
-      <HeroSection />
-      <MarqueeTicker />
-      <FeaturesBento />
-      <HowItWorks />
-      <TrustStats />
+    <div className="bg-black min-h-screen font-sans selection:bg-[#00AE43] selection:text-white">
+      {/* <CustomCursor /> */}
+      <SlidingDoorsHero />
+      <ValueProposition />
+      <FeatureParallaxScroll />
+      <ReviewMarquee />
+      <PricingSection />
+      <GetStartedSection />
       <Footer />
-    </main>
+    </div>
   );
 }
