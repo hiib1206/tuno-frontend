@@ -4,10 +4,12 @@ import {
   InferenceStatus,
   parseInferenceHistoryItem,
   parseSnapbackResult,
-  QuantSignalResult,
-  SnapbackResult,
+  SnapbackResult
 } from "@/types/Inference";
+import { AxiosResponseHeaders, RawAxiosResponseHeaders } from "axios";
 import apiClient from "./apiClient";
+
+export type ResponseHeaders = AxiosResponseHeaders | RawAxiosResponseHeaders;
 
 export interface SnapbackRequest {
   ticker: string;
@@ -19,6 +21,7 @@ export interface SnapbackResponse {
   statusCode: number;
   message: string;
   data: SnapbackResult;
+  headers: ResponseHeaders;
 }
 
 export interface QuantSignalRequest {
@@ -34,6 +37,7 @@ export interface QuantSignalResponse {
   data: {
     historyId: string;
   };
+  headers: ResponseHeaders;
 }
 
 // AI 추론 이력 조회
@@ -44,6 +48,7 @@ export interface InferenceHistoryQueryParams {
   ticker?: string;
   days?: number;
   status?: InferenceStatus;
+  all?: boolean;
 }
 
 export interface InferenceHistoryResponse {
@@ -81,6 +86,7 @@ const inferenceApi = {
       statusCode: response.data.statusCode,
       message: response.data.message,
       data: parseSnapbackResult(response.data.data),
+      headers: response.headers,
     };
   },
 
@@ -97,6 +103,7 @@ const inferenceApi = {
       statusCode: response.data.statusCode,
       message: response.data.message,
       data: response.data.data,
+      headers: response.headers,
     };
   },
 
@@ -111,10 +118,10 @@ const inferenceApi = {
       message: response.data.message,
       data: rawData
         ? {
-            items: rawData.items.map(parseInferenceHistoryItem),
-            nextCursor: rawData.nextCursor,
-            hasNext: rawData.hasNext,
-          }
+          items: rawData.items.map(parseInferenceHistoryItem),
+          nextCursor: rawData.nextCursor,
+          hasNext: rawData.hasNext,
+        }
         : null,
     };
   },

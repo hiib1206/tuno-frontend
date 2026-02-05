@@ -78,6 +78,19 @@ export function formatRelativeTime(date: Date): string {
 }
 
 /**
+ * 남은 시간(밀리초)을 "X시간 Y분 후 초기화" 형식으로 포맷팅합니다.
+ * @param ms - 남은 시간 (밀리초)
+ * @returns 포맷팅된 문자열 (예: "3시간 24분 후 초기화", "45분 후 초기화", "곧 초기화됩니다.")
+ */
+export function formatTimeRemaining(ms: number): string {
+  if (ms <= 0) return "곧 초기화됩니다.";
+  const hours = Math.floor(ms / 3600000);
+  const minutes = Math.floor((ms % 3600000) / 60000);
+  if (hours > 0) return `${hours}시간 ${minutes}분 후 초기화`;
+  return `${minutes}분 후 초기화`;
+}
+
+/**
  * device ID를 가져오거나 생성합니다.
  * localStorage에 저장되어 있으면 반환하고, 없으면 새로 생성하여 저장합니다.
  * @returns device ID 문자열 (브라우저 환경이 아닌 경우 null)

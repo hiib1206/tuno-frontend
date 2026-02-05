@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/components/AuthProvider";
+import { QueryProvider } from "@/components/QueryProvider";
 import { Toaster } from "@/components/ToastProvider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -61,13 +62,15 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          <TooltipProvider>
-            <AuthProvider />
-            {children}
-            <Toaster />
+          <QueryProvider>
+            <TooltipProvider>
+              <AuthProvider />
+              {children}
+              <Toaster />
             {/* <Analytics는 vercel에 정보 보내서 분석하는 서비스이므로 일단 주석처리 */}
             {/* <Analytics /> */}
-          </TooltipProvider>
+            </TooltipProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
