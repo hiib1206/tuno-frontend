@@ -65,32 +65,32 @@ export default function ThemePage() {
   return (
     <div className="xl:flex xl:items-center xl:min-h-full">
       <div className="w-full xl:w-[70vw] xl:h-[1024px] mx-auto flex flex-col xl:flex-row gap-2">
-      {/* 트리맵 */}
-      <div className="h-[500px] xl:h-full xl:flex-1 shrink-0">
-        {isLoadingThemes ? (
-          <ThemeTreemapSkeleton />
-        ) : (
-          <ThemeTreemap data={themes} onSelectTheme={handleSelectTheme} onRefresh={handleRefresh} />
-        )}
-      </div>
+        {/* 트리맵 */}
+        <div className="h-[500px] xl:h-full xl:flex-1 shrink-0">
+          {isLoadingThemes ? (
+            <ThemeTreemapSkeleton />
+          ) : (
+            <ThemeTreemap data={themes} onSelectTheme={handleSelectTheme} onRefresh={handleRefresh} />
+          )}
+        </div>
 
-      {/* 종목 리스트 + 뉴스 리스트 */}
-      <div className="flex flex-col xl:flex-row xl:contents gap-2">
-        <div className="h-[500px] xl:w-90 xl:h-full xl:flex-none">
-          {isLoadingThemes || !selectedTheme ? (
-            <ThemeStockListSkeleton />
-          ) : (
-            <ThemeStockList />
-          )}
+        {/* 종목 리스트 + 뉴스 리스트 */}
+        <div className="flex flex-col xl:flex-row xl:contents gap-2">
+          <div className="h-[500px] xl:w-90 xl:h-full xl:flex-none">
+            {isLoadingThemes || !selectedTheme ? (
+              <ThemeStockListSkeleton />
+            ) : (
+              <ThemeStockList />
+            )}
+          </div>
+          <div className="h-[500px] xl:w-90 xl:h-full xl:flex-none">
+            {isLoadingThemes || !selectedTheme ? (
+              <ThemeNewsListSkeleton />
+            ) : (
+              <ThemeNewsList tmname={selectedTheme.tmname} />
+            )}
+          </div>
         </div>
-        <div className="h-[500px] xl:w-90 xl:h-full xl:flex-none">
-          {isLoadingThemes || !selectedTheme ? (
-            <ThemeNewsListSkeleton />
-          ) : (
-            <ThemeNewsList tmname={selectedTheme.tmname} />
-          )}
-        </div>
-      </div>
       </div>
     </div>
   );

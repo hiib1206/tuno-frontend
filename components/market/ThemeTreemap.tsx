@@ -112,6 +112,7 @@ export function ThemeTreemap({ data, onSelectTheme, onRefresh }: ThemeTreemapPro
     }));
 
     return {
+      animation: false,
       tooltip: {
         backgroundColor: chartColors.tooltipBg,
         borderColor: chartColors.tooltipBg,
@@ -133,6 +134,7 @@ export function ThemeTreemap({ data, onSelectTheme, onRefresh }: ThemeTreemapPro
       series: [
         {
           type: "treemap",
+          animation: false,
           top: 0,
           left: 0,
           right: 0,
