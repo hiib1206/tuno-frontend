@@ -7,15 +7,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Bell, CreditCard, Shield, User } from "lucide-react";
+import { Shield, User } from "lucide-react";
 
 export type MenuItem =
-  | "dashboard"
-  | "history"
-  | "favorites"
   | "profile"
-  | "notifications"
-  | "subscription"
   | "security";
 
 interface SidebarProps {
@@ -26,12 +21,6 @@ interface SidebarProps {
 export function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
   const menuItems = [
     { id: "profile" as MenuItem, label: "내 정보 관리", icon: User },
-    { id: "notifications" as MenuItem, label: "알림 설정 샘플", icon: Bell },
-    {
-      id: "subscription" as MenuItem,
-      label: "구독 관리 샘플",
-      icon: CreditCard,
-    },
     { id: "security" as MenuItem, label: "보안 설정 샘플", icon: Shield },
   ];
 
@@ -72,11 +61,10 @@ export function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
             <button
               key={item.id}
               onClick={() => setActiveMenu(item.id)}
-              className={`cursor-pointer flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors ${
-                activeMenu === item.id
-                  ? "bg-background-1 text-accent"
-                  : "text-foreground hover:bg-background-1"
-              }`}
+              className={`cursor-pointer flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors ${activeMenu === item.id
+                ? "bg-background-1 text-accent"
+                : "text-foreground hover:bg-background-1"
+                }`}
             >
               <Icon className="h-4 w-4" />
               {item.label}

@@ -1,10 +1,8 @@
 "use client";
 
-import { NotificationSettings } from "@/components/settings/NotificationSettings";
 import { ProfileSettings } from "@/components/settings/ProfileSettings";
 import { SecuritySettings } from "@/components/settings/SecuritySettings";
 import { Sidebar, type MenuItem } from "@/components/settings/Sidebar";
-import { SubscriptionManagement } from "@/components/settings/SubscriptionManagement";
 import {
   Dialog,
   DialogContent,
@@ -48,8 +46,6 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
           {/* Main Content Area */}
           <div className="border-l border-border overflow-y-auto max-h-[700px]">
             {activeMenu === "profile" && <ProfileSettings />}
-            {activeMenu === "notifications" && <NotificationSettings />}
-            {activeMenu === "subscription" && <SubscriptionManagement />}
             {activeMenu === "security" && <SecuritySettings />}
           </div>
         </div>
