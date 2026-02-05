@@ -6,17 +6,20 @@ import { AnalysisInferenceHistory } from "@/components/analysis/AnalysisInferenc
 import { AnalysisStockSearch } from "@/components/analysis/AnalysisStockSearch";
 import { AnalysisWatchlist } from "@/components/analysis/AnalysisWatchlist";
 import { LineChartDataPoint, SimpleLineChart } from "@/components/chart/SimpleLineChart";
+import { LoginRequestModal } from "@/components/modals/LoginRequestModal";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useQuota, useUpdateQuotaFromHeaders } from "@/hooks/useQuota";
 import { toast } from "@/hooks/useToast";
 import { getExchangeName } from "@/lib/stock";
 import { loadSessionLatestStock } from "@/lib/stockLocalStorage";
-import { cn } from "@/lib/utils";
+import { cn, formatTimeRemaining } from "@/lib/utils";
 import aiLogoAnimation from "@/public/lottie/ai-logo.json";
+import { useAuthStore } from "@/stores/authStore";
 import { ExchangeCode, StockInfo } from "@/types/Stock";
 import Lottie from "lottie-react";
 import { ArrowUpRight, BarChart3, Calendar, Clock, Loader2, Search, Star } from "lucide-react";
@@ -59,8 +62,12 @@ function getStockColor(code: string): string {
 
 export default function QuantAnalysisPage() {
   const router = useRouter();
+  const { user } = useAuthStore();
+  const { data: quota } = useQuota();
+  const updateQuota = useUpdateQuotaFromHeaders();
   const [mainTab, setMainTab] = useState<MainTab>("stock");
   const [listTab, setListTab] = useState<ListTab>("search");
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // 랜덤 인사말 (클라이언트에서만 선택)
   const [greetingMessage, setGreetingMessage] = useState("");
@@ -85,6 +92,7 @@ export default function QuantAnalysisPage() {
   const [stockInfo, setStockInfo] = useState<StockInfo | null>(null);
   const [priceHistory, setPriceHistory] = useState<LineChartDataPoint[]>([]);
   const [latestCandle, setLatestCandle] = useState<{ date: Date; close: number } | null>(null);
+  const [candleCount, setCandleCount] = useState<number>(0);
   const [isLoadingInfo, setIsLoadingInfo] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analyzeCooldown, setAnalyzeCooldown] = useState(false);
@@ -97,6 +105,7 @@ export default function QuantAnalysisPage() {
       setStockInfo(null);
       setPriceHistory([]);
       setLatestCandle(null);
+      setCandleCount(0);
       setStockInfoError(false);
       setPriceHistoryError(false);
       return;
@@ -124,7 +133,7 @@ export default function QuantAnalysisPage() {
             exchange: selectedStock.exchange,
             code: selectedStock.code,
             interval: "1d",
-            limit: 60,
+            limit: 240,
           }),
         ]);
 
@@ -136,7 +145,10 @@ export default function QuantAnalysisPage() {
 
         if (candleRes.success && candleRes.data && candleRes.data.candles.length > 0) {
           const candles = candleRes.data.candles;
-          const chartData = candles.map((c) => ({
+          setCandleCount(candles.length);
+          // 차트에는 최근 60개만 표시
+          const chartCandles = candles.slice(-60);
+          const chartData = chartCandles.map((c) => ({
             date: new Date(c.time * 1000).toLocaleDateString("ko-KR", {
               month: "2-digit",
               day: "2-digit",
@@ -147,6 +159,7 @@ export default function QuantAnalysisPage() {
           const last = candles[candles.length - 1];
           setLatestCandle({ date: new Date(last.time * 1000), close: last.close });
         } else if (!candleRes.success) {
+          setCandleCount(0);
           setPriceHistoryError(true);
         }
       } catch {
@@ -170,12 +183,26 @@ export default function QuantAnalysisPage() {
   const handleAnalyze = async () => {
     if (!selectedStock || isAnalyzing || analyzeCooldown) return;
 
+    if (candleCount < 240) {
+      toast({
+        variant: "destructive",
+        description: "분석에 필요한 데이터가 부족합니다. (최소 240일 필요)",
+      });
+      return;
+    }
+
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
     setIsAnalyzing(true);
     try {
       const response = await inferenceApi.quantSignal({
         ticker: selectedStock.code,
       });
       if (response.success) {
+        updateQuota(response.headers);
         router.push(`/analysis/quant/${response.data.historyId}`);
       } else {
         toast({
@@ -189,14 +216,23 @@ export default function QuantAnalysisPage() {
     } catch (error: unknown) {
       const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
       const status = axiosError.response?.status;
-      // 400 에러만 서버 메시지 표시 (validation error), 그 외는 일반 메시지
-      const message = status === 400
-        ? (axiosError.response?.data?.message ?? "분석 요청에 실패했습니다.")
-        : "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
-      toast({
-        variant: "destructive",
-        description: message,
-      });
+
+      if (status === 429) {
+        toast({
+          variant: "destructive",
+          title: "일일 사용량 한도 초과",
+          description: "한도가 초기화될 때까지 기다려 주세요.",
+        });
+      } else {
+        // 400 에러만 서버 메시지 표시 (validation error), 그 외는 일반 메시지
+        const message = status === 400
+          ? (axiosError.response?.data?.message ?? "분석 요청에 실패했습니다.")
+          : "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        toast({
+          variant: "destructive",
+          description: message,
+        });
+      }
       // 에러 후 쿨다운
       setAnalyzeCooldown(true);
       setTimeout(() => setAnalyzeCooldown(false), 3000);
@@ -217,6 +253,17 @@ export default function QuantAnalysisPage() {
             {greetingMessage}
           </h1>
         </div>
+
+        {/* 쿼터 안내 */}
+        {user && quota && quota.remaining <= 3 && (
+          <div className="flex justify-center mb-4 animate-fade-in-up">
+            <span className="text-sm bg-warning text-warning-foreground border border-warning-border px-4 py-2 rounded-full">
+              {quota.remaining === 0
+                ? `일일 사용량 한도 초과. ${formatTimeRemaining(quota.resetsAt * 1000 - Date.now())}`
+                : `사용량 한도까지 ${quota.remaining}회 남았습니다`}
+            </span>
+          </div>
+        )}
 
         {/* 메인 탭 */}
         <div className="flex justify-center mb-6 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
@@ -340,9 +387,9 @@ export default function QuantAnalysisPage() {
                       </div>
                       <button
                         onClick={handleAnalyze}
-                        disabled={isAnalyzing || analyzeCooldown || stockInfoError || isLoadingInfo}
+                        disabled={isAnalyzing || analyzeCooldown || stockInfoError || isLoadingInfo || candleCount < 240}
                         className="p-2.5 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="분석 시작"
+                        title={candleCount < 240 && !isLoadingInfo ? "분석에 필요한 데이터가 부족합니다" : "분석 시작"}
                       >
                         {isAnalyzing ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -431,6 +478,10 @@ export default function QuantAnalysisPage() {
         )}
       </div>
 
+      <LoginRequestModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </div >
   );
 }

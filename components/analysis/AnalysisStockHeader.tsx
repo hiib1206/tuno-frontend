@@ -20,6 +20,12 @@ import { AnalysisStockSearch } from "./AnalysisStockSearch";
 import { Skeleton } from "../ui/Skeleton";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 interface AnalysisStockHeaderProps {
   stockInfo?: StockInfo | null;
@@ -281,18 +287,27 @@ export function AnalysisStockHeader({
           {/* 관심종목 버튼 + 종목 정보 */}
           <div className="flex items-stretch gap-2 shrink-0">
             {/* 관심종목 버튼 */}
-            <Button
-              variant="ghost"
-              onClick={handleWatchlistToggle}
-              disabled={isToggling}
-              className={cn(
-                "transition-colors hover:opacity-80 flex-shrink-0 has-[>svg]:p-0 items-start mt-1",
-                isWatchList && "text-watchlist hover:text-watchlist-hover",
-                !isWatchList && "text-muted-foreground"
-              )}
-            >
-              <Star className={cn("!w-5.5 !h-5.5", isWatchList && "fill-current")} />
-            </Button>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    onClick={handleWatchlistToggle}
+                    disabled={isToggling}
+                    className={cn(
+                      "transition-colors hover:opacity-80 flex-shrink-0 has-[>svg]:p-0 items-start mt-1",
+                      isWatchList && "text-watchlist hover:text-watchlist-hover",
+                      !isWatchList && "text-muted-foreground"
+                    )}
+                  >
+                    <Star className={cn("!w-5.5 !h-5.5", isWatchList && "fill-current")} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={8}>
+                  {isWatchList ? "관심종목 해제" : "관심종목 추가"}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
             {/* 종목 정보 (2행) */}
             <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
@@ -366,15 +381,24 @@ export function AnalysisStockHeader({
 
           {/* AI 분석 버튼 - 450px 미만에서 숨김, md 미만에서는 order-last로 오른쪽 끝 */}
           {onInference && (
-            <div className="shrink-0 hidden min-[450px]:flex items-center order-last md:order-none">
-              <AILoader
-                size={58}
-                isActive={isInferring}
-                onClick={onInference}
-                clickable
-                inactiveText="분석"
-              />
-            </div>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="shrink-0 hidden min-[450px]:flex items-center order-last md:order-none">
+                    <AILoader
+                      size={58}
+                      isActive={isInferring}
+                      onClick={onInference}
+                      clickable
+                      inactiveText="분석"
+                    />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={8}>
+                  AI 분석 실행
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
 
           {/* 빈 공간 - md 미만에서는 AI버튼 앞에 위치 */}
@@ -389,15 +413,24 @@ export function AnalysisStockHeader({
         {/* 3행: 분석 버튼 - 450px 미만에서만 표시 */}
         {onInference && (
           <div className="flex min-[450px]:hidden px-4 pb-2">
-            <Button
-              variant="accent-rounded"
-              size="sm"
-              onClick={onInference}
-              disabled={isInferring}
-              className="w-full"
-            >
-              {isInferring ? "분석 중..." : "분석 하기"}
-            </Button>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="accent-rounded"
+                    size="sm"
+                    onClick={onInference}
+                    disabled={isInferring}
+                    className="w-full"
+                  >
+                    {isInferring ? "분석 중..." : "분석 하기"}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={8}>
+                  AI 분석 실행
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         )}
       </div>

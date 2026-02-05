@@ -15,6 +15,7 @@ import { SignalWaveCard } from "@/components/workspace/quant/SignalWaveCard";
 import { StockHeader } from "@/components/workspace/quant/StockHeader";
 import { SubChartPanel } from "@/components/workspace/quant/sub-charts/SubChartPanel";
 import { WorkspaceFeedback } from "@/components/workspace/WorkspaceFeedback";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { EXCHANGE_NAMES } from "@/lib/stock";
 import { useAuthStore } from "@/stores/authStore";
 import { InferenceHistoryItem, InferenceStatus, QuantSignalResult } from "@/types/Inference";
@@ -29,6 +30,7 @@ const SIGNAL_COLORS: SignalColors = {
 };
 
 export default function QuantResultPage() {
+  useRequireAuth();
   const params = useParams();
   const id = params.id as string;
   const { isAuthLoading } = useAuthStore();

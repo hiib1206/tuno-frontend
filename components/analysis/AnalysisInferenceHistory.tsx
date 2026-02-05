@@ -22,6 +22,12 @@ import {
   RefreshCw,
   X,
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 interface AnalysisInferenceHistoryProps {
@@ -40,7 +46,7 @@ export const AnalysisInferenceHistory = forwardRef<
   AnalysisInferenceHistoryRef,
   AnalysisInferenceHistoryProps
 >(({ onSelect, onSelectHistory, modelType = "SNAPBACK", showHeader = true, className }, ref) => {
-  const { isAuthLoading } = useAuthStore();
+  const { user, isAuthLoading } = useAuthStore();
   const [history, setHistory] = useState<InferenceHistoryItem[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -79,12 +85,11 @@ export const AnalysisInferenceHistory = forwardRef<
     refresh: () => fetchHistory(),
   }));
 
-  // 초기 이력 로드
+  // 초기 이력 로드 (로그인 사용자만)
   useEffect(() => {
-    // 인증 로딩 중이면 기다림
-    if (isAuthLoading) return;
+    if (isAuthLoading || !user) return;
     fetchHistory();
-  }, [fetchHistory, isAuthLoading]);
+  }, [fetchHistory, isAuthLoading, user]);
 
   // 무한 스크롤 sentinel
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -186,13 +191,22 @@ export const AnalysisInferenceHistory = forwardRef<
             <History className="w-3 h-3 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">분석 이력</span>
           </div>
-          <button
-            onClick={() => fetchHistory()}
-            disabled={isLoadingHistory}
-            className="p-1 rounded hover:bg-background-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-          >
-            <RefreshCw className={cn("w-3 h-3", isLoadingHistory && "animate-spin")} />
-          </button>
+          <TooltipProvider delayDuration={300}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => fetchHistory()}
+                  disabled={isLoadingHistory}
+                  className="p-1 rounded hover:bg-background-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className={cn("w-3 h-3", isLoadingHistory && "animate-spin")} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" sideOffset={8}>
+                새로고침
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       )}
 

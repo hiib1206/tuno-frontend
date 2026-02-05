@@ -1,6 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { useQuota } from "@/hooks/useQuota";
+import { cn, formatTimeRemaining } from "@/lib/utils";
+import { useAuthStore } from "@/stores/authStore";
 import Lottie from "lottie-react";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
@@ -13,7 +15,7 @@ const navItems = [
     label: "지지선 예측",
     aiName: "Snapback AI",
     description:
-      "상승 종목이 조정받는 구간에서 반등 가능성이 높은 가격대를 예측하는 회귀(Regression) 기반 AI 모델입니다. \n과거 가격 흐름, 변동성, 거래 패턴을 종합적으로 학습해 '몇 % 하락에서 반등이 나올지'를 1~3개의 지지선(하락률/가격)으로 제시합니다. \n 종목 성향을 분류하는 방식이 아니라, 실제 투자 판단에 유용한 지점 중심으로 신호를 제공해 리스크 관리와 타점 선정에 도움을 줍니다.",
+      "상승 종목이 조정받는 구간에서 반등 가능성이 높은 가격대를 예측하는 회귀 기반 AI 모델입니다. \n과거 가격 흐름, 변동성, 거래 패턴을 종합적으로 학습해 몇 % 하락에서 반등이 나올지를 1~3개의 지지선(하락률/가격)으로 제시합니다. \n 종목 성향을 분류하는 방식이 아니라, 실제 투자 판단에 유용한 지점 중심으로 신호를 제공해 리스크 관리와 타점 선정에 도움을 줍니다.",
   },
   {
     href: "/analysis/individual/breakthrough",
@@ -30,6 +32,8 @@ export default function AnalysisIndividualLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { user } = useAuthStore();
+  const { data: quota } = useQuota();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [animationData, setAnimationData] = useState<any>(null);
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(true);
@@ -54,7 +58,7 @@ export default function AnalysisIndividualLayout({
     <div className="w-full xl:w-[70vw] mx-auto min-h-full flex flex-col gap-1">
       {/* 헤더 */}
       <header className="w-full rounded-sm bg-background-1 p-2 flex flex-col">
-        {/* 상단: 로고 + 네비게이션 */}
+        {/* 상단: 로고 + 네비게이션 + 쿼터 안내 */}
         <div className="flex items-center gap-4">
           {animationData && (
             <Lottie
@@ -88,6 +92,15 @@ export default function AnalysisIndividualLayout({
               )
             )}
           </nav>
+
+          {/* 쿼터 안내 */}
+          {user && quota && quota.remaining <= 3 && (
+            <span className="text-xs bg-warning text-warning-foreground border border-warning-border px-3 py-1.5 rounded-full">
+              {quota.remaining === 0
+                ? `일일 사용량 한도 초과. ${formatTimeRemaining(quota.resetsAt * 1000 - Date.now())}`
+                : `사용량 한도까지 ${quota.remaining}회 남았습니다`}
+            </span>
+          )}
         </div>
 
         {/* AI 설명 영역 */}

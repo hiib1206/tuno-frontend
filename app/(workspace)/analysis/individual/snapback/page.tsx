@@ -7,18 +7,21 @@ import {
   AnalysisInferenceHistoryRef,
 } from "@/components/analysis/AnalysisInferenceHistory";
 import { AnalysisOrderbook } from "@/components/analysis/AnalysisOrderbook";
-import { AnalysisWatchlist } from "@/components/analysis/AnalysisWatchlist";
 import { AnalysisSnapbackResult } from "@/components/analysis/AnalysisSnapbackResult";
 import { AnalysisStockHeader } from "@/components/analysis/AnalysisStockHeader";
 import { AnalysisThemeStocks } from "@/components/analysis/AnalysisThemeStocks";
 import { AnalysisTradingPanel } from "@/components/analysis/AnalysisTradingPanel";
+import { AnalysisWatchlist } from "@/components/analysis/AnalysisWatchlist";
+import { LoginRequestModal } from "@/components/modals/LoginRequestModal";
 import { toast } from "@/components/ToastProvider";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { CandleChart } from "@/components/workspace/chart/CandleChart";
+import { useUpdateQuotaFromHeaders } from "@/hooks/useQuota";
 import { useStockWebSocket } from "@/hooks/useStockWebSocket";
 import { loadLastViewedStock, saveLastViewedStock } from "@/lib/stockLocalStorage";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/authStore";
 import {
   parseSnapbackResult,
   SNAPBACK_ERROR_CODES,
@@ -32,7 +35,6 @@ import {
   StockRealtimeData,
   TR_ID,
 } from "@/types/Stock";
-import { useAuthStore } from "@/stores/authStore";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -48,7 +50,8 @@ const DEFAULT_STOCK = {
 export default function AnalysisIndividualSnapbackPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { isAuthLoading } = useAuthStore();
+  const { user, isAuthLoading } = useAuthStore();
+  const updateQuota = useUpdateQuotaFromHeaders();
 
   // URL에서 종목 코드/거래소/이력ID 읽기
   const codeFromUrl = searchParams.get("code");
@@ -90,16 +93,23 @@ export default function AnalysisIndividualSnapbackPage() {
   const historyRef = useRef<AnalysisInferenceHistoryRef>(null);
   const [bottomTab, setBottomTab] = useState<BottomTabType>("trading");
   const [sideTab, setSideTab] = useState<SideTabType>("orderbook");
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // AI 추론 실행
   const handleInference = async () => {
     if (!selectedCode || isInferring) return;
+
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
 
     setIsInferring(true);
     try {
       const response = await inferenceApi.snapback({ ticker: selectedCode });
       if (response.success && response.data) {
         setSnapbackResult(response.data);
+        updateQuota(response.headers);
         // 이력 새로고침
         historyRef.current?.refresh();
         // URL에서 historyId 제거 (새 분석 결과이므로)
@@ -115,7 +125,13 @@ export default function AnalysisIndividualSnapbackPage() {
       }
     } catch (error: any) {
       historyRef.current?.refresh();
-      if (SNAPBACK_ERROR_CODES.includes(error?.response?.data?.data?.code)) {
+      if (error?.response?.status === 429) {
+        toast({
+          variant: "destructive",
+          title: "일일 사용량 한도 초과",
+          description: "한도가 초기화될 때까지 기다려 주세요.",
+        });
+      } else if (SNAPBACK_ERROR_CODES.includes(error?.response?.data?.data?.code)) {
         setErrorModal({
           open: true,
           title: "분석 조건 미충족",
@@ -267,9 +283,9 @@ export default function AnalysisIndividualSnapbackPage() {
   }, [selectedCode, stockInfo]);
 
   // 분석 결과 로드 (historyId가 있으면 해당 이력, 없으면 최신 이력)
+  // 비로그인 사용자는 이력 조회를 하지 않음
   useEffect(() => {
-    // 인증 로딩 중이거나 selectedCode가 없으면 대기
-    if (isAuthLoading || !selectedCode) return;
+    if (isAuthLoading || !selectedCode || !user) return;
 
     const fetchResult = async () => {
       try {
@@ -302,7 +318,7 @@ export default function AnalysisIndividualSnapbackPage() {
     };
 
     fetchResult();
-  }, [selectedCode, historyId, isAuthLoading]);
+  }, [selectedCode, historyId, isAuthLoading, user]);
 
   return (
     <>
@@ -472,7 +488,7 @@ export default function AnalysisIndividualSnapbackPage() {
         <div className="hidden xl:flex min-h-[400px] gap-1 shrink-0">
           {/* 왼쪽: 트레이딩 패널 */}
           <div className="flex-1 bg-background-1 rounded-sm overflow-hidden">
-            <AnalysisTradingPanel />
+            <AnalysisTradingPanel stockInfo={stockInfo} />
           </div>
 
           {/* 오른쪽: AI 분석 결과 */}
@@ -521,7 +537,7 @@ export default function AnalysisIndividualSnapbackPage() {
 
           {/* 탭 콘텐츠 */}
           <div className="flex-1 overflow-auto min-h-0">
-            {bottomTab === "trading" && <AnalysisTradingPanel />}
+            {bottomTab === "trading" && <AnalysisTradingPanel stockInfo={stockInfo} />}
             {bottomTab === "analysis" && (
               snapbackResult ? (
                 <AnalysisSnapbackResult
@@ -538,6 +554,10 @@ export default function AnalysisIndividualSnapbackPage() {
           </div>
         </div>
       </div>
+      <LoginRequestModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </>
   );
 }
