@@ -1,5 +1,6 @@
 "use client";
 
+import { LoginRequestModal } from "@/components/modals/LoginRequestModal";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { SettingsModal } from "@/components/SettingsModal";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import aiLogoAnimation from "@/public/lottie/ai-logo.json";
 import { useAuthStore } from "@/stores/authStore";
 import Lottie from "lottie-react";
 import {
+  LayoutDashboard,
   ArrowLeft,
   BarChart3,
   ChevronDown,
@@ -57,6 +59,7 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   const [mounted, setMounted] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -76,6 +79,13 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
   })();
 
   const routes = [
+    {
+      label: "대시보드",
+      icon: LayoutDashboard,
+      href: "/dashboard",
+      active: pathname.startsWith("/dashboard"),
+      requireAuth: true,
+    },
     {
       label: "퀀트 분석",
       icon: BarChart3,
@@ -141,40 +151,69 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       <div className="flex-1 overflow-y-auto overflow-x-hidden">
         <div className="px-3 pb-2">
           <nav className="space-y-1">
-            {routes.map((route) => (
-              <Link
-                key={route.href}
-                href={route.href}
-                title={!isOpen ? route.label : undefined}
-                className={cn(
-                  "flex items-center text-sm font-medium transition-all duration-200 h-10 rounded",
-                  route.active
-                    ? "text-accent-text bg-background-2"
-                    : "text-foreground/60 hover:text-foreground hover:bg-background-2"
-                )}
-              >
-                <div className="relative ml-[10px]">
-                  <route.icon className="w-5 h-5 flex-shrink-0" />
-                  {route.hasAi && (
-                    <div className="absolute -top-2 -left-2 w-4.5 h-4.5">
-                      <Lottie
-                        animationData={aiLogoAnimation}
-                        loop
-                        className="w-full h-full"
-                      />
+            {routes.map((route) => {
+              // 로그인 필요한 메뉴인데 비로그인이면 버튼으로 처리
+              if (route.requireAuth && !user) {
+                return (
+                  <button
+                    key={route.href}
+                    onClick={() => setIsLoginModalOpen(true)}
+                    title={!isOpen ? route.label : undefined}
+                    className={cn(
+                      "w-full flex items-center text-sm font-medium transition-all duration-200 h-10 rounded cursor-pointer",
+                      "text-foreground/60 hover:text-foreground hover:bg-background-2"
+                    )}
+                  >
+                    <div className="relative ml-[10px]">
+                      <route.icon className="w-5 h-5 flex-shrink-0" />
                     </div>
-                  )}
-                </div>
-                <span
+                    <span
+                      className={cn(
+                        "whitespace-nowrap transition-all duration-300 overflow-hidden",
+                        isOpen ? "opacity-100 ml-3 max-w-[200px]" : "opacity-0 ml-0 max-w-0"
+                      )}
+                    >
+                      {route.label}
+                    </span>
+                  </button>
+                );
+              }
+
+              return (
+                <Link
+                  key={route.href}
+                  href={route.href}
+                  title={!isOpen ? route.label : undefined}
                   className={cn(
-                    "whitespace-nowrap transition-all duration-300 overflow-hidden",
-                    isOpen ? "opacity-100 ml-3 max-w-[200px]" : "opacity-0 ml-0 max-w-0"
+                    "flex items-center text-sm font-medium transition-all duration-200 h-10 rounded",
+                    route.active
+                      ? "text-accent-text bg-background-2"
+                      : "text-foreground/60 hover:text-foreground hover:bg-background-2"
                   )}
                 >
-                  {route.label}
-                </span>
-              </Link>
-            ))}
+                  <div className="relative ml-[10px]">
+                    <route.icon className="w-5 h-5 flex-shrink-0" />
+                    {route.hasAi && (
+                      <div className="absolute -top-2 -left-2 w-4.5 h-4.5">
+                        <Lottie
+                          animationData={aiLogoAnimation}
+                          loop
+                          className="w-full h-full"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <span
+                    className={cn(
+                      "whitespace-nowrap transition-all duration-300 overflow-hidden",
+                      isOpen ? "opacity-100 ml-3 max-w-[200px]" : "opacity-0 ml-0 max-w-0"
+                    )}
+                  >
+                    {route.label}
+                  </span>
+                </Link>
+              );
+            })}
           </nav>
         </div>
       </div>
@@ -285,7 +324,12 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
       {isSettingsOpen && (
         <SettingsModal open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       )}
+
+      {/* 로그인 유도 모달 */}
+      <LoginRequestModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </div>
   );
 }
-
