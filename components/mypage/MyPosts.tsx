@@ -1,7 +1,6 @@
 "use client";
 
 import postApi from "@/api/postApi";
-import { LoadingState } from "@/components/feedback/loading-state";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -251,8 +250,23 @@ export default function MyPosts() {
       <h2 className="mb-6 text-lg sm:text-xl font-semibold">나의 게시글</h2>
 
       {loading ? (
-        <div className="py-35">
-          <LoadingState message="게시글을 불러오는 중..." />
+        <div className="min-h-[600px] mt-2">
+          {/* 정렬 및 삭제 버튼 영역 skeleton */}
+          <div className="flex justify-between items-center">
+            <div className="h-3 w-20 skeleton-gradient-loading rounded" />
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-16 skeleton-gradient-loading rounded" />
+              <div className="h-6 w-20 skeleton-gradient-loading rounded" />
+            </div>
+          </div>
+          <div className="h-px border-t border-border-2 mt-2" />
+          {/* 컬럼 헤더 skeleton */}
+          <div className="h-10 w-full skeleton-gradient-loading rounded" />
+          <div className="h-px border-t border-border-2" />
+          {/* 게시글 리스트 skeleton - 한 덩어리 */}
+          <div className="py-2">
+            <div className="h-[480px] w-full skeleton-gradient-loading rounded" />
+          </div>
         </div>
       ) : error ? (
         <div className="py-48">
@@ -281,9 +295,8 @@ export default function MyPosts() {
                 <span>
                   {deleting
                     ? "삭제 중..."
-                    : `${
-                        selectedIds.size > 0 ? `( ${selectedIds.size}개 ) ` : ""
-                      } 삭제하기`}
+                    : `${selectedIds.size > 0 ? `( ${selectedIds.size}개 ) ` : ""
+                    } 삭제하기`}
                 </span>
               </Button>
               <DropdownMenu>
