@@ -31,10 +31,10 @@ export default function PricingSection() {
           viewport={{ once: true }}
           className="text-center mb-16 md:mb-20"
         >
-          <span className="text-[#00AE43] font-bold tracking-widest uppercase text-sm mb-4 block">
+          <span className="text-[#00AE43] font-bold tracking-widest uppercase text-[10px] mobile:text-sm mb-4 block">
             Pricing
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight break-keep">
+          <h2 className="text-xl mobile:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight break-keep">
             합리적인 요금제
           </h2>
         </motion.div>

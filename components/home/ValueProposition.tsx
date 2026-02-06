@@ -15,7 +15,7 @@ export default function ValueProposition() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
               viewport={{ once: false }}
-              className="text-3xl md:text-4xl lg:text-5xl font-bold text-black tracking-tight leading-[1.35] mb-10 break-keep"
+              className="text-xl mobile:text-3xl md:text-4xl lg:text-5xl font-bold text-black tracking-tight leading-[1.35] mb-10 break-keep"
             >
               투자는{" "}
               <span className="text-randing-accent">노동</span>이
@@ -27,7 +27,7 @@ export default function ValueProposition() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
               viewport={{ once: false }}
-              className="text-slate-500 text-base md:text-lg leading-[1.9] break-keep"
+              className="text-slate-500 text-sm mobile:text-base md:text-lg leading-[1.9] break-keep"
             >
               매일 아침 쏟아지는 뉴스, 흔들리는 차트, 수십 장의 리포트...
               <br />
@@ -48,7 +48,7 @@ export default function ValueProposition() {
           viewport={{ once: false }}
           className="md:ml-auto"
         >
-          <p className="text-center text-xl md:text-2xl font-bold text-slate-800 leading-relaxed break-keep">
+          <p className="text-center text-base mobile:text-xl md:text-2xl font-bold text-slate-800 leading-relaxed break-keep">
             Tuno는 복잡한 분석을 대신하는 AI 기반의 {" "}
             <span className="text-randing-accent">
               투자 분석 플랫폼

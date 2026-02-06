@@ -109,13 +109,13 @@ const FeatureSection = ({
               viewport={{ once: false }}
               className="max-w-lg"
             >
-              <span className="text-[#00AE43] font-bold tracking-widest uppercase text-sm mb-4 block">
+              <span className="text-[#00AE43] font-bold tracking-widest uppercase text-[10px] mobile:text-sm mb-4 block">
                 0{i + 1} — {feature.category}
               </span>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-6 break-keep whitespace-nowrap">
+              <h2 className="text-xl mobile:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-6 break-keep whitespace-nowrap">
                 {feature.title}
               </h2>
-              <p className="text-sm sm:text-lg lg:text-xl text-slate-500 leading-relaxed break-keep whitespace-pre-line">
+              <p className="text-xs mobile:text-sm sm:text-lg lg:text-xl text-slate-500 leading-relaxed break-keep whitespace-pre-line">
                 {feature.desc}
               </p>
             </motion.div>

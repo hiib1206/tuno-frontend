@@ -124,7 +124,7 @@ const TiltCard = ({ review, index }: { review: Review; index: number }) => {
 
         {/* Content */}
         <p
-          className="flex-1 text-slate-600 text-sm md:text-[0.938rem] leading-[1.8] mb-7 break-keep whitespace-pre-line relative z-10"
+          className="flex-1 text-slate-600 text-xs mobile:text-sm md:text-[0.938rem] leading-[1.8] mb-7 break-keep whitespace-pre-line relative z-10"
           style={{ transform: "translateZ(30px)" }}
         >
           {review.content}
@@ -162,10 +162,10 @@ export default function ReviewMarquee() {
           viewport={{ once: true }}
           className="text-center mb-16 md:mb-20"
         >
-          <span className="text-[#00AE43] font-bold tracking-widest uppercase text-sm mb-4 block">
+          <span className="text-[#00AE43] font-bold tracking-widest uppercase text-[10px] mobile:text-sm mb-4 block">
             Reviews
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight break-keep">
+          <h2 className="text-xl mobile:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 tracking-tight break-keep">
             사용자들의 이야기
           </h2>
         </motion.div>

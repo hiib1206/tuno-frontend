@@ -1,9 +1,40 @@
 "use client";
 
 import { BrandText } from "@/components/ui/BrandText";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+/* ── Grain Overlay ── */
+const GrainOverlay = () => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 200;
+    canvas.height = 200;
+    const ctx = canvas.getContext("2d");
+    if (!ctx || !ref.current) return;
+    const imageData = ctx.createImageData(200, 200);
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      const val = Math.random() * 255;
+      imageData.data[i] = val;
+      imageData.data[i + 1] = val;
+      imageData.data[i + 2] = val;
+      imageData.data[i + 3] = 255;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    ref.current.style.backgroundImage = `url(${canvas.toDataURL()})`;
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay"
+      style={{ backgroundSize: "200px 200px" }}
+    />
+  );
+};
 
 // --- 6-MONTH DAILY CHART DATA GENERATION ---
 const CHART_W = 1200;
@@ -101,6 +132,16 @@ const CANDLES = RAW_CANDLES.map((c, i) => ({
 
 const SlidingDoorsHero = () => {
   const containerRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile (sm breakpoint = 640px)
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
@@ -132,33 +173,68 @@ const SlidingDoorsHero = () => {
   const lockOpacity = useTransform(scrollYProgress, [0.22, 0.25], [1, 0]);
 
   // Phase 3: Doors Opening
-  const xLeft = useTransform(scrollYProgress, [0.25, 0.55], ["0%", "-50%"]);
-  const xRight = useTransform(scrollYProgress, [0.25, 0.55], ["0%", "50%"]);
+  const xLeft = useTransform(scrollYProgress, [0.25, 0.55], ["0%", "-100%"]);
+  const xRight = useTransform(scrollYProgress, [0.25, 0.55], ["0%", "100%"]);
 
   // Visual Effects
   const lightOpacity = useTransform(scrollYProgress, [0.25, 0.4], [0, 1]);
   const contentScale = useTransform(scrollYProgress, [0.25, 0.6], [0.8, 1]);
   const contentOpacity = useTransform(scrollYProgress, [0.25, 0.35], [0, 1]);
 
+  // Background visibility (triggers when doors ~80% open)
+  const [isBackgroundVisible, setIsBackgroundVisible] = useState(false);
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    setIsBackgroundVisible(latest >= 0.49);
+  });
+
   // Door Chart Animation — left-to-right reveal (synced with Phase 1: 0 → 20%)
   const chartRevealW = useTransform(scrollYProgress, [0, 0.18], [0, CHART_W]);
 
   return (
-    <section ref={containerRef} className="relative h-[300vh]">
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+    <section ref={containerRef} className={`relative ${isMobile ? "h-screen" : "h-[300vh]"}`}>
+      <div className={`${isMobile ? "" : "sticky"} top-0 h-screen w-full overflow-hidden flex items-center justify-center`}>
         {/* 1. REVEALED CONTENT */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center bg-randing-background-1">
-          <motion.div
-            style={{ scale: contentScale, opacity: contentOpacity }}
-            className="relative z-10 text-center px-4"
+        {/* Base background - always visible */}
+        <div className="absolute inset-0 z-0 bg-randing-background-1" />
+
+        {/* Green overlay - fades in after doors fully open (immediate on mobile) */}
+        <motion.div
+          initial={{ opacity: isMobile ? 1 : 0 }}
+          animate={{ opacity: isMobile || isBackgroundVisible ? 1 : 0 }}
+          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeInOut" }}
+          className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,#00AE43_0%,#007D4D_100%)]"
+        >
+          {/* Film grain texture */}
+          <GrainOverlay />
+          {/* 상승 추세 모양 배경 - 차트처럼 꺾이는 띠 */}
+          <svg
+            className="absolute inset-0 w-full h-full"
+            viewBox="0 0 1920 1080"
+            preserveAspectRatio="xMidYMid slice"
+            fill="none"
           >
-            <div className="text-black/70 font-medium tracking-[0.2em] uppercase mb-6 text-sm md:text-base">
+            <polygon
+              points="0,658 960,203 1267,350 1920,20
+              1920,362 1267,692 960,545 0,1000"
+              className="fill-randing-background-1"
+            />
+          </svg>
+        </motion.div>
+
+        {/* Content - visible as doors open (immediate on mobile) */}
+        <motion.div
+          style={isMobile ? { opacity: 1, scale: 1 } : { scale: contentScale, opacity: contentOpacity }}
+          className="absolute inset-0 z-10"
+        >
+          {/* Text - absolute, positioned from top */}
+          <div className="absolute top-[26%] mobile:top-[25%] sm:top-[26%] left-1/2 -translate-x-1/2 text-center px-4 w-full">
+            <div className="text-black/70 font-medium tracking-[0.2em] uppercase mb-4 text-[10px] mobile:text-xs md:text-sm">
               AI Investment Analysis Platform
             </div>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-black tracking-tight leading-[1.35]">
+            <h1 className="text-2xl mobile:text-4xl sm:text-6xl font-bold text-black tracking-tight leading-[1.35] break-keep">
               앞서가는 투자의 길, <br />
               <BrandText
-                className="text-4xl md:text-6xl lg:text-7xl"
+                className="text-2xl mobile:text-4xl sm:text-6xl"
                 style={{ WebkitTextStroke: "4px currentColor" }}
               >
                 Tuno
@@ -170,22 +246,25 @@ const SlidingDoorsHero = () => {
               <br />
               새로운 투자 분석을 경험해 보세요.
             </div>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link
-                href="/analysis/quant"
-                className="mt-10 inline-block px-8 py-3 bg-randing-accent text-white rounded-full font-bold text-lg hover:bg-randing-accent/80 transition-colors shadow-lg"
-              >
-                무료로 시작하기
-              </Link>
-            </motion.div>
-          </motion.div>
-          {/* <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,black_1px,transparent_1px)] bg-[size:20px_20px]" /> */}
-        </div>
+          </div>
 
-        {/* 2. THE DOORS */}
+          {/* Button - absolute, positioned from bottom */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="absolute bottom-168 sm:bottom-130 left-1/2 -translate-x-1/2"
+          >
+            <Link
+              href="/analysis/quant"
+              className="inline-block px-4 py-2 sm:px-6 sm:py-3 bg-white text-randing-accent rounded-full font-bold text-sm mobile:text-base sm:text-lg transition-colors shadow-[0_3px_15px_rgba(0,0,0,0.3)] sm:shadow-[0_6px_25px_rgba(0,0,0,0.5)]"
+            >
+              무료로 시작하기
+            </Link>
+          </motion.div>
+        </motion.div>
+
+        {/* 2. THE DOORS & LOCK UI (hidden on mobile via CSS) */}
+        <div className="hidden sm:contents">
         <motion.div
           style={{ x: xLeft }}
           className="absolute top-0 left-0 w-1/2 h-full bg-randing-door z-20 flex items-center justify-end border-r border-[#333] overflow-hidden"
@@ -373,6 +452,7 @@ const SlidingDoorsHero = () => {
               </div>
             </motion.div>
           </motion.div>
+        </div>
         </div>
       </div>
     </section>
