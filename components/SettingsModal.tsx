@@ -32,19 +32,19 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="p-0 max-w-2xl overflow-hidden h-[700px] top-[50%] translate-y-[-50%]"
+        className="p-0 max-w-2xl overflow-hidden h-[85dvh] lg:h-[700px] top-[50%] translate-y-[-50%]"
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogTitle className="sr-only">설정</DialogTitle>
         <DialogDescription className="sr-only">
           애플리케이션 설정을 관리합니다
         </DialogDescription>
-        <div className="bg-background-1 grid grid-cols-1 lg:grid-cols-2 lg:grid-cols-[1.1fr_3fr]">
+        <div className="bg-background-1 flex flex-col lg:grid lg:grid-cols-[1.1fr_3fr] h-full">
           {/* Left Sidebar Navigation */}
           <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
 
           {/* Main Content Area */}
-          <div className="border-l border-border overflow-y-auto max-h-[700px]">
+          <div className="border-l border-border overflow-y-auto flex-1 min-h-0 lg:max-h-[700px]">
             {activeMenu === "profile" && <ProfileSettings />}
             {activeMenu === "security" && <SecuritySettings />}
           </div>

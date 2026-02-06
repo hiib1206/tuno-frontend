@@ -21,23 +21,23 @@ interface SidebarProps {
 export function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
   const menuItems = [
     { id: "profile" as MenuItem, label: "내 정보 관리", icon: User },
-    { id: "security" as MenuItem, label: "보안 설정 샘플", icon: Shield },
+    { id: "security" as MenuItem, label: "보안 설정", icon: Shield },
   ];
 
   return (
-    <div className="py-4 px-2">
+    <div className="py-4 px-2 mt-6 lg:mt-0">
       {/* Mobile Dropdown Menu - visible on small screens */}
       <div className="lg:hidden">
         <Select
           value={activeMenu}
           onValueChange={(value) => setActiveMenu(value as MenuItem)}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full rounded">
             <SelectValue>
               {menuItems.find((item) => item.id === activeMenu)?.label}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded">
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
