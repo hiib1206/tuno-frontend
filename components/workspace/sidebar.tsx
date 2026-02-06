@@ -47,9 +47,10 @@ import { BrandText } from "../ui/BrandText";
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
+  isMobile?: boolean;
 }
 
-export function Sidebar({ isOpen, onToggle }: SidebarProps) {
+export function Sidebar({ isOpen, onToggle, isMobile = false }: SidebarProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const segments = useSelectedLayoutSegments();
@@ -218,8 +219,8 @@ export function Sidebar({ isOpen, onToggle }: SidebarProps) {
         </div>
       </div>
 
-      {/* User 프로필 영역 - 열린 상태일 때만 표시 (하단 고정, 스크롤되지 않음) */}
-      {isOpen && (
+      {/* User 프로필 영역 - 열린 상태이고 모바일이 아닐 때만 표시 (하단 고정, 스크롤되지 않음) */}
+      {isOpen && !isMobile && (
         <div className="flex-shrink-0 py-1 px-2 border-t border-border-2">
           {user ? (
             <DropdownMenu

@@ -2,6 +2,7 @@
 
 import { LoginRequestModal } from "@/components/modals/LoginRequestModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { UserMenu } from "@/components/UserMenu";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -14,6 +15,8 @@ import { WatchlistPanel } from "@/components/workspace/WatchlistPanel";
 import { useAuthStore } from "@/stores/authStore";
 import { useWatchlistStore } from "@/stores/watchlistStore";
 import { Menu } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function DashboardLayout({
@@ -23,6 +26,8 @@ export default function DashboardLayout({
 }) {
   const { user } = useAuthStore();
   const { fetchWatchlist, reset: resetWatchlist } = useWatchlistStore();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isLoggedIn = !!user;
 
   const [isMobile, setIsMobile] = useState(false);
@@ -107,7 +112,7 @@ export default function DashboardLayout({
           }
         `}
       >
-        <Sidebar isOpen={isSidebarOpen} onToggle={handleToggle} />
+        <Sidebar isOpen={isSidebarOpen} onToggle={handleToggle} isMobile={isMobile} />
       </div>
 
       {/* 메인 컨텐츠 */}
@@ -115,11 +120,6 @@ export default function DashboardLayout({
         {/* 헤더 */}
         <div className="flex-shrink-0 z-30 bg-background-2">
           <div className="flex items-center gap-2 px-4 py-3 lg:px-6">
-            {/* 테마 토글 - 가장 왼쪽 (모바일에서 숨김) */}
-            <div className="hidden sm:block">
-              <ThemeToggle />
-            </div>
-
             {/* 모바일: 햄버거 메뉴 */}
             {isMobile && !isSidebarOpen && (
               <Button
@@ -132,11 +132,17 @@ export default function DashboardLayout({
               </Button>
             )}
 
-            {/* 좌측 여백 (데스크톱에서 검색창 가운데 정렬을 위해) */}
-            <div className="flex-1 hidden sm:block"></div>
+            {/* 테마 토글 - 가장 왼쪽 (1024px 미만에서 숨김) */}
+            <div className="hidden lg:block">
+              <ThemeToggle />
+            </div>
 
-            {/* 검색창과 관심종목 */}
-            <div className="flex items-center w-full max-w-md hidden sm:flex">
+
+            {/* 좌측 여백 (데스크톱에서 검색창 가운데 정렬을 위해) */}
+            <div className="flex-1 hidden lg:block"></div>
+
+            {/* 검색창과 관심종목 - 1024px 이상에서만 */}
+            <div className="flex items-center w-full max-w-md hidden lg:flex">
               <StockSearchBar />
               {isLoggedIn ? (
                 <Popover>
@@ -170,11 +176,30 @@ export default function DashboardLayout({
             </div>
 
             {/* 우측 여백 (데스크톱에서 검색창 가운데 정렬을 위해) */}
-            <div className="flex-1 hidden sm:flex justify-end"></div>
+            <div className="flex-1 hidden lg:flex justify-end"></div>
 
-            {/* 모바일: 검색 입력란 */}
-            <div className="sm:hidden flex items-center gap-2 flex-1">
+            {/* 모바일/태블릿: 검색 입력란 + 유저 (1024px 미만) */}
+            <div className="lg:hidden flex items-center gap-2 flex-1">
               <StockSearchBar />
+              {/* 모바일: 유저/로그인 버튼 */}
+              {isLoggedIn ? (
+                <UserMenu />
+              ) : (
+                <Link
+                  href={`/login?redirect=${encodeURIComponent(
+                    searchParams?.toString()
+                      ? `${pathname}?${searchParams.toString()}`
+                      : pathname
+                  )}`}
+                >
+                  <Button
+                    variant="default-accent"
+                    className="shrink-0"
+                  >
+                    로그인
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
