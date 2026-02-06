@@ -61,7 +61,7 @@ function getNotificationIcon(type: NotificationType) {
 
 export function NotificationBell() {
   const router = useRouter();
-  const { user, isAuthLoading } = useAuthStore();
+  const { user, isAuthLoading, accessToken } = useAuthStore();
   const {
     notifications,
     unreadCount,
@@ -104,7 +104,7 @@ export function NotificationBell() {
 
   // 읽지 않은 수 조회(토큰 갱신 보장) → SSE 연결
   useEffect(() => {
-    if (isAuthLoading || !user) return;
+    if (isAuthLoading || !user || !accessToken) return;
     let cancelled = false;
 
     fetchUnreadCount().then(() => {
@@ -115,8 +115,7 @@ export function NotificationBell() {
       cancelled = true;
       disconnectSSE();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, isAuthLoading]);
+  }, [user, isAuthLoading, accessToken, fetchUnreadCount, connectSSE, disconnectSSE]);
 
   // 팝오버 열릴 때 목록 + 읽지 않은 수 동기화
   useEffect(() => {

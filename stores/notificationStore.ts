@@ -1,3 +1,4 @@
+import { refreshAccessToken } from "@/api/apiClient";
 import notificationApi from "@/api/notification";
 import { streamNotifications } from "@/api/notificationSse";
 import { useAuthStore } from "@/stores/authStore";
@@ -156,6 +157,15 @@ export const useNotificationStore = create<NotificationStore>()((set, get) => ({
               ? [notification, ...state.notifications]
               : state.notifications,
           }));
+        },
+        onError: async (error) => {
+          if (error instanceof Error && error.message === "Unauthorized") {
+            get().disconnectSSE();
+            const newToken = await refreshAccessToken();
+            if (newToken) {
+              get().connectSSE();
+            }
+          }
         },
       }
     );

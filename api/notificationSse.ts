@@ -44,7 +44,9 @@ export function streamNotifications(
         return;
       }
       if (response.status === 401) {
-        throw new Error("Unauthorized");
+        ctrl.abort();
+        callbacks.onError?.(new Error("Unauthorized"));
+        return;
       }
     },
 
