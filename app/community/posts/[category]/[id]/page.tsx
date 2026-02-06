@@ -4,7 +4,7 @@ import postApi from "@/api/postApi";
 import { CommentSection } from "@/components/community/CommentSection";
 import TiptapEditor from "@/components/editor/TiptapEditor";
 import { ErrorState } from "@/components/feedback/error-state";
-import { LoadingState } from "@/components/feedback/loading-state";
+import AsyncScanner from "@/components/loading/AiLoader/AsyncScanner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -76,8 +76,10 @@ export default function PostDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[500px]">
-        <LoadingState />
+      <div className="flex flex-col items-center justify-center min-h-[800px]">
+        <div className="w-[440px] h-60 mx-auto">
+          <AsyncScanner />
+        </div>
       </div>
     );
   }
@@ -325,13 +327,12 @@ export default function PostDetailPage() {
             className={`flex items-center gap-1  cursor-pointer`}
           >
             <Heart
-              className={`h-4 w-4 transition-all ${
-                post.isLiked
-                  ? "fill-current text-red-500"
-                  : user
+              className={`h-4 w-4 transition-all ${post.isLiked
+                ? "fill-current text-red-500"
+                : user
                   ? "text-muted-foreground hover:text-red-500 hover:fill-current"
                   : "text-muted-foreground"
-              }`}
+                }`}
             />
             <span>{post.likeCount.toLocaleString()}</span>
           </button>

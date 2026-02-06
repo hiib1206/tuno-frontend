@@ -3,7 +3,7 @@
 import postApi from "@/api/postApi";
 import { WritePostForm } from "@/components/community/WritePostForm";
 import { ErrorState } from "@/components/feedback/error-state";
-import { LoadingState } from "@/components/feedback/loading-state";
+import AsyncScanner from "@/components/loading/AiLoader/AsyncScanner";
 import { toast } from "@/components/ToastProvider";
 import { Button } from "@/components/ui/button";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -37,7 +37,7 @@ export default function EditPostPage() {
         if (err.response?.status === 400 || err.response?.status === 404) {
           setError(
             err.response?.data?.message ||
-              "게시글을 불러오는 중 오류가 발생했습니다."
+            "게시글을 불러오는 중 오류가 발생했습니다."
           );
         } else {
           setError("게시글을 불러오는 중 오류가 발생했습니다.");
@@ -117,8 +117,10 @@ export default function EditPostPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[300px] gap-4">
-        <LoadingState />
+      <div className="flex flex-col items-center justify-center min-h-[800px] gap-4">
+        <div className="w-[440px] h-60 mx-auto">
+          <AsyncScanner />
+        </div>
       </div>
     );
   }
