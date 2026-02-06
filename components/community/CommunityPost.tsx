@@ -25,6 +25,7 @@ interface CommunityPostProps {
   sortOptions?: PostSortOption[];
   currentSort?: string;
   onSortChange?: (sortOption: PostSortOption) => void;
+  loading?: boolean;
 }
 
 export function CommunityPost({
@@ -36,6 +37,7 @@ export function CommunityPost({
   sortOptions = [],
   currentSort = "latest",
   onSortChange,
+  loading = false,
 }: CommunityPostProps) {
   const { user } = useAuthStore();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -57,19 +59,16 @@ export function CommunityPost({
     >
       {/* 제목 섹션 */}
       <div className="mb-3 flex flex-row items-center justify-between gap-2">
-        <h2 className="px-1 text-lg sm:text-xl font-semibold">{title}</h2>
+        <h2 className="px-1 text-lg sm:text-xl font-semibold whitespace-nowrap">{title}</h2>
         {showWriteButton && (
           <Button
             variant="accent"
             size="sm"
-            className="w-full sm:w-auto flex flex-col"
+            className="shrink-0"
             onClick={handleWriteClick}
           >
-            <div className="h-4"></div>
-            <div className="flex items-center gap-1">
-              <Plus className="h-4 w-4" />
-              <span>글쓰기</span>
-            </div>
+            <Plus className="h-4 w-4" />
+            <span>글쓰기</span>
           </Button>
         )}
         {showSort && sortOptions.length > 0 && (
@@ -110,7 +109,22 @@ export function CommunityPost({
       </div>
 
       {/* 포스트 리스트 */}
-      {posts.length === 0 ? (
+      {loading ? (
+        <div className="">
+          <div className="h-px border-t border-border/60" />
+          {/* 블록형 스켈레톤 - 2열 그리드 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3">
+            {Array(10)
+              .fill(null)
+              .map((_, index) => (
+                <div
+                  key={index}
+                  className="h-32 sm:h-36 w-full skeleton-gradient-loading rounded"
+                />
+              ))}
+          </div>
+        </div>
+      ) : posts.length === 0 ? (
         <div className="text-center space-y-4">
           <div className="h-px border-t border-border/60" />
 

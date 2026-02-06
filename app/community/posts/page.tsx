@@ -3,7 +3,6 @@
 import postApi from "@/api/postApi";
 import { CommunityPost } from "@/components/community/CommunityPost";
 import { ErrorState } from "@/components/feedback/error-state";
-import { LoadingState } from "@/components/feedback/loading-state";
 import { Pagination } from "@/components/ui/pagination";
 import {
   POST_LIST_LIMIT,
@@ -68,14 +67,6 @@ export default function PostsPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[500px] gap-4">
-        <LoadingState />
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] gap-4">
@@ -86,10 +77,10 @@ export default function PostsPage() {
 
   return (
     <div className="space-y-6">
-      <CommunityPost title="최신 글" posts={posts} />
+      <CommunityPost title="최신 글" posts={posts} loading={loading} />
 
       {/* 페이지네이션 */}
-      {totalPages > 1 && (
+      {!loading && totalPages > 1 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

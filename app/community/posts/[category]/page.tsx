@@ -3,7 +3,6 @@
 import postApi from "@/api/postApi";
 import { CommunityPost } from "@/components/community/CommunityPost";
 import { ErrorState } from "@/components/feedback/error-state";
-import { LoadingState } from "@/components/feedback/loading-state";
 import { Pagination } from "@/components/ui/pagination";
 import {
   POST_LIST_LIMIT,
@@ -87,14 +86,6 @@ export default function CategoryPostsPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[500px]">
-        <LoadingState lottieFile="/lottie/paper-plane.json" />
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px]">
@@ -105,10 +96,10 @@ export default function CategoryPostsPage() {
 
   return (
     <div className="space-y-6">
-      <CommunityPost title={title} posts={posts} />
+      <CommunityPost title={title} posts={posts} loading={loading} />
 
       {/* 페이지네이션 */}
-      {totalPages > 1 && (
+      {!loading && totalPages > 1 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
