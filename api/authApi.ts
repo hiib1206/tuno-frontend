@@ -1,5 +1,11 @@
 import apiClient from "./apiClient";
 
+// 인증 관련 기본 응답 (data 없음)
+export interface BasicResponse {
+  success: boolean;
+  message: string;
+}
+
 const authApi = {
   register: async (
     username: string,
@@ -44,6 +50,35 @@ const authApi = {
     const response = await apiClient.post("/api/auth/email/verify", {
       email,
       code,
+    });
+    return response.data;
+  },
+  // 아이디 찾기
+  findUsername: async (email: string): Promise<BasicResponse> => {
+    const response = await apiClient.post("/api/auth/find-username", {
+      email,
+    });
+    return response.data;
+  },
+  // 비밀번호 재설정 요청
+  requestPasswordReset: async (
+    username: string,
+    email: string
+  ): Promise<BasicResponse> => {
+    const response = await apiClient.post("/api/auth/password/reset-request", {
+      username,
+      email,
+    });
+    return response.data;
+  },
+  // 비밀번호 재설정
+  resetPassword: async (
+    token: string,
+    newPw: string
+  ): Promise<BasicResponse> => {
+    const response = await apiClient.post("/api/auth/password/reset", {
+      token,
+      newPw,
     });
     return response.data;
   },

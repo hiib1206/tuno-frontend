@@ -62,7 +62,7 @@ export default function LoginPage() {
     // OAuth 성공 처리
     if (oauthCallback === "true") {
       const redirect = getRedirectUrl(searchParams);
-      const redirectPath = redirect || "/";
+      const redirectPath = redirect || "/analysis/quant";
       router.push(redirectPath);
     }
   }, [searchParams]);
@@ -82,7 +82,7 @@ export default function LoginPage() {
           localStorage.removeItem("saved-username");
         }
         const redirect = getRedirectUrl(searchParams);
-        const redirectPath = redirect || "/";
+        const redirectPath = redirect || "/analysis/quant";
         router.push(redirectPath);
       } else {
         setError("로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.");
@@ -112,9 +112,8 @@ export default function LoginPage() {
       params.append("redirect", redirectParam);
     }
     const queryString = params.toString();
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google${
-      queryString ? `?${queryString}` : ""
-    }`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google${queryString ? `?${queryString}` : ""
+      }`;
   };
 
   const handleNaverLogin = async () => {
@@ -128,9 +127,8 @@ export default function LoginPage() {
       params.append("redirect", redirect);
     }
     const queryString = params.toString();
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/naver${
-      queryString ? `?${queryString}` : ""
-    }`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/naver${queryString ? `?${queryString}` : ""
+      }`;
   };
 
   const handleKakaoLogin = async () => {
@@ -144,9 +142,8 @@ export default function LoginPage() {
       params.append("redirect", redirect);
     }
     const queryString = params.toString();
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/kakao${
-      queryString ? `?${queryString}` : ""
-    }`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/kakao${queryString ? `?${queryString}` : ""
+      }`;
   };
 
   return (
@@ -214,11 +211,11 @@ export default function LoginPage() {
                 </Label>
               </div>
               <Link
-                href="/forgot-password"
+                href="/find-account"
                 className="text-sm text-muted-foreground hover:text-accent transition-colors"
                 tabIndex={4}
               >
-                비밀번호 찾기
+                아이디/비밀번호 찾기
               </Link>
             </div>
 
