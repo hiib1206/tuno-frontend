@@ -17,9 +17,9 @@ const userApi = {
   // 내 정보 조회
   me: async (options?: { skipRedirect?: boolean }) => {
     const response = await apiClient.get("/api/user/me", {
-        skipRedirect: options?.skipRedirect,
-      });
-      return response.data;
+      skipRedirect: options?.skipRedirect,
+    });
+    return response.data;
   },
   // 아이디 중복 체크
   checkUsername: async (username: string) => {
@@ -76,8 +76,8 @@ const userApi = {
   // 비번 변경 요청
   changePassword: async (currentPassword: string, newPassword: string) => {
     const response = await apiClient.patch("/api/user/password", {
-      currentPassword,
-      newPassword,
+      oldPw: currentPassword,
+      newPw: newPassword,
     });
     return response.data;
   },

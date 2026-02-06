@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEmailVerification } from "@/hooks/useEmailVerification";
 import { useNicknameCheck } from "@/hooks/useNicknameCheck";
+import { usePasswordValidation } from "@/hooks/usePasswordValidation";
 import { getRedirectUrl, withRedirect } from "@/lib/utils";
 import {
   CheckCircle2,
@@ -56,6 +57,16 @@ export default function SignupPage() {
 
   // 닉네임 체크 훅 사용
   const { nickStatus, nickMessage } = useNicknameCheck(nick);
+
+  // 비밀번호 유효성 훅 사용
+  const {
+    passwordStatus,
+    strengthText,
+    strengthColorClass,
+    errorMessage: passwordErrorMessage,
+    successMessage: passwordSuccessMessage,
+    reset: resetPassword,
+  } = usePasswordValidation(pw);
 
   // 비밀번호 일치 상태
   const [passwordMatchStatus, setPasswordMatchStatus] = useState<
@@ -171,6 +182,12 @@ export default function SignupPage() {
       return;
     }
 
+    // 비밀번호 유효성 검증
+    if (passwordStatus !== "valid") {
+      setError("비밀번호 조건을 모두 충족해주세요.");
+      return;
+    }
+
     // 비밀번호 확인 검증
     if (pw !== confirmPw) {
       setError("비밀번호가 일치하지 않습니다.");
@@ -197,6 +214,7 @@ export default function SignupPage() {
       setPasswordMatchStatus("idle");
       setUsernameMessage("");
       setPasswordMatchMessage("");
+      resetPassword();
       resetEmail();
 
       // 2초 후 모달 닫고 로그인 페이지로 이동
@@ -532,21 +550,53 @@ export default function SignupPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="pw">비밀번호</Label>
-              <Input
-                id="pw"
-                type="password"
-                placeholder="••••••••"
-                value={pw}
-                onChange={(e) => setPw(e.target.value)}
-                autoComplete="new-password"
-                required
-                disabled={isLoading}
-                className="rounded focus-visible:ring-0"
-              />
-              <p className="text-xs text-muted-foreground">
-                나중에 추가. 최소 8자 이상, 영문, 숫자, 특수문자 포함.
-              </p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="pw">비밀번호</Label>
+                {pw.length > 0 && (
+                  <span className={`text-xs font-medium ${strengthColorClass}`}>
+                    {strengthText}
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <Input
+                  id="pw"
+                  type="password"
+                  placeholder="••••••••"
+                  value={pw}
+                  onChange={(e) => setPw(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                  disabled={isLoading || success}
+                  className={
+                    "rounded focus-visible:ring-0 " +
+                    (passwordStatus === "invalid"
+                      ? "border-destructive pr-10"
+                      : passwordStatus === "valid"
+                        ? "border-green-500 pr-10"
+                        : undefined)
+                  }
+                />
+                {passwordStatus === "valid" && (
+                  <CheckCircle2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
+                )}
+                {passwordStatus === "invalid" && (
+                  <XCircle className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-destructive" />
+                )}
+              </div>
+              {passwordErrorMessage && (
+                <p className="text-xs text-destructive">{passwordErrorMessage}</p>
+              )}
+              {passwordSuccessMessage && (
+                <p className="text-xs text-green-600 dark:text-green-400">
+                  {passwordSuccessMessage}
+                </p>
+              )}
+              {pw.length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  최소 8자 이상, 영문, 숫자, 특수문자 포함
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -638,7 +688,7 @@ export default function SignupPage() {
                 email.length == 0 ||
                 emailStatus !== "valid" ||
                 !emailVerified ||
-                pw.length == 0 ||
+                passwordStatus !== "valid" ||
                 confirmPw.length == 0 ||
                 passwordMatchStatus !== "match"
               }
