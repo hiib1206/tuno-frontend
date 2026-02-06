@@ -54,7 +54,7 @@ export function CommunityNav() {
   }, [allSubMenus]);
 
   return (
-    <nav className="relative">
+    <nav className="relative hidden sm:block">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center">
           {navItems.map((item) => {
