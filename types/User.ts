@@ -1,4 +1,4 @@
-import { IsActive, Role } from "./Common";
+import { Role } from "./Common";
 
 // AuthProvider 타입 정의 (선택적)
 export interface AuthProvider {
@@ -20,7 +20,7 @@ export class User {
   profileImageUpdatedAt?: Date;
   createdAt?: Date;
   updatedAt?: Date;
-  isActive?: IsActive;
+  deletedAt?: Date;
   authProviders?: AuthProvider[]; // ✅ 추가
 
   constructor(
@@ -37,7 +37,7 @@ export class User {
     profileImageUpdatedAt?: Date,
     createdAt?: Date,
     updatedAt?: Date,
-    isActive?: IsActive,
+    deletedAt?: Date,
     authProviders?: AuthProvider[] // ✅ 추가
   ) {
     this.id = id;
@@ -53,7 +53,7 @@ export class User {
     this.profileImageUpdatedAt = profileImageUpdatedAt;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
-    this.isActive = isActive;
+    this.deletedAt = deletedAt;
     this.authProviders = authProviders; // ✅ 추가
   }
 
@@ -88,16 +88,20 @@ export class User {
           ? new Date(map.updatedAt)
           : map.updatedAt
         : undefined,
-      map.isActive ?? undefined,
+      map.deletedAt
+        ? typeof map.deletedAt === "string"
+          ? new Date(map.deletedAt)
+          : map.deletedAt
+        : undefined,
       // ✅ authProviders 추가
       map.authProviders
         ? map.authProviders.map((ap: any) => ({
-            provider: ap.provider,
-            createdAt:
-              typeof ap.createdAt === "string"
-                ? new Date(ap.createdAt)
-                : ap.createdAt,
-          }))
+          provider: ap.provider,
+          createdAt:
+            typeof ap.createdAt === "string"
+              ? new Date(ap.createdAt)
+              : ap.createdAt,
+        }))
         : undefined
     );
   }
@@ -117,7 +121,7 @@ export class User {
       profileImageUpdatedAt: this.profileImageUpdatedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-      isActive: this.isActive,
+      deletedAt: this.deletedAt,
       authProviders: this.authProviders, // ✅ 추가
     };
   }

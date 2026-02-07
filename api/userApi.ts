@@ -86,6 +86,11 @@ const userApi = {
     const response = await apiClient.get("/api/user/community/stats");
     return response.data;
   },
+  // 회원탈퇴
+  deleteAccount: async () => {
+    const response = await apiClient.delete("/api/user/me");
+    return response.data;
+  },
 };
 
 export default userApi;

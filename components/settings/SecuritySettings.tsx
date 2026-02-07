@@ -2,21 +2,34 @@
 
 import userApi from "@/api/userApi";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePasswordValidation } from "@/hooks/usePasswordValidation";
 import { useToast } from "@/hooks/useToast";
 import { useAuthStore } from "@/stores/authStore";
 import { CheckCircle2, Loader2, Lock, LogOut, XCircle } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export function SecuritySettings() {
-  const { user } = useAuthStore();
+  const router = useRouter();
+  const pathname = usePathname();
+  const { user, logout } = useAuthStore();
   const { toast } = useToast();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // 로컬 계정 여부 확인 (소셜 로그인만 있으면 비밀번호 변경 불가)
   const hasLocalAuth = user?.authProviders ? user.authProviders?.some(
@@ -77,6 +90,34 @@ export function SecuritySettings() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await userApi.deleteAccount();
+      toast({
+        title: "회원탈퇴 완료",
+        description: "그동안 이용해 주셔서 감사합니다.",
+      });
+      await logout();
+      const redirectPath = pathname.startsWith("/community")
+        ? "/community"
+        : "/workspace/analysis/quant";
+      router.push(redirectPath);
+    } catch (err: any) {
+      const message =
+        err.response?.status === 404
+          ? "사용자를 찾을 수 없습니다."
+          : "회원탈퇴에 실패했습니다. 다시 시도해 주세요.";
+      toast({
+        description: message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -216,7 +257,7 @@ export function SecuritySettings() {
         </Button>
       </div>
 
-      <div className="border-destructive/50 p-6">
+      <div className="border-destructive/50 py-6">
         <div className="mb-4 flex items-center gap-2">
           <LogOut className="h-5 w-5 text-destructive" />
           <h3 className="text-lg font-semibold text-destructive">위험 구역</h3>
@@ -227,13 +268,45 @@ export function SecuritySettings() {
           수 없습니다.
         </p>
 
-        <Button
-          variant="outline"
-          className="text-destructive hover:bg-destructive/10"
-        >
+        <Button variant="cancel" onClick={() => setIsDeleteModalOpen(true)}>
           계정 삭제
         </Button>
       </div>
+
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-destructive">정말 탈퇴하시겠습니까?</DialogTitle>
+            <DialogDescription>
+              회원탈퇴 시 모든 데이터가 영구적으로 삭제되며, 이 작업은 되돌릴 수
+              없습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteModalOpen(false)}
+              disabled={isDeleting}
+            >
+              취소
+            </Button>
+            <Button
+              variant="cancel"
+              onClick={handleDeleteAccount}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  탈퇴 처리 중...
+                </>
+              ) : (
+                "탈퇴하기"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
