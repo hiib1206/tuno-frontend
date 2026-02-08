@@ -26,7 +26,7 @@ import {
 } from "@/types/Stock";
 import { Building2, FileWarning } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 const PANELS_STORAGE_KEY = "market:stockPage:panels";
 const PANELS_TTL_MS = 1000 * 60 * 60 * 24 * 30;
@@ -69,7 +69,7 @@ function savePanels(next: { indexOpen: boolean; chatOpen: boolean }) {
   localStorage.setItem(PANELS_STORAGE_KEY, JSON.stringify(payload));
 }
 
-export default function StockPage() {
+function StockPageContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const { isAuthLoading } = useAuthStore();
@@ -349,5 +349,13 @@ export default function StockPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function StockPage() {
+  return (
+    <Suspense fallback={null}>
+      <StockPageContent />
+    </Suspense>
   );
 }

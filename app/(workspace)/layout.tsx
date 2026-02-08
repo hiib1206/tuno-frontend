@@ -2,13 +2,13 @@
 
 import { LoginRequestModal } from "@/components/modals/LoginRequestModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { UserMenu } from "@/components/UserMenu";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { UserMenu } from "@/components/UserMenu";
 import { Sidebar } from "@/components/workspace/sidebar";
 import StockSearchBar from "@/components/workspace/StockSearchBar";
 import { WatchlistPanel } from "@/components/workspace/WatchlistPanel";
@@ -17,7 +17,27 @@ import { useWatchlistStore } from "@/stores/watchlistStore";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+
+// useSearchParams를 사용하는 부분을 별도 컴포넌트로 분리
+function MobileLoginButton() {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  return (
+    <Link
+      href={`/login?redirect=${encodeURIComponent(
+        searchParams?.toString()
+          ? `${pathname}?${searchParams.toString()}`
+          : pathname
+      )}`}
+    >
+      <Button variant="default-accent" className="shrink-0">
+        로그인
+      </Button>
+    </Link>
+  );
+}
 
 export default function DashboardLayout({
   children,
@@ -26,8 +46,6 @@ export default function DashboardLayout({
 }) {
   const { user } = useAuthStore();
   const { fetchWatchlist, reset: resetWatchlist } = useWatchlistStore();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const isLoggedIn = !!user;
 
   const [isMobile, setIsMobile] = useState(false);
@@ -112,7 +130,9 @@ export default function DashboardLayout({
           }
         `}
       >
-        <Sidebar isOpen={isSidebarOpen} onToggle={handleToggle} isMobile={isMobile} />
+        <Suspense fallback={<div className="w-64 h-full bg-background-1" />}>
+          <Sidebar isOpen={isSidebarOpen} onToggle={handleToggle} isMobile={isMobile} />
+        </Suspense>
       </div>
 
       {/* 메인 컨텐츠 */}
@@ -185,20 +205,9 @@ export default function DashboardLayout({
               {isLoggedIn ? (
                 <UserMenu />
               ) : (
-                <Link
-                  href={`/login?redirect=${encodeURIComponent(
-                    searchParams?.toString()
-                      ? `${pathname}?${searchParams.toString()}`
-                      : pathname
-                  )}`}
-                >
-                  <Button
-                    variant="default-accent"
-                    className="shrink-0"
-                  >
-                    로그인
-                  </Button>
-                </Link>
+                <Suspense fallback={<Button variant="default-accent" className="shrink-0">로그인</Button>}>
+                  <MobileLoginButton />
+                </Suspense>
               )}
             </div>
           </div>

@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 interface LoginRequestModalProps {
   isOpen: boolean;
@@ -16,7 +17,8 @@ interface LoginRequestModalProps {
   redirectUrl?: string;
 }
 
-export function LoginRequestModal({
+// useSearchParams를 사용하는 내부 컴포넌트
+function LoginRequestModalContent({
   isOpen,
   onClose,
   redirectUrl,
@@ -76,5 +78,14 @@ export function LoginRequestModal({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// Suspense로 감싼 외부 컴포넌트
+export function LoginRequestModal(props: LoginRequestModalProps) {
+  return (
+    <Suspense fallback={null}>
+      <LoginRequestModalContent {...props} />
+    </Suspense>
   );
 }

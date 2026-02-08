@@ -36,7 +36,7 @@ import {
   TR_ID,
 } from "@/types/Stock";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
 type BottomTabType = "trading" | "analysis";
 type SideTabType = "orderbook" | "history" | "watchlist" | "theme";
@@ -47,7 +47,7 @@ const DEFAULT_STOCK = {
   exchange: "KP" as ExchangeCode,
 };
 
-export default function AnalysisIndividualSnapbackPage() {
+function AnalysisIndividualSnapbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user, isAuthLoading } = useAuthStore();
@@ -559,5 +559,13 @@ export default function AnalysisIndividualSnapbackPage() {
         onClose={() => setIsLoginModalOpen(false)}
       />
     </>
+  );
+}
+
+export default function AnalysisIndividualSnapbackPage() {
+  return (
+    <Suspense fallback={null}>
+      <AnalysisIndividualSnapbackContent />
+    </Suspense>
   );
 }

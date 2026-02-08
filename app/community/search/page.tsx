@@ -20,11 +20,11 @@ import { useAuthStore } from "@/stores/authStore";
 import { Post } from "@/types/Post";
 import { FileText, Newspaper, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
 type SearchTab = "posts" | "news";
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const { isAuthLoading } = useAuthStore();
@@ -260,5 +260,13 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-12"></div>}>
+      <SearchContent />
+    </Suspense>
   );
 }

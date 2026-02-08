@@ -10,11 +10,11 @@ import { getRedirectUrl, withRedirect } from "@/lib/utils";
 import { CheckCircle2, Loader2, Mail, User, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 type TabType = "find-username" | "reset-password";
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordContent() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabType>("find-username");
 
@@ -372,5 +372,13 @@ export default function ForgotPasswordPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-background-2"></div>}>
+      <ForgotPasswordContent />
+    </Suspense>
   );
 }

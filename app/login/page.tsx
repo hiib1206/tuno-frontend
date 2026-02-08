@@ -20,9 +20,9 @@ import { LogIn } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((state) => state.login);
@@ -344,5 +344,13 @@ export default function LoginPage() {
         </Dialog>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-background-2"></div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

@@ -29,9 +29,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function SignupPage() {
+function SignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [username, setUsername] = useState("");
@@ -1137,5 +1137,13 @@ export default function SignupPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-background-2"></div>}>
+      <SignupContent />
+    </Suspense>
   );
 }
