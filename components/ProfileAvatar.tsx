@@ -45,15 +45,11 @@ export function ProfileAvatar({
   // textSize가 지정되지 않으면 size를 사용
   const effectiveTextSize = textSize || size;
 
-  // user가 없으면 placeholder 이미지만 표시
+  // user가 없으면 기본 User 아이콘 표시
   if (!user) {
     return (
       <Avatar className={cn(sizeClasses[size], className)}>
-        <AvatarImage
-          className={cn("object-cover", textSizes[effectiveTextSize])}
-          src="/placeholder.svg"
-          alt="프로필"
-        />
+        <AvatarFallback />
       </Avatar>
     );
   }

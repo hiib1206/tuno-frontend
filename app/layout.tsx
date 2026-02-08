@@ -20,26 +20,12 @@ const bungeeShade = Bungee_Shade({
 });
 
 export const metadata: Metadata = {
-  title: "InvestAI - AI 기반 자동 주식 투자 플랫폼",
+  title: "Tuno - AI 투자 분석 플랫폼",
   description:
-    "AI 알고리즘을 활용한 자동화된 포트폴리오 관리. 감정을 배제한 데이터 기반 투자로 합리적인 의사결정을 지원합니다.",
-  generator: "v0.app",
+    "AI 기반 투자 분석 플랫폼. 퀀트 시그널 탐색과 기술적 매수 타이밍 분석을 한 곳에서. Tuno에서 시작하세요.",
   icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
+    icon: "/favicon-32x32.png",
+    apple: "/apple-icon-180x180.png",
   },
 };
 
@@ -67,8 +53,8 @@ export default function RootLayout({
               <AuthProvider />
               {children}
               <Toaster />
-            {/* <Analytics는 vercel에 정보 보내서 분석하는 서비스이므로 일단 주석처리 */}
-            {/* <Analytics /> */}
+              {/* <Analytics는 vercel에 정보 보내서 분석하는 서비스이므로 일단 주석처리 */}
+              {/* <Analytics /> */}
             </TooltipProvider>
           </QueryProvider>
         </ThemeProvider>
