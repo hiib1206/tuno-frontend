@@ -202,7 +202,7 @@ const SlidingDoorsHero = () => {
           initial={{ opacity: isMobile ? 1 : 0 }}
           animate={{ opacity: isMobile || isBackgroundVisible ? 1 : 0 }}
           transition={{ duration: isMobile ? 0 : 0.5, ease: "easeInOut" }}
-          className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,#00AE43_0%,#007D4D_100%)]"
+          className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,#00AE43_0%,#006B54_100%)]"
         >
           {/* Film grain texture */}
           <GrainOverlay />
@@ -265,194 +265,194 @@ const SlidingDoorsHero = () => {
 
         {/* 2. THE DOORS & LOCK UI (hidden on mobile via CSS) */}
         <div className="hidden sm:contents">
-        <motion.div
-          style={{ x: xLeft }}
-          className="absolute top-0 left-0 w-1/2 h-full bg-randing-door z-20 flex items-center justify-end border-r border-[#333] overflow-hidden"
-        >
-          {/* Continuous Chart — Left Half */}
-          <div className="absolute inset-y-0 left-0 w-[200%] z-0 opacity-30 pointer-events-none">
-            <svg
-              className="w-full h-full"
-              viewBox={`0 0 ${CHART_W} ${CHART_H}`}
-              preserveAspectRatio="none"
-              fill="none"
-            >
-              <defs>
-                <clipPath id="chart-reveal">
-                  <motion.rect x="0" y="0" height={CHART_H} style={{ width: chartRevealW }} />
-                </clipPath>
-              </defs>
-              <g clipPath="url(#chart-reveal)">
-                {/* Grid */}
-                <g>
-                  {Array.from({ length: 12 }, (_, i) => (CHART_W / 12) * (i + 1)).map((x) => (
-                    <line key={`v-${x}`} x1={x} y1={PRICE_TOP} x2={x} y2={VOL_BOTTOM} stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" strokeDasharray="2 6" />
-                  ))}
-                </g>
-                {/* Volume */}
-                <g>
-                  {CANDLES.map((c, i) => (
-                    <rect key={`vol-${i}`} x={c.x - candleWidth * 0.35} y={VOL_BOTTOM - c.v} width={candleWidth * 0.7} height={c.v} fill="rgba(255,255,255,0.06)" rx="0.5" />
-                  ))}
-                </g>
-                {/* Candles */}
-                <g>
-                  {CANDLES.map((c, i) => {
-                    const top = Math.min(c.o, c.c);
-                    const h = Math.max(Math.abs(c.o - c.c), 0.5);
-                    const bw = candleWidth * 0.6;
-                    return (
-                      <g key={i}>
-                        <line x1={c.x} y1={c.h} x2={c.x} y2={top} stroke={c.bullish ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)"} strokeWidth="0.8" />
-                        <line x1={c.x} y1={top + h} x2={c.x} y2={c.l} stroke={c.bullish ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)"} strokeWidth="0.8" />
-                        <rect x={c.x - bw / 2} y={top} width={bw} height={h} fill={c.bullish ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.12)"} rx="0.3" />
-                      </g>
-                    );
-                  })}
-                </g>
-              </g>
-            </svg>
-          </div>
-
-          <div className="relative z-10 mr-15 md:mr-26 text-right opacity-80">
-            <p className="text-xs md:text-sm font-medium text-white/50 tracking-widest mb-1">투자의</p>
-            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
-              TU
-            </h2>
-          </div>
-        </motion.div>
-
-        <motion.div
-          style={{ x: xRight }}
-          className="absolute top-0 right-0 w-1/2 h-full bg-randing-door z-20 flex items-center justify-start border-l border-[#333] overflow-hidden"
-        >
-          {/* Continuous Chart — Right Half */}
-          <div className="absolute inset-y-0 right-0 w-[200%] z-0 opacity-30 pointer-events-none">
-            <svg
-              className="w-full h-full"
-              viewBox={`0 0 ${CHART_W} ${CHART_H}`}
-              preserveAspectRatio="none"
-              fill="none"
-            >
-              <defs>
-                <clipPath id="chart-reveal">
-                  <motion.rect x="0" y="0" height={CHART_H} style={{ width: chartRevealW }} />
-                </clipPath>
-              </defs>
-              <g clipPath="url(#chart-reveal)">
-                {/* Grid */}
-                <g>
-                  {Array.from({ length: 12 }, (_, i) => (CHART_W / 12) * (i + 1)).map((x) => (
-                    <line key={`v-${x}`} x1={x} y1={PRICE_TOP} x2={x} y2={VOL_BOTTOM} stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" strokeDasharray="2 6" />
-                  ))}
-                </g>
-                {/* Volume */}
-                <g>
-                  {CANDLES.map((c, i) => (
-                    <rect key={`vol-${i}`} x={c.x - candleWidth * 0.35} y={VOL_BOTTOM - c.v} width={candleWidth * 0.7} height={c.v} fill="rgba(255,255,255,0.06)" rx="0.5" />
-                  ))}
-                </g>
-                {/* Candles */}
-                <g>
-                  {CANDLES.map((c, i) => {
-                    const top = Math.min(c.o, c.c);
-                    const h = Math.max(Math.abs(c.o - c.c), 0.5);
-                    const bw = candleWidth * 0.6;
-                    return (
-                      <g key={i}>
-                        <line x1={c.x} y1={c.h} x2={c.x} y2={top} stroke={c.bullish ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)"} strokeWidth="0.8" />
-                        <line x1={c.x} y1={top + h} x2={c.x} y2={c.l} stroke={c.bullish ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)"} strokeWidth="0.8" />
-                        <rect x={c.x - bw / 2} y={top} width={bw} height={h} fill={c.bullish ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.12)"} rx="0.3" />
-                      </g>
-                    );
-                  })}
-                </g>
-              </g>
-            </svg>
-          </div>
-
-          <div className="relative z-10 ml-14 md:ml-24 text-left opacity-80">
-            <p className="text-xs md:text-sm font-medium text-white/50 tracking-widest mb-1">노하우</p>
-            <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
-              NO
-            </h2>
-          </div>
-        </motion.div>
-
-        {/* 3. CENTER LOCK UI */}
-        <div className="absolute top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
-          {/* === A. VERTICAL LATCH BARS (Mechanical Split) === */}
-          {/* Top Latch - Moves UP */}
           <motion.div
-            style={{ y: latchUp, opacity: latchOpacity }}
-            className="absolute bottom-1/2 left-1/2 -translate-x-1/2 w-[2px] h-[50vh] bg-[#444] origin-bottom z-10 flex flex-col justify-end items-center"
+            style={{ x: xLeft }}
+            className="absolute top-0 left-0 w-1/2 h-full bg-randing-door z-20 flex items-center justify-end border-r border-[#333] overflow-hidden"
           >
-            {/* Connection Joint */}
-            <div className="w-1.5 h-4 bg-[#666] mb-0 rounded-full" />
-          </motion.div>
-
-          {/* Bottom Latch - Moves DOWN */}
-          <motion.div
-            style={{ y: latchDown, opacity: latchOpacity }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[2px] h-[50vh] bg-[#444] origin-top z-10 flex flex-col justify-start items-center"
-          >
-            {/* Connection Joint */}
-            <div className="w-1.5 h-4 bg-[#666] mt-0 rounded-full" />
-          </motion.div>
-
-          {/* === B. THE LUXURY KNOB === */}
-          <motion.div
-            style={{ opacity: lockOpacity }}
-            className="relative w-24 h-24 md:w-36 md:h-36 flex items-center justify-center z-20"
-          >
-            {/* Outer Bezel & Ticks (Fixed) */}
-            <div className="absolute inset-0 rounded-full border border-[#444] bg-[#222]" />
-            <div className="absolute inset-2 rounded-full flex items-center justify-center">
+            {/* Continuous Chart — Left Half */}
+            <div className="absolute inset-y-0 left-0 w-[200%] z-0 opacity-30 pointer-events-none">
               <svg
-                className="absolute inset-0 w-full h-full"
-                viewBox="0 0 100 100"
+                className="w-full h-full"
+                viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+                preserveAspectRatio="none"
+                fill="none"
               >
-                {[...Array(60)].map((_, i) => (
-                  <line
-                    key={i}
-                    x1="50"
-                    y1="4"
-                    x2="50"
-                    y2="7"
-                    stroke={i % 5 === 0 ? "#888" : "#444"}
-                    strokeWidth={i % 5 === 0 ? "1.5" : "0.5"}
-                    transform={`rotate(${i * 6} 50 50)`}
-                  />
-                ))}
+                <defs>
+                  <clipPath id="chart-reveal">
+                    <motion.rect x="0" y="0" height={CHART_H} style={{ width: chartRevealW }} />
+                  </clipPath>
+                </defs>
+                <g clipPath="url(#chart-reveal)">
+                  {/* Grid */}
+                  <g>
+                    {Array.from({ length: 12 }, (_, i) => (CHART_W / 12) * (i + 1)).map((x) => (
+                      <line key={`v-${x}`} x1={x} y1={PRICE_TOP} x2={x} y2={VOL_BOTTOM} stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" strokeDasharray="2 6" />
+                    ))}
+                  </g>
+                  {/* Volume */}
+                  <g>
+                    {CANDLES.map((c, i) => (
+                      <rect key={`vol-${i}`} x={c.x - candleWidth * 0.35} y={VOL_BOTTOM - c.v} width={candleWidth * 0.7} height={c.v} fill="rgba(255,255,255,0.06)" rx="0.5" />
+                    ))}
+                  </g>
+                  {/* Candles */}
+                  <g>
+                    {CANDLES.map((c, i) => {
+                      const top = Math.min(c.o, c.c);
+                      const h = Math.max(Math.abs(c.o - c.c), 0.5);
+                      const bw = candleWidth * 0.6;
+                      return (
+                        <g key={i}>
+                          <line x1={c.x} y1={c.h} x2={c.x} y2={top} stroke={c.bullish ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)"} strokeWidth="0.8" />
+                          <line x1={c.x} y1={top + h} x2={c.x} y2={c.l} stroke={c.bullish ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)"} strokeWidth="0.8" />
+                          <rect x={c.x - bw / 2} y={top} width={bw} height={h} fill={c.bullish ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.12)"} rx="0.3" />
+                        </g>
+                      );
+                    })}
+                  </g>
+                </g>
               </svg>
             </div>
 
-            {/* Indicator */}
-            <div className="absolute top-[-1px] md:top-[-2px] z-20">
-              <div className="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[4px] border-t-randing-accent md:border-l-[5px] md:border-r-[5px] md:border-t-[6px]" />
+            <div className="relative z-10 mr-15 md:mr-26 text-right opacity-80">
+              <p className="text-xs md:text-sm font-medium text-white/50 tracking-widest mb-1">투자의</p>
+              <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
+                TU
+              </h2>
+            </div>
+          </motion.div>
+
+          <motion.div
+            style={{ x: xRight }}
+            className="absolute top-0 right-0 w-1/2 h-full bg-randing-door z-20 flex items-center justify-start border-l border-[#333] overflow-hidden"
+          >
+            {/* Continuous Chart — Right Half */}
+            <div className="absolute inset-y-0 right-0 w-[200%] z-0 opacity-30 pointer-events-none">
+              <svg
+                className="w-full h-full"
+                viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+                preserveAspectRatio="none"
+                fill="none"
+              >
+                <defs>
+                  <clipPath id="chart-reveal">
+                    <motion.rect x="0" y="0" height={CHART_H} style={{ width: chartRevealW }} />
+                  </clipPath>
+                </defs>
+                <g clipPath="url(#chart-reveal)">
+                  {/* Grid */}
+                  <g>
+                    {Array.from({ length: 12 }, (_, i) => (CHART_W / 12) * (i + 1)).map((x) => (
+                      <line key={`v-${x}`} x1={x} y1={PRICE_TOP} x2={x} y2={VOL_BOTTOM} stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" strokeDasharray="2 6" />
+                    ))}
+                  </g>
+                  {/* Volume */}
+                  <g>
+                    {CANDLES.map((c, i) => (
+                      <rect key={`vol-${i}`} x={c.x - candleWidth * 0.35} y={VOL_BOTTOM - c.v} width={candleWidth * 0.7} height={c.v} fill="rgba(255,255,255,0.06)" rx="0.5" />
+                    ))}
+                  </g>
+                  {/* Candles */}
+                  <g>
+                    {CANDLES.map((c, i) => {
+                      const top = Math.min(c.o, c.c);
+                      const h = Math.max(Math.abs(c.o - c.c), 0.5);
+                      const bw = candleWidth * 0.6;
+                      return (
+                        <g key={i}>
+                          <line x1={c.x} y1={c.h} x2={c.x} y2={top} stroke={c.bullish ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)"} strokeWidth="0.8" />
+                          <line x1={c.x} y1={top + h} x2={c.x} y2={c.l} stroke={c.bullish ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)"} strokeWidth="0.8" />
+                          <rect x={c.x - bw / 2} y={top} width={bw} height={h} fill={c.bullish ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.12)"} rx="0.3" />
+                        </g>
+                      );
+                    })}
+                  </g>
+                </g>
+              </svg>
             </div>
 
-            {/* Rotating Knob */}
-            <motion.div
-              style={{ rotate: dialRotate }}
-              className="relative z-10 w-16 h-16 md:w-24 md:h-24 rounded-full shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center bg-[#181818]"
-            >
-              <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_45deg,#111,#333,#111,#333,#111)] opacity-80" />
-              <div className="absolute inset-[1px] rounded-full border border-[#ffffff10]" />
-              <div className="absolute inset-0 rounded-full border-[1px] border-dashed border-[#444] opacity-30" />
-              <div className="absolute inset-1 rounded-full bg-[linear-gradient(135deg,rgba(255,255,255,0.03)_0%,rgba(0,0,0,0.1)_50%,rgba(255,255,255,0.02)_100%)]" />
-              <div className="absolute w-8 h-8 md:w-12 md:h-12 rounded-full bg-gradient-to-b from-[#111] to-[#000] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] border border-[#222]" />
-
-              <motion.div
-                style={{ backgroundColor: statusColor, boxShadow: statusGlow }}
-                className="relative z-20 w-1.5 h-1.5 rounded-full"
-              />
-              <div className="absolute top-1 md:top-2 w-[2px] h-2 md:h-3 bg-[#444] rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,1)] z-20">
-                <div className="w-full h-full bg-randing-accent opacity-80" />
-              </div>
-            </motion.div>
+            <div className="relative z-10 ml-14 md:ml-24 text-left opacity-80">
+              <p className="text-xs md:text-sm font-medium text-white/50 tracking-widest mb-1">노하우</p>
+              <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">
+                NO
+              </h2>
+            </div>
           </motion.div>
-        </div>
+
+          {/* 3. CENTER LOCK UI */}
+          <div className="absolute top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+            {/* === A. VERTICAL LATCH BARS (Mechanical Split) === */}
+            {/* Top Latch - Moves UP */}
+            <motion.div
+              style={{ y: latchUp, opacity: latchOpacity }}
+              className="absolute bottom-1/2 left-1/2 -translate-x-1/2 w-[2px] h-[50vh] bg-[#444] origin-bottom z-10 flex flex-col justify-end items-center"
+            >
+              {/* Connection Joint */}
+              <div className="w-1.5 h-4 bg-[#666] mb-0 rounded-full" />
+            </motion.div>
+
+            {/* Bottom Latch - Moves DOWN */}
+            <motion.div
+              style={{ y: latchDown, opacity: latchOpacity }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[2px] h-[50vh] bg-[#444] origin-top z-10 flex flex-col justify-start items-center"
+            >
+              {/* Connection Joint */}
+              <div className="w-1.5 h-4 bg-[#666] mt-0 rounded-full" />
+            </motion.div>
+
+            {/* === B. THE LUXURY KNOB === */}
+            <motion.div
+              style={{ opacity: lockOpacity }}
+              className="relative w-24 h-24 md:w-36 md:h-36 flex items-center justify-center z-20"
+            >
+              {/* Outer Bezel & Ticks (Fixed) */}
+              <div className="absolute inset-0 rounded-full border border-[#444] bg-[#222]" />
+              <div className="absolute inset-2 rounded-full flex items-center justify-center">
+                <svg
+                  className="absolute inset-0 w-full h-full"
+                  viewBox="0 0 100 100"
+                >
+                  {[...Array(60)].map((_, i) => (
+                    <line
+                      key={i}
+                      x1="50"
+                      y1="4"
+                      x2="50"
+                      y2="7"
+                      stroke={i % 5 === 0 ? "#888" : "#444"}
+                      strokeWidth={i % 5 === 0 ? "1.5" : "0.5"}
+                      transform={`rotate(${i * 6} 50 50)`}
+                    />
+                  ))}
+                </svg>
+              </div>
+
+              {/* Indicator */}
+              <div className="absolute top-[-1px] md:top-[-2px] z-20">
+                <div className="w-0 h-0 border-l-[3px] border-l-transparent border-r-[3px] border-r-transparent border-t-[4px] border-t-randing-accent md:border-l-[5px] md:border-r-[5px] md:border-t-[6px]" />
+              </div>
+
+              {/* Rotating Knob */}
+              <motion.div
+                style={{ rotate: dialRotate }}
+                className="relative z-10 w-16 h-16 md:w-24 md:h-24 rounded-full shadow-[0_5px_15px_rgba(0,0,0,0.8)] flex items-center justify-center bg-[#181818]"
+              >
+                <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_45deg,#111,#333,#111,#333,#111)] opacity-80" />
+                <div className="absolute inset-[1px] rounded-full border border-[#ffffff10]" />
+                <div className="absolute inset-0 rounded-full border-[1px] border-dashed border-[#444] opacity-30" />
+                <div className="absolute inset-1 rounded-full bg-[linear-gradient(135deg,rgba(255,255,255,0.03)_0%,rgba(0,0,0,0.1)_50%,rgba(255,255,255,0.02)_100%)]" />
+                <div className="absolute w-8 h-8 md:w-12 md:h-12 rounded-full bg-gradient-to-b from-[#111] to-[#000] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] border border-[#222]" />
+
+                <motion.div
+                  style={{ backgroundColor: statusColor, boxShadow: statusGlow }}
+                  className="relative z-20 w-1.5 h-1.5 rounded-full"
+                />
+                <div className="absolute top-1 md:top-2 w-[2px] h-2 md:h-3 bg-[#444] rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,1)] z-20">
+                  <div className="w-full h-full bg-randing-accent opacity-80" />
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
       </div>
     </section>
