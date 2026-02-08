@@ -81,7 +81,7 @@ export function streamNewsImages(
   jobId: string,
   callbacks: StreamNewsImagesCallbacks
 ): EventSource {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://59.25.224.32:4000";
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const eventSource = new EventSource(
     `${baseUrl}/api/news/jobs/${jobId}/stream`
   );
@@ -149,9 +149,8 @@ const newsApi = {
     if (limit) queryParams.append("limit", String(limit));
 
     const queryString = queryParams.toString();
-    const url = `/api/news/${encodeURIComponent(topicId)}${
-      queryString ? `?${queryString}` : ""
-    }`;
+    const url = `/api/news/${encodeURIComponent(topicId)}${queryString ? `?${queryString}` : ""
+      }`;
 
     const response = await apiClient.get(url);
     return {

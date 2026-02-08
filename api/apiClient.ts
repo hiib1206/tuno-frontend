@@ -4,7 +4,7 @@ import { useAuthStore } from "@/stores/authStore";
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: process.env?.NEXT_PUBLIC_API_URL || "http://59.25.224.32:4000",
+  baseURL: process.env?.NEXT_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
   },

@@ -1,5 +1,5 @@
-import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { NotificationResponse, parseNotification } from "@/types/Notification";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 export interface StreamNotificationsCallbacks {
   onMessage: (notification: ReturnType<typeof parseNotification>) => void;
@@ -27,7 +27,7 @@ export function streamNotifications(
   const ctrl = new AbortController();
 
   const baseUrl =
-    process.env.NEXT_PUBLIC_API_URL || "http://59.25.224.32:4000";
+    process.env.NEXT_PUBLIC_API_URL;
   const url = `${baseUrl}/api/notification/stream`;
 
   fetchEventSource(url, {
