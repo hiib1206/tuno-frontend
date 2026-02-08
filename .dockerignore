@@ -1,0 +1,45 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Git
+.git
+.gitignore
+
+# Environment (infra에서 주입)
+.env
+.env.*
+
+# IDE
+.vscode
+.idea
+.cursor
+*.swp
+*.swo
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs & Test
+docs
+AGENTS.md
+README.md
+test-page
+test-tiptap
+test-chart
+
+# TypeScript cache
+*.tsbuildinfo

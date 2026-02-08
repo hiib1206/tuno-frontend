@@ -7,6 +7,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  output: "standalone", // Docker 배포용
 };
 
 export default nextConfig;
