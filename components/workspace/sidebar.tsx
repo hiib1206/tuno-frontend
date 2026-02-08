@@ -17,12 +17,12 @@ import aiLogoAnimation from "@/public/lottie/ai-logo.json";
 import { useAuthStore } from "@/stores/authStore";
 import Lottie from "lottie-react";
 import {
-  LayoutDashboard,
   ArrowLeft,
   BarChart3,
   ChevronDown,
   ChevronUp,
   Layers,
+  LayoutDashboard,
   LineChart,
   LogIn,
   LogOut,

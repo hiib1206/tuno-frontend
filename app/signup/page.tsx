@@ -296,10 +296,10 @@ function SignupContent() {
               {usernameMessage && (
                 <p
                   className={`text-xs ${usernameStatus === "available"
-                      ? "text-green-600 dark:text-green-400"
-                      : usernameStatus === "unavailable"
-                        ? "text-destructive"
-                        : "text-muted-foreground"
+                    ? "text-green-600 dark:text-green-400"
+                    : usernameStatus === "unavailable"
+                      ? "text-destructive"
+                      : "text-muted-foreground"
                     }`}
                 >
                   {usernameMessage}
@@ -341,10 +341,10 @@ function SignupContent() {
               {nickMessage && (
                 <p
                   className={`text-xs ${nickStatus === "available"
-                      ? "text-green-600 dark:text-green-400"
-                      : nickStatus === "unavailable"
-                        ? "text-destructive"
-                        : "text-muted-foreground"
+                    ? "text-green-600 dark:text-green-400"
+                    : nickStatus === "unavailable"
+                      ? "text-destructive"
+                      : "text-muted-foreground"
                     }`}
                 >
                   {nickMessage}
@@ -428,10 +428,10 @@ function SignupContent() {
               {emailMessage && (
                 <p
                   className={`text-xs ${emailStatus === "valid"
-                      ? "text-green-600 dark:text-green-400"
-                      : emailStatus === "invalid"
-                        ? "text-destructive"
-                        : "text-muted-foreground"
+                    ? "text-green-600 dark:text-green-400"
+                    : emailStatus === "invalid"
+                      ? "text-destructive"
+                      : "text-muted-foreground"
                     }`}
                 >
                   {emailVerified
@@ -449,8 +449,8 @@ function SignupContent() {
                   {codeExpiresIn > 0 && (
                     <span
                       className={`text-xs whitespace-nowrap tabular-nums ${codeExpiresIn <= 60
-                          ? "text-destructive"
-                          : "text-muted-foreground"
+                        ? "text-destructive"
+                        : "text-muted-foreground"
                         }`}
                     >
                       유효 시간 {Math.floor(codeExpiresIn / 60)}:
@@ -460,10 +460,10 @@ function SignupContent() {
                   {/* 시도 횟수 표시 - 항상 표시하되 attempts가 0이면 0/5로 표시 */}
                   <span
                     className={`text-xs whitespace-nowrap tabular-nums ${attempts >= maxAttempts
-                        ? "text-destructive font-semibold"
-                        : attempts >= maxAttempts - 1
-                          ? "text-orange-500"
-                          : "text-muted-foreground"
+                      ? "text-destructive font-semibold"
+                      : attempts >= maxAttempts - 1
+                        ? "text-orange-500"
+                        : "text-muted-foreground"
                       }`}
                   >
                     시도 횟수: {attempts}/{maxAttempts}
@@ -630,10 +630,10 @@ function SignupContent() {
               {passwordMatchMessage && (
                 <p
                   className={`text-xs ${passwordMatchStatus === "match"
-                      ? "text-green-600 dark:text-green-400"
-                      : passwordMatchStatus === "mismatch"
-                        ? "text-destructive"
-                        : "text-muted-foreground"
+                    ? "text-green-600 dark:text-green-400"
+                    : passwordMatchStatus === "mismatch"
+                      ? "text-destructive"
+                      : "text-muted-foreground"
                     }`}
                 >
                   {passwordMatchMessage}
@@ -745,8 +745,8 @@ function SignupContent() {
                 setModalAgreed(false);
               }}
               className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${activeTab === "terms"
-                  ? "border-b-2 border-accent text-accent"
-                  : "text-muted-foreground hover:text-foreground"
+                ? "border-b-2 border-accent text-accent"
+                : "text-muted-foreground hover:text-foreground"
                 }`}
             >
               이용약관
@@ -758,8 +758,8 @@ function SignupContent() {
                 setModalAgreed(false);
               }}
               className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${activeTab === "privacy"
-                  ? "border-b-2 border-accent text-accent"
-                  : "text-muted-foreground hover:text-foreground"
+                ? "border-b-2 border-accent text-accent"
+                : "text-muted-foreground hover:text-foreground"
                 }`}
             >
               개인정보처리방침
