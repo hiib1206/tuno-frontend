@@ -41,6 +41,9 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${instrumentSans.variable} ${bungeeShade.variable}`}
     >
+      <head>
+        <meta name="color-scheme" content="light dark" />
+      </head>
       <body className={`font-sans antialiased bg-background-2`}>
         <ThemeProvider
           attribute="class"
