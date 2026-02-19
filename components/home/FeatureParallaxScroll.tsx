@@ -11,7 +11,7 @@ const features = [
     desc: "다양한 기술적 지표와 시장 흐름을 AI가 상황에 맞는\nBUY · HOLD · SELL 신호를 제공합니다.\n빠르고 직관적인 투자 판단을 경험하세요.",
     image: "/randing/quant-result-screen.png",
     subImage: "/randing/quant-entry-screen.png",
-    subPosition: "-bottom-5 -left-[6%] w-[55%]",
+    subPosition: "-bottom-15 left-0 w-[55%]",
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const features = [
     desc: "복잡한 기술적 지표를 일일이 확인할 필요 없이\nAI가 차트 패턴과 매수·매도 타이밍을 분석합니다.\n반등 신호부터 추세 전환까지, 한눈에 파악하세요.",
     image: "/randing/snapback-screen.png",
     subImage: "/randing/snapback-result-screen.png",
-    subPosition: "-bottom-20 -right-[6%] w-[40%]",
+    subPosition: "-bottom-20 right-0 w-[40%]",
   },
   {
     id: 3,
@@ -126,35 +126,38 @@ const FeatureSection = ({
           {/* ── Image Column: 8/12 ── */}
           <div className="w-full lg:w-8/12">
             {feature.subImage ? (
-              <motion.div style={{ y }} className="relative pb-10">
-                {/* Main image */}
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.3 }}
-                  viewport={{ once: false }}
-                  className="relative rounded-2xl overflow-hidden shadow-2xl shadow-[#00AE43]/20"
-                >
-                  <img
-                    src={feature.image}
-                    alt={feature.title}
-                    className="w-full h-auto block"
-                  />
-                </motion.div>
-                {/* Sub image - overlaps bottom-left */}
-                <motion.div
-                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.55 }}
-                  viewport={{ once: false }}
-                  className={`absolute rounded-2xl overflow-hidden shadow-xl shadow-[#00AE43]/15 ring-4 ring-white z-10 ${feature.subPosition}`}
-                >
-                  <img
-                    src={feature.subImage}
-                    alt={`${feature.title} detail`}
-                    className="w-full h-auto block"
-                  />
-                </motion.div>
+              <motion.div style={{ y }} className="pb-10">
+                {/* Wrapper - relative container with padding for sub image overflow */}
+                <div className="relative px-[6%]">
+                  {/* Main image */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: 0.3 }}
+                    viewport={{ once: false }}
+                    className="rounded-2xl overflow-hidden shadow-2xl shadow-[#00AE43]/20"
+                  >
+                    <img
+                      src={feature.image}
+                      alt={feature.title}
+                      className="w-full h-auto block"
+                    />
+                  </motion.div>
+                  {/* Sub image - relative to main image wrapper */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 0.55 }}
+                    viewport={{ once: false }}
+                    className={`absolute rounded-2xl overflow-hidden shadow-xl shadow-[#00AE43]/15 ring-4 ring-white z-10 ${feature.subPosition}`}
+                  >
+                    <img
+                      src={feature.subImage}
+                      alt={`${feature.title} detail`}
+                      className="w-full h-auto block"
+                    />
+                  </motion.div>
+                </div>
               </motion.div>
             ) : (
               <motion.div style={{ y }} className={feature.imageClass}>

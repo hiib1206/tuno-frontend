@@ -182,14 +182,17 @@ const SlidingDoorsHero = () => {
   const contentScale = useTransform(scrollYProgress, [0.25, 0.6], [0.8, 1]);
   const contentOpacity = useTransform(scrollYProgress, [0.25, 0.35], [0, 1]);
 
-  // Background visibility (triggers when doors ~80% open)
+  // Background visibility (triggers when content starts appearing)
   const [isBackgroundVisible, setIsBackgroundVisible] = useState(false);
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    setIsBackgroundVisible(latest >= 0.49);
+    setIsBackgroundVisible(latest >= 0.25);
   });
 
   // Door Chart Animation — left-to-right reveal (synced with Phase 1: 0 → 20%)
   const chartRevealW = useTransform(scrollYProgress, [0, 0.18], [0, CHART_W]);
+
+  // Scroll Hint fade out
+  const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
 
   // 애니메이션 비활성화 여부 (SSR/초기 로드 시에는 모바일처럼 즉시 표시)
   const disableScrollAnimation = isSmallScreen !== false;
@@ -201,70 +204,67 @@ const SlidingDoorsHero = () => {
         {/* Base background - always visible */}
         <div className="absolute inset-0 z-0 bg-randing-background-1" />
 
-        {/* Green overlay - fades in after doors fully open (immediate on mobile) */}
+        {/* Light background - revealed when doors open */}
         <motion.div
           initial={{ opacity: disableScrollAnimation ? 1 : 0 }}
           animate={{ opacity: disableScrollAnimation || isBackgroundVisible ? 1 : 0 }}
           transition={{ duration: disableScrollAnimation ? 0 : 0.5, ease: "easeInOut" }}
-          className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,#00AE43_0%,#006B54_100%)]"
-        >
-          {/* Film grain texture */}
-          <GrainOverlay />
-          {/* 상승 추세 모양 배경 - 차트처럼 꺾이는 띠 */}
-          <svg
-            className="absolute inset-0 w-full h-full"
-            viewBox="0 0 1920 1080"
-            preserveAspectRatio="xMidYMid slice"
-            fill="none"
-          >
-            <polygon
-              points="0,658 960,203 1267,350 1920,20
-              1920,362 1267,692 960,545 0,1000"
-              className="fill-randing-background-1"
-            />
-          </svg>
-        </motion.div>
+          className="absolute inset-0 z-[1] bg-randing-background-1"
+        />
 
         {/* Content - visible as doors open (immediate on mobile) */}
         <motion.div
           style={disableScrollAnimation ? { opacity: 1, scale: 1 } : { scale: contentScale, opacity: contentOpacity }}
-          className="absolute inset-0 z-10"
+          className="absolute inset-0 z-10 flex items-center"
         >
-          {/* Text - absolute, positioned from top */}
-          <div className="absolute top-[26%] mobile:top-[25%] sm:top-[26%] left-1/2 -translate-x-1/2 text-center px-4 w-full">
-            <div className="text-black/70 font-medium tracking-[0.2em] uppercase mb-4 text-[10px] mobile:text-xs md:text-sm">
-              AI Investment Analysis Platform
-            </div>
-            <h1 className="text-2xl mobile:text-4xl sm:text-6xl font-bold text-black tracking-tight leading-[1.35] break-keep">
-              앞서가는 투자의 길, <br />
-              <BrandText
-                className="text-2xl mobile:text-4xl sm:text-6xl"
-                style={{ WebkitTextStroke: "4px currentColor" }}
+          <div className="w-full max-w-7xl mx-auto px-2 mobile:px-20 flex flex-col lg:flex-row items-center gap-20">
+            {/* Left: Text + Button */}
+            <div className="flex-1 text-center lg:text-left">
+              <div className="text-black/50 font-medium tracking-[0.2em] uppercase mb-4 text-[10px] mobile:text-xs md:text-sm">
+                AI Investment Analysis Platform
+              </div>
+              <h1 className="text-2xl mobile:text-4xl sm:text-5xl lg:text-5xl font-bold text-black tracking-tight leading-[1.35] break-keep">
+                앞서가는 투자의 길 <br />
+                <BrandText className="text-2xl mobile:text-4xl sm:text-5xl lg:text-5xl">
+                  Tuno
+                </BrandText>
+                가 함께합니다.
+              </h1>
+              <div className="mt-6 md:mt-8 text-black/70 font-medium text-sm mobile:text-base md:text-lg lg:text-xl leading-relaxed break-keep">
+                퀀트 시그널부터 매수 타이밍까지
+                <br />
+                새로운 투자 분석을 경험해 보세요.
+              </div>
+              {/* Button */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="mt-8 md:mt-10"
               >
-                Tuno
-              </BrandText>
-              가 함께합니다.
-            </h1>
-            <div className="mt-8 max-w-2xl mx-auto text-randing-accent font-medium text-lg md:text-xl leading-relaxed break-keep">
-              퀀트 시그널부터 매수 타이밍까지
-              <br />
-              새로운 투자 분석을 경험해 보세요.
+                <Link
+                  href="/analysis/quant"
+                  className="inline-block px-4 py-2 sm:px-6 sm:py-3 bg-randing-accent text-white rounded-full font-bold text-xs mobile:text-base sm:text-lg transition-colors shadow-[0_4px_20px_rgba(0,174,67,0.3)] hover:shadow-[0_6px_30px_rgba(0,174,67,0.4)]"
+                >
+                  무료로 시작하기
+                </Link>
+              </motion.div>
+            </div>
+
+            {/* Right: Screenshot */}
+            <div className="flex-1 flex justify-center md:justify-end">
+              <div className="relative">
+                {/* Gradient glow behind image */}
+                <div
+                  className="absolute -inset-8 rounded-2xl blur-2xl bg-[#00AE43]/20"
+                />
+                <img
+                  src="/randing/quant-entry-screen.png"
+                  alt="Tuno 퀀트 분석 화면"
+                  className="relative w-full max-w-md md:max-w-lg lg:max-w-xl rounded-2xl"
+                />
+              </div>
             </div>
           </div>
-
-          {/* Button - absolute, positioned from bottom */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="absolute bottom-168 sm:bottom-130 left-1/2 -translate-x-1/2"
-          >
-            <Link
-              href="/analysis/quant"
-              className="inline-block px-4 py-2 sm:px-6 sm:py-3 bg-white text-randing-accent rounded-full font-bold text-sm mobile:text-base sm:text-lg transition-colors shadow-[0_3px_15px_rgba(0,0,0,0.3)] sm:shadow-[0_6px_25px_rgba(0,0,0,0.5)]"
-            >
-              무료로 시작하기
-            </Link>
-          </motion.div>
         </motion.div>
 
         {/* 2. THE DOORS & LOCK UI (hidden on mobile via CSS) */}
@@ -383,7 +383,46 @@ const SlidingDoorsHero = () => {
             </div>
           </motion.div>
 
-          {/* 3. CENTER LOCK UI */}
+          {/* 3. SCROLL HINT */}
+          <motion.div
+            style={{ opacity: scrollHintOpacity }}
+            className="absolute bottom-12 left-1/2 z-[60] pointer-events-none"
+          >
+            {/* Text - 중앙 기준 왼쪽 */}
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text text-white/40 tracking-[0.15em] uppercase">
+              Scroll
+            </span>
+            {/* Chevron Cascade - 중앙 기준 오른쪽 */}
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col items-center -space-y-1">
+              {[0, 1, 2].map((i) => (
+                <motion.svg
+                  key={i}
+                  width="34"
+                  height="17"
+                  viewBox="0 0 16 8"
+                  className="text-white/30"
+                  animate={{ opacity: [0.15, 0.6, 0.15] }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: i * 0.2,
+                  }}
+                >
+                  <path
+                    d="M1 1 L8 6 L15 1"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                  />
+                </motion.svg>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* 4. CENTER LOCK UI */}
           <div className="absolute top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
             {/* === A. VERTICAL LATCH BARS (Mechanical Split) === */}
             {/* Top Latch - Moves UP */}

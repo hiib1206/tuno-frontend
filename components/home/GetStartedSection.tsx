@@ -33,10 +33,10 @@ const CTAButton = ({ children }: { children: React.ReactNode }) => {
     >
       <Link
         href="/analysis/quant"
-        className="group relative inline-flex items-center gap-2 px-10 py-4 bg-white text-randing-accent rounded-full font-bold text-lg cursor-pointer transition-shadow duration-500 hover:shadow-[0_0_50px_rgba(255,255,255,0.25)]"
+        className="group relative inline-flex items-center gap-2 px-8 py-3 bg-white text-randing-accent rounded-full font-bold text-lg cursor-pointer transition-shadow duration-500 hover:shadow-[0_0_50px_rgba(255,255,255,0.25)]"
       >
         {children}
-        <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-300" />
+        <ArrowRight className="w-4 h-4 mobile:w-5 mobile:h-5 group-hover:translate-x-1.5 transition-transform duration-300" />
       </Link>
     </motion.div>
   );
@@ -154,7 +154,7 @@ const GetStartedSection = () => {
               ease: "easeInOut",
             }}
           />
-          <CTAButton>무료로 시작하기</CTAButton>
+          <CTAButton><span className="text-xs mobile:text-base">무료로 시작하기</span></CTAButton>
         </motion.div>
 
         {/* Bottom note */}

@@ -7,10 +7,6 @@ import type { Metadata, Viewport } from "next";
 import { Bungee_Shade, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 
-/**
- * 삼성 인터넷 등 모바일 브라우저의 강제 다크모드 변환을 방지한다.
- * Next.js가 자동으로 head 최상단에 `<meta name="color-scheme">` 태그를 렌더링한다.
- */
 export const viewport: Viewport = {
   colorScheme: "light dark",
 };
@@ -35,6 +31,9 @@ export const metadata: Metadata = {
     icon: "/favicon-32x32.png",
     apple: "/apple-icon-180x180.png",
   },
+  other: {
+    "color-scheme": "light dark",
+  },
 };
 
 export default function RootLayout({
@@ -49,6 +48,10 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${instrumentSans.variable} ${bungeeShade.variable}`}
     >
+      <head>
+        {/* 삼성 인터넷 강제 다크모드 방지 - 반드시 head 최상단에 위치해야 함 */}
+        <meta name="color-scheme" content="light dark" />
+      </head>
       <body className={`font-sans antialiased bg-background-2`}>
         <ThemeProvider
           attribute="class"

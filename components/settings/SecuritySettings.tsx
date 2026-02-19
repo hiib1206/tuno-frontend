@@ -104,7 +104,7 @@ export function SecuritySettings() {
       await logout();
       const redirectPath = pathname.startsWith("/community")
         ? "/community"
-        : "/workspace/analysis/quant";
+        : "/analysis/quant";
       router.push(redirectPath);
     } catch (err: any) {
       const message =

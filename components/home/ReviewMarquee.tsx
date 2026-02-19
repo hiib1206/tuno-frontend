@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useRef } from "react";
+import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef, useState } from "react";
 
 interface Review {
   name: string;
@@ -151,6 +152,16 @@ const TiltCard = ({ review, index }: { review: Review; index: number }) => {
 };
 
 export default function ReviewMarquee() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? reviews.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev === reviews.length - 1 ? 0 : prev + 1));
+  };
+
   return (
     <section className="py-28 md:py-40 bg-[#f8f8f8]">
       <div className="max-w-6xl mx-auto px-6 sm:px-8 md:px-16">
@@ -170,8 +181,57 @@ export default function ReviewMarquee() {
           </h2>
         </motion.div>
 
-        {/* Card Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+        {/* Mobile: Carousel with arrows */}
+        <div className="sm:hidden">
+          {/* Card */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentIndex}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <TiltCard review={reviews[currentIndex]} index={0} />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Navigation: arrows + dots */}
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <button
+              onClick={handlePrev}
+              className="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-slate-500 hover:text-[#00AE43] transition-colors"
+              aria-label="이전 리뷰"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            {/* Dots */}
+            <div className="flex gap-2">
+              {reviews.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentIndex(i)}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    i === currentIndex ? "bg-[#00AE43]" : "bg-slate-300"
+                  }`}
+                  aria-label={`리뷰 ${i + 1}로 이동`}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={handleNext}
+              className="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-slate-500 hover:text-[#00AE43] transition-colors"
+              aria-label="다음 리뷰"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Desktop: Grid */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
           {reviews.map((review, i) => (
             <TiltCard key={i} review={review} index={i} />
           ))}
