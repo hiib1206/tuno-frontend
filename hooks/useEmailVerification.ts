@@ -1,44 +1,57 @@
 import authApi from "@/api/authApi";
 import { useEffect, useState } from "react";
 
+/** 이메일 유효성 상태 타입 */
 type EmailStatus = "idle" | "valid" | "invalid";
 
+/** useEmailVerification 훅 반환 타입 */
+/** useEmailVerification 훅 반환 타입 */
 interface UseEmailVerificationReturn {
-  // 이메일 입력값
+  /** 이메일 입력값 */
   email: string;
+  /** 이메일 설정 함수 */
   setEmail: (email: string) => void;
-
-  // 이메일 유효성 검사 상태
+  /** 이메일 유효성 상태 */
   emailStatus: EmailStatus;
+  /** 이메일 유효성 메시지 */
   emailMessage: string;
-
-  // 이메일 인증 코드 상태
+  /** 인증 코드 입력값 */
   emailCode: string;
+  /** 인증 코드 설정 함수 */
   setEmailCode: (code: string) => void;
+  /** 인증 코드 메시지 */
   emailCodeMessage: string;
+  /** 인증 코드 발송 여부 */
   isCodeSent: boolean;
+  /** 인증 코드 발송 중 여부 */
   isSendingCode: boolean;
+  /** 인증 코드 검증 중 여부 */
   isVerifying: boolean;
+  /** 이메일 인증 완료 여부 */
   emailVerified: boolean;
+  /** 재발송 대기 잔여 시간 (초) */
   remainingSeconds: number;
+  /** 인증 코드 만료까지 잔여 시간 (초) */
   codeExpiresIn: number;
+  /** 인증 코드 발송 메시지 */
   codeSentMessage: string;
+  /** 회원가입 토큰 */
   signupToken: string | null;
-
-  // 에러 상태
+  /** 에러 메시지 */
   emailError: string;
-
-  // 시도 횟수 관련
+  /** 인증 시도 횟수 */
   attempts: number;
+  /** 최대 인증 시도 횟수 */
   maxAttempts: number;
-
-  // 핸들러 함수
+  /** 인증 코드 발송 함수 */
   handleSendEmailCode: () => Promise<void>;
+  /** 인증 코드 재발송 함수 */
   handleResendEmailCode: () => Promise<void>;
+  /** 인증 코드 검증 함수 */
   handleVerifyEmailCode: () => Promise<void>;
+  /** 이메일 변경 함수 (인증 상태 초기화) */
   handleChangeEmail: () => void;
-
-  // 초기화 함수
+  /** 전체 상태 초기화 함수 */
   reset: () => void;
 }
 

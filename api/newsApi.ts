@@ -1,82 +1,119 @@
 import { NewsTopicId } from "@/lib/community";
 import apiClient from "./apiClient";
 
-// 뉴스 아이템 타입
+/** 뉴스 아이템 */
 export interface NewsItem {
+  /** 뉴스 ID */
   id: string;
+  /** 뉴스 제목 */
   title: string;
+  /** 출처 */
   source: string;
+  /** 기사 링크 */
   link: string;
+  /** 발행일 */
   pubDate: string;
+  /** 썸네일 이미지 URL */
   thumbnail?: string;
 }
 
-// 뉴스 조회 응답 타입
+/** 뉴스 조회 응답 */
 export interface NewsResponse {
   success: boolean;
   message: string;
   data: {
+    /** 뉴스 목록 */
     news: NewsItem[];
+    /** 다음 페이지 커서 */
     nextCursor: string | null;
+    /** 다음 페이지 존재 여부 */
     hasNextPage: boolean;
   };
 }
 
-// 뉴스 조회 파라미터 타입
+/** 뉴스 조회 파라미터 */
 export interface GetNewsParams {
+  /** 페이지네이션 커서 */
   cursor?: string;
+  /** 조회 개수 */
   limit?: number;
 }
 
-// 토픽별 뉴스 조회 파라미터 타입
+/** 토픽별 뉴스 조회 파라미터 */
 export interface GetNewsByTopicParams {
-  topicId: NewsTopicId | string; // 토픽 ID (Google News 토픽 ID)
+  /** 토픽 ID (Google News 토픽 ID) */
+  topicId: NewsTopicId | string;
+  /** 페이지네이션 커서 */
   cursor?: string;
-  limit?: number; // 1~10, 기본값 10
+  /** 조회 개수 (1~10, 기본값 10) */
+  limit?: number;
 }
 
-// 뉴스 검색 파라미터 타입
+/** 뉴스 검색 파라미터 */
 export interface GetNewsSearchParams {
-  q: string; // 검색어 (1~200자, 필수)
-  cursor?: string; // 페이지네이션 커서
-  limit?: number; // 1~10, 기본값 10
+  /** 검색어 (1~200자, 필수) */
+  q: string;
+  /** 페이지네이션 커서 */
+  cursor?: string;
+  /** 조회 개수 (1~10, 기본값 10) */
+  limit?: number;
 }
 
-// 뉴스 이미지 추출 작업 요청 타입
+/** 뉴스 이미지 추출 작업 요청 파라미터 */
 export interface CreateNewsJobParams {
-  urls: string[]; // Google News RSS URL 배열 (1~20개)
+  /** Google News RSS URL 배열 (1~20개) */
+  urls: string[];
 }
 
-// 뉴스 이미지 추출 작업 응답 타입
+/** 뉴스 이미지 추출 작업 응답 */
 export interface CreateNewsJobResponse {
   success: boolean;
   message: string;
   data: {
-    jobId: string; // UUID
+    /** 작업 ID (UUID) */
+    jobId: string;
   };
 }
 
-// 뉴스 이미지 추출 결과 타입 (SSE success 이벤트)
+/** 뉴스 이미지 추출 결과 (SSE success 이벤트) */
 export interface NewsImageResult {
+  /** RSS URL */
   rssUrl: string;
+  /** 원본 기사 URL */
   originalUrl: string;
+  /** 추출된 썸네일 URL */
   thumbnail: string;
 }
 
-// 뉴스 이미지 추출 에러 타입 (SSE error 이벤트)
+/** 뉴스 이미지 추출 에러 (SSE error 이벤트) */
 export interface NewsImageError {
+  /** RSS URL */
   rssUrl: string;
+  /** 에러 메시지 */
   message: string;
 }
 
-// SSE 스트리밍 콜백 타입
+/** 뉴스 이미지 SSE 스트리밍 콜백 */
 export interface StreamNewsImagesCallbacks {
+  /** 개별 이미지 추출 성공 시 호출 */
   onSuccess: (result: NewsImageResult) => void;
+  /** 개별 이미지 추출 실패 시 호출 */
   onError?: (error: NewsImageError) => void;
+  /** 모든 작업 완료 시 호출 */
   onCompleted?: () => void;
 }
 
-// SSE 스트리밍 함수
+/**
+ * 뉴스 이미지 추출 SSE 스트림을 연결한다.
+ *
+ * @remarks
+ * EventSource를 사용하여 서버로부터 실시간으로 이미지 추출 결과를 수신한다.
+ * 연결 에러 시 자동 재연결을 시도하며, completed 이벤트를 받을 때까지 연결을 유지한다.
+ *
+ * @param jobId - 이미지 추출 작업 ID
+ * @param callbacks - 이벤트 콜백
+ * @returns EventSource 인스턴스 (수동 종료 시 close() 호출)
+ */
 export function streamNewsImages(
   jobId: string,
   callbacks: StreamNewsImagesCallbacks
@@ -86,38 +123,40 @@ export function streamNewsImages(
     `${baseUrl}/api/news/jobs/${jobId}/stream`
   );
 
-  // 개별 성공
   eventSource.addEventListener("success", (e) => {
     const result: NewsImageResult = JSON.parse((e as MessageEvent).data);
     callbacks.onSuccess(result);
   });
 
-  // 개별 실패
   eventSource.addEventListener("error", (e) => {
     const error: NewsImageError = JSON.parse((e as MessageEvent).data);
     callbacks.onError?.(error);
   });
 
-  // 모든 작업 완료
   eventSource.addEventListener("completed", () => {
     eventSource.close();
     callbacks.onCompleted?.();
   });
 
-  // 연결 에러 (네트워크 문제 등)
-  // 주의: EventSource는 자동으로 재연결을 시도하므로
-  // onerror에서 close()를 호출하면 안 됩니다.
-  // completed 이벤트를 받을 때까지 연결을 유지해야 합니다.
-  eventSource.onerror = () => {
-    // close() 제거 - completed 이벤트를 받을 때까지 연결 유지
-    // EventSource가 자동으로 재연결을 시도하도록 함
-  };
+  // EventSource는 자동으로 재연결을 시도하므로 onerror에서 close()를 호출하지 않는다.
+  eventSource.onerror = () => {};
 
   return eventSource;
 }
 
+/**
+ * 뉴스 관련 API
+ *
+ * @remarks
+ * 뉴스 목록 조회, 토픽별 조회, 검색, 이미지 추출 작업을 처리한다.
+ */
 const newsApi = {
-  // 뉴스 목록 조회 (커서 기반 페이지네이션)
+  /**
+   * 뉴스 목록을 조회한다.
+   *
+   * @param cursor - 페이지네이션 커서
+   * @param limit - 조회 개수
+   */
   getNews: async (cursor?: string, limit?: number): Promise<NewsResponse> => {
     const queryParams = new URLSearchParams();
     if (cursor) queryParams.append("cursor", cursor);
@@ -138,7 +177,11 @@ const newsApi = {
     };
   },
 
-  // 토픽별 뉴스 조회 (커서 기반 페이지네이션)
+  /**
+   * 토픽별 뉴스를 조회한다.
+   *
+   * @param params - 조회 파라미터
+   */
   getNewsByTopic: async ({
     topicId,
     cursor,
@@ -164,7 +207,11 @@ const newsApi = {
     };
   },
 
-  // 뉴스 검색 (커서 기반 페이지네이션)
+  /**
+   * 뉴스를 검색한다.
+   *
+   * @param params - 검색 파라미터
+   */
   searchNews: async ({
     q,
     cursor,
@@ -190,7 +237,11 @@ const newsApi = {
     };
   },
 
-  // 뉴스 이미지 추출 작업 예약
+  /**
+   * 뉴스 이미지 추출 작업을 예약한다.
+   *
+   * @param params - 작업 요청 파라미터
+   */
   createJob: async ({
     urls,
   }: CreateNewsJobParams): Promise<CreateNewsJobResponse> => {

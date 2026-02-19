@@ -248,10 +248,7 @@ export function ThemeTreemap({ data, onSelectTheme, onRefresh }: ThemeTreemapPro
     <div className="h-full w-full p-4 bg-background-1 rounded-md flex flex-col">
       {/* 헤더 */}
       <div className="flex justify-between items-center mb-2">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-foreground">주요 테마</h2>
-          <span className="text-xs text-muted-foreground">※ 실시간 정보는 제공되지 않습니다</span>
-        </div>
+        <h2 className="text-lg font-bold text-foreground">주요 테마</h2>
         <div className="flex items-center gap-2">
           {/* 정렬 기준 선택 */}
           <div className="flex rounded overflow-hidden border border-border">

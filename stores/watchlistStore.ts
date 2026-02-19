@@ -2,31 +2,36 @@ import stockApi from "@/api/stockApi";
 import { ExchangeCode, WatchlistItem } from "@/types/Stock";
 import { create } from "zustand";
 
+/**
+ * 관심종목 스토어 인터페이스
+ *
+ * @remarks
+ * 관심종목 CRUD, 순서 변경, 토글 기능을 관리한다.
+ */
 interface WatchlistStore {
+  /** 관심종목 목록 */
   items: WatchlistItem[];
+  /** 로딩 중 여부 */
   isLoading: boolean;
+  /** 에러 메시지 */
   error: string | null;
-
-  // 관심종목 목록 조회
+  /** 관심종목 목록을 조회한다. */
   fetchWatchlist: () => Promise<void>;
-
-  // 관심종목 토글 (추가/제거)
+  /** 관심종목을 토글한다 (추가/제거). */
   toggleWatchlist: (code: string, exchange: ExchangeCode) => Promise<boolean>;
-
-  // 관심종목 순서 변경 (드래그 앤 드롭)
+  /** 관심종목 순서를 로컬에서 변경한다. */
   updateOrder: (newItems: WatchlistItem[]) => void;
+  /** 관심종목 순서를 서버에 저장한다. */
   updateOrderWithApi: (newItems: WatchlistItem[]) => Promise<boolean>;
-
-  // 전체 삭제
+  /** 모든 관심종목을 삭제한다. */
   removeAll: () => Promise<boolean>;
-
-  // 특정 종목이 관심종목인지 확인
+  /** 특정 종목이 관심종목인지 확인한다. */
   isInWatchlist: (code: string, exchange: ExchangeCode) => boolean;
-
-  // 초기화 (로그아웃 시)
+  /** 스토어를 초기화한다. */
   reset: () => void;
 }
 
+/** 관심종목 스토어 */
 export const useWatchlistStore = create<WatchlistStore>()((set, get) => ({
   items: [],
   isLoading: false,

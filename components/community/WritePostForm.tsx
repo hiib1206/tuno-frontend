@@ -48,17 +48,17 @@ export function WritePostForm({
     initialData?.content || null
   ); // JSON 객체로 저장 (성능 최적화)
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  // SSR에서는 null로 시작하여 hydration mismatch 방지
+  const [isSmallScreen, setIsSmallScreen] = useState<boolean | null>(null);
   const editorRef = useRef<Editor | null>(null);
   const [isEditorInitialized, setIsEditorInitialized] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const mql = window.matchMedia("(max-width: 639px)");
+    setIsSmallScreen(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsSmallScreen(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
   }, []);
 
   const handleContentUpdate = (html: string, json: any) => {
@@ -221,7 +221,7 @@ export function WritePostForm({
             content={initialData?.content || ""}
             onUpdate={handleContentUpdate}
             onEditorReady={handleEditorReady}
-            minHeight={isMobile ? "300px" : "400px"}
+            minHeight={isSmallScreen !== false ? "300px" : "400px"}
           />
         </div>
       </div>

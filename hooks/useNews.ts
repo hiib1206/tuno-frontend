@@ -7,6 +7,7 @@ import newsApi, {
 } from "@/api/newsApi";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+/** useNews 훅 옵션 */
 interface UseNewsOptions {
   /** 페이지네이션 활성화 여부 */
   enablePagination?: boolean;
@@ -18,17 +19,25 @@ interface UseNewsOptions {
   key?: string;
 }
 
+/** useNews 훅 반환 타입 */
 interface UseNewsReturn {
+  /** 뉴스 목록 */
   news: NewsItem[];
+  /** 초기 로딩 상태 */
   loading: boolean;
+  /** 에러 메시지 */
   error: string | null;
-  // 페이지네이션 관련 (enablePagination이 false일 때는 사용하지 않음)
+  /** 추가 로딩 상태 (페이지네이션) */
   loadingMore: boolean;
+  /** 다음 페이지 커서 */
   nextCursor: string | null;
+  /** 다음 페이지 존재 여부 */
   hasNextPage: boolean;
+  /** 추가 뉴스 로드 함수 */
   loadMore: () => void;
-  // 이미지 추출 관련 (enableImageExtraction이 false일 때는 빈 Set)
+  /** 이미지 추출 실패한 URL 집합 */
   failedImageUrls: Set<string>;
+  /** 이미지 추출 활성화 여부 */
   enableImageExtraction: boolean;
 }
 
@@ -93,7 +102,6 @@ export function useNews(
           onError: (error) => {
             // 실패한 URL을 Set에 추가하여 스켈레톤 제거
             if (enableImageExtraction) {
-              console.warn("이미지 추출 실패:", error);
               setFailedImageUrls((prev) => new Set(prev).add(error.rssUrl));
             }
           },
@@ -139,8 +147,14 @@ export function useNews(
 
           // 상태 업데이트
           if (enablePagination && !isInitial) {
-            // 페이지네이션: 기존 뉴스에 추가
-            setNews((prev) => [...prev, ...newNews]);
+            // 페이지네이션: 기존 뉴스에 추가 (중복 제거)
+            setNews((prev) => {
+              const existingIds = new Set(prev.map((item) => item.id));
+              const uniqueNewNews = newNews.filter(
+                (item) => !existingIds.has(item.id)
+              );
+              return [...prev, ...uniqueNewNews];
+            });
           } else {
             // 초기 로드 또는 페이지네이션 없음: 교체
             setNews(newNews);

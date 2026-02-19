@@ -26,31 +26,43 @@ import {
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+/** useStockChart 훅 옵션 */
 interface UseStockChartOptions {
+  /** 캔들 간격 */
   interval?: "1d";
+  /** 초기 로드 캔들 수 */
   limit?: number;
+  /** 당일 시세 정보 (당일 캔들 생성용) */
   stockQuote?: StockQuote | null;
 }
 
+/** useStockChart 훅 반환 타입 */
 interface UseStockChartResult {
-  // 로딩/에러 상태
+  /** 초기 데이터 로딩 상태 */
   isLoading: boolean;
+  /** 에러 메시지 */
   error: string | null;
-  // 시리즈 등록 함수
+  /** 캔들 시리즈 등록 함수 */
   registerCandleSeries: (series: ISeriesApi<"Candlestick">) => void;
+  /** 거래량 시리즈 등록 함수 */
   registerVolumeSeries: (series: ISeriesApi<"Histogram">) => void;
+  /** 이동평균선 시리즈 등록 함수 */
   registerMaSeries: (period: number, series: ISeriesApi<"Line">) => void;
-  // 실시간 데이터 업데이트 함수
+  /** 실시간 데이터 업데이트 함수 */
   updateRealtimeData: (data: StockRealtimeData) => void;
-  // 과거 데이터 로드
+  /** 과거 데이터 로드 함수 */
   loadMoreData: () => Promise<number>;
+  /** 추가 로드 가능한 데이터 존재 여부 */
   hasMoreData: boolean;
-  // 데이터 업데이트 이벤트 구독
+  /** 데이터 업데이트 이벤트 구독 함수 */
   onDataUpdate: (callback: () => void) => () => void;
 }
 
 /**
- * YYYYMMDD 형식을 Unix timestamp (초 단위)로 변환
+ * YYYYMMDD 형식을 Unix timestamp (초 단위)로 변환한다.
+ *
+ * @param dateStr - YYYYMMDD 형식 날짜 문자열
+ * @returns Unix timestamp (초 단위)
  */
 function dateStrToTimestamp(dateStr: string): UTCTimestamp {
   if (dateStr.length !== 8) return 0 as UTCTimestamp;
@@ -63,11 +75,17 @@ function dateStrToTimestamp(dateStr: string): UTCTimestamp {
 }
 
 /**
- * 통합 차트 관리 훅
- * - REST API로 초기 캔들 데이터 fetch
- * - 차트 시리즈 ref 관리
- * - 데이터는 ref로 관리하여 불필요한 리렌더링 방지
- * - 실시간 데이터는 외부에서 updateRealtimeData로 전달
+ * 주식 차트 데이터를 관리하는 통합 훅.
+ *
+ * @remarks
+ * REST API로 초기 캔들 데이터를 로드하고, 차트 시리즈를 ref로 관리한다.
+ * 데이터는 ref로 관리하여 불필요한 리렌더링을 방지하며,
+ * 실시간 데이터는 외부에서 updateRealtimeData로 전달받는다.
+ *
+ * @param code - 종목 코드
+ * @param market - 시장 코드 (KR/US)
+ * @param exchange - 거래소 코드
+ * @param options - 차트 옵션
  */
 export function useStockChart(
   code: string,

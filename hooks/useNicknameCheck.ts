@@ -1,8 +1,10 @@
 import userApi from "@/api/userApi";
 import { useEffect, useState } from "react";
 
+/** 닉네임 상태 타입 */
 type NickStatus = "idle" | "checking" | "available" | "unavailable";
 
+/** useNicknameCheck 훅 옵션 */
 interface UseNicknameCheckOptions {
   /**
    * 현재 사용 중인 닉네임 (동일하면 사용 가능으로 처리)
@@ -18,8 +20,11 @@ interface UseNicknameCheckOptions {
   debounceMs?: number;
 }
 
+/** useNicknameCheck 훅 반환 타입 */
 interface UseNicknameCheckReturn {
+  /** 닉네임 상태 */
   nickStatus: NickStatus;
+  /** 상태 메시지 */
   nickMessage: string;
 }
 

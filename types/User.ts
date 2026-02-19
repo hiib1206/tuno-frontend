@@ -1,27 +1,50 @@
 import { Role } from "./Common";
 
-// AuthProvider 타입 정의 (선택적)
+/** 인증 제공자 정보 */
 export interface AuthProvider {
-  provider: string; // 'local' | 'naver' | 'kakao' | 'google'
+  /** 인증 제공자 ('local' | 'naver' | 'kakao' | 'google') */
+  provider: string;
+  /** 연결 일시 */
   createdAt: Date;
 }
 
+/**
+ * 사용자 정보 클래스
+ *
+ * @remarks
+ * 백엔드 User 엔티티와 매핑되는 클라이언트 모델
+ */
 export class User {
+  /** 사용자 고유 ID */
   id: number;
-  username?: string | null; // ✅ nullable로 변경
+  /** 로그인 아이디 (소셜 로그인 전용 사용자는 null) */
+  username?: string | null;
+  /** 비밀번호 (응답에서는 제외됨) */
   pw?: string;
+  /** 닉네임 */
   nick: string;
+  /** 이메일 주소 */
   email?: string;
+  /** 이메일 인증 일시 */
   emailVerifiedAt?: Date;
+  /** 전화번호 */
   phone?: string;
+  /** 주소 */
   address?: string;
+  /** 사용자 권한 */
   role?: Role;
+  /** 프로필 이미지 URL */
   profileImageUrl?: string;
+  /** 프로필 이미지 수정 일시 */
   profileImageUpdatedAt?: Date;
+  /** 계정 생성 일시 */
   createdAt?: Date;
+  /** 계정 수정 일시 */
   updatedAt?: Date;
+  /** 계정 삭제 일시 */
   deletedAt?: Date;
-  authProviders?: AuthProvider[]; // ✅ 추가
+  /** 연결된 인증 제공자 목록 */
+  authProviders?: AuthProvider[];
 
   constructor(
     id: number,
@@ -57,6 +80,11 @@ export class User {
     this.authProviders = authProviders; // ✅ 추가
   }
 
+  /**
+   * Record 객체에서 User 인스턴스를 생성한다.
+   *
+   * @param map - 변환할 객체 (백엔드 API 응답)
+   */
   static fromMap(map: Record<string, any>): User {
     return new User(
       map.id,
@@ -106,6 +134,7 @@ export class User {
     );
   }
 
+  /** User 인스턴스를 Record 객체로 변환한다. */
   toMap(): Record<string, any> {
     return {
       id: this.id,
@@ -126,12 +155,16 @@ export class User {
     };
   }
 
-  // JSON 문자열을 User 객체로 변환
+  /**
+   * JSON 문자열에서 User 인스턴스를 생성한다.
+   *
+   * @param json - 변환할 JSON 문자열
+   */
   static fromJson(json: string): User {
     return User.fromMap(JSON.parse(json));
   }
 
-  // User 객체를 JSON 문자열로 변환
+  /** User 인스턴스를 JSON 문자열로 변환한다. */
   toJson(): string {
     return JSON.stringify(this.toMap());
   }

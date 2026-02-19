@@ -3,9 +3,17 @@ import { QueryProvider } from "@/components/QueryProvider";
 import { Toaster } from "@/components/ToastProvider";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bungee_Shade, Instrument_Sans } from "next/font/google";
 import "./globals.css";
+
+/**
+ * 삼성 인터넷 등 모바일 브라우저의 강제 다크모드 변환을 방지한다.
+ * Next.js가 자동으로 head 최상단에 `<meta name="color-scheme">` 태그를 렌더링한다.
+ */
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+};
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
@@ -41,9 +49,6 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${instrumentSans.variable} ${bungeeShade.variable}`}
     >
-      <head>
-        <meta name="color-scheme" content="light dark" />
-      </head>
       <body className={`font-sans antialiased bg-background-2`}>
         <ThemeProvider
           attribute="class"

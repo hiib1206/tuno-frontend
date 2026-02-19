@@ -5,6 +5,16 @@ import stockCommentApi from "@/api/stockCommentApi";
 import { toast } from "@/components/ToastProvider";
 import { StockComment, StockCommentOpinion } from "@/types/StockComment";
 
+/**
+ * 종목 댓글을 관리하는 훅.
+ *
+ * @remarks
+ * 댓글 목록 조회, 작성, 수정, 삭제 기능을 제공한다.
+ * 최근 100개 댓글을 오래된 순으로 정렬하여 표시한다.
+ *
+ * @param ticker - 종목 코드
+ * @param exchange - 거래소 코드
+ */
 export function useStockComments(ticker: string, exchange: string) {
   const [comments, setComments] = useState<StockComment[]>([]);
   const [isLoading, setIsLoading] = useState(true);

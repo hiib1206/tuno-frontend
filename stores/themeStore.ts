@@ -2,28 +2,45 @@ import themeApi from "@/api/themeApi";
 import { SpecialTheme, ThemeStock, ThemeStockInfo } from "@/types/Theme";
 import { create } from "zustand";
 
+/**
+ * 테마 스토어 인터페이스
+ *
+ * @remarks
+ * 특이테마 목록, 선택된 테마, 테마별 종목 정보를 관리한다.
+ */
 interface ThemeStore {
-  // 상태
+  /** 특이테마 목록 */
   themes: SpecialTheme[];
+  /** 선택된 테마 */
   selectedTheme: SpecialTheme | null;
+  /** 선택된 테마의 종목 목록 */
   stocks: ThemeStock[];
+  /** 선택된 테마의 정보 */
   stockInfo: ThemeStockInfo | null;
+  /** 테마 로딩 중 여부 */
   isLoadingThemes: boolean;
+  /** 종목 로딩 중 여부 */
   isLoadingStocks: boolean;
+  /** 테마 에러 메시지 */
   themesError: string | null;
+  /** 종목 에러 메시지 */
   stocksError: string | null;
-
-  // 액션
+  /** 테마 목록을 조회한다. */
   fetchThemes: (autoSelect?: boolean) => Promise<void>;
+  /** 테마 목록과 선택된 테마의 종목을 갱신한다. */
   refreshThemes: () => Promise<void>;
+  /** 테마를 선택한다. */
   selectTheme: (theme: SpecialTheme) => void;
+  /** 테마의 종목 목록을 조회한다. */
   fetchThemeStocks: (tmcode: string) => Promise<void>;
+  /** 스토어를 초기화한다. */
   reset: () => void;
 }
 
-// 종목 요청 카운터 — stale response 무시용
+/** 종목 요청 카운터 (stale response 무시용) */
 let stocksFetchId = 0;
 
+/** 테마 스토어 */
 export const useThemeStore = create<ThemeStore>()((set, get) => ({
   themes: [],
   selectedTheme: null,
@@ -34,7 +51,6 @@ export const useThemeStore = create<ThemeStore>()((set, get) => ({
   themesError: null,
   stocksError: null,
 
-  // 테마 로드 (autoSelect=true: 상승률 1위 자동 선택, false: 선택 안함)
   fetchThemes: async (autoSelect = true) => {
     if (get().isLoadingThemes) return;
 
@@ -82,7 +98,6 @@ export const useThemeStore = create<ThemeStore>()((set, get) => ({
     }
   },
 
-  // 폴링용 강제 갱신 (테마 목록 + 선택된 테마 종목)
   refreshThemes: async () => {
     try {
       const res = await themeApi.getSpecialThemes();
@@ -111,13 +126,11 @@ export const useThemeStore = create<ThemeStore>()((set, get) => ({
     }
   },
 
-  // 테마 선택
   selectTheme: (theme: SpecialTheme) => {
     set({ selectedTheme: theme });
     get().fetchThemeStocks(theme.tmcode);
   },
 
-  // 테마 종목 조회
   fetchThemeStocks: async (tmcode: string) => {
     const requestId = ++stocksFetchId;
     set({ isLoadingStocks: true, stocksError: null });
@@ -150,7 +163,6 @@ export const useThemeStore = create<ThemeStore>()((set, get) => ({
     }
   },
 
-  // 초기화 (로그아웃 시 등)
   reset: () => {
     set({
       themes: [],

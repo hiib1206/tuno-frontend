@@ -3,34 +3,42 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL!;
 
-/**
- * 사용 예시:
- * const { realtimeData } = useStockWebSocket("005930", {
- *   trCodes: ["H0UNCNT0", "H0STASP0"],
- *   onData: (trId, data) => {
- *     if (trId === "H0UNCNT0") {
- *       // 체결가 데이터 처리
- *     } else if (trId === "H0STASP0") {
- *       // 호가 데이터 처리
- *     }
- *   }
- * });
- */
+/** useStockWebSocket 훅 옵션 */
 interface UseStockWebSocketOptions {
+  /** WebSocket 연결 활성화 여부 */
   enabled?: boolean;
-  trCodes?: TrId[]; // 구독할 TR 코드 배열
-  onData?: (trId: string, data: any) => void; // TR 코드와 데이터를 함께 전달
+  /** 구독할 TR 코드 배열 */
+  trCodes?: TrId[];
+  /** 실시간 데이터 수신 시 호출되는 콜백 */
+  onData?: (trId: string, data: any) => void;
 }
 
+/** useStockWebSocket 훅 반환 타입 */
 interface UseStockWebSocketResult {
-  realtimeData: Record<string, any>; // TR 코드별 데이터
+  /** TR 코드별 실시간 데이터 */
+  realtimeData: Record<string, any>;
+  /** WebSocket 연결 상태 */
   isConnected: boolean;
+  /** 에러 메시지 */
   error: string | null;
 }
 
 /**
- * 실시간 주식 데이터를 수신하는 WebSocket 훅
- * 여러 TR 코드를 동시에 구독 가능
+ * 실시간 주식 데이터를 수신하는 WebSocket 훅.
+ *
+ * @remarks
+ * 여러 TR 코드를 동시에 구독 가능하며, 연결 끊김 시 자동 재연결을 지원한다.
+ *
+ * @param stockCode - 종목 코드
+ * @param options - WebSocket 옵션
+ *
+ * @example
+ * ```ts
+ * const { realtimeData } = useStockWebSocket("005930", {
+ *   trCodes: ["H0UNCNT0", "H0STASP0"],
+ *   onData: (trId, data) => console.log(trId, data),
+ * });
+ * ```
  */
 export function useStockWebSocket(
   stockCode: string,

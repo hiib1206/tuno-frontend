@@ -132,14 +132,15 @@ const CANDLES = RAW_CANDLES.map((c, i) => ({
 
 const SlidingDoorsHero = () => {
   const containerRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
+  // SSR에서는 null로 시작하여 hydration mismatch 방지. 애니메이션 제어에만 사용.
+  const [isSmallScreen, setIsSmallScreen] = useState<boolean | null>(null);
 
-  // Detect mobile (sm breakpoint = 640px)
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const mql = window.matchMedia("(max-width: 639px)");
+    setIsSmallScreen(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsSmallScreen(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
   }, []);
 
   const { scrollYProgress } = useScroll({
@@ -190,18 +191,21 @@ const SlidingDoorsHero = () => {
   // Door Chart Animation — left-to-right reveal (synced with Phase 1: 0 → 20%)
   const chartRevealW = useTransform(scrollYProgress, [0, 0.18], [0, CHART_W]);
 
+  // 애니메이션 비활성화 여부 (SSR/초기 로드 시에는 모바일처럼 즉시 표시)
+  const disableScrollAnimation = isSmallScreen !== false;
+
   return (
-    <section ref={containerRef} className={`relative ${isMobile ? "h-screen" : "h-[300vh]"}`}>
-      <div className={`${isMobile ? "" : "sticky"} top-0 h-screen w-full overflow-hidden flex items-center justify-center`}>
+    <section ref={containerRef} className="relative h-screen sm:h-[300vh]">
+      <div className="sm:sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
         {/* 1. REVEALED CONTENT */}
         {/* Base background - always visible */}
         <div className="absolute inset-0 z-0 bg-randing-background-1" />
 
         {/* Green overlay - fades in after doors fully open (immediate on mobile) */}
         <motion.div
-          initial={{ opacity: isMobile ? 1 : 0 }}
-          animate={{ opacity: isMobile || isBackgroundVisible ? 1 : 0 }}
-          transition={{ duration: isMobile ? 0 : 0.5, ease: "easeInOut" }}
+          initial={{ opacity: disableScrollAnimation ? 1 : 0 }}
+          animate={{ opacity: disableScrollAnimation || isBackgroundVisible ? 1 : 0 }}
+          transition={{ duration: disableScrollAnimation ? 0 : 0.5, ease: "easeInOut" }}
           className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,#00AE43_0%,#006B54_100%)]"
         >
           {/* Film grain texture */}
@@ -223,7 +227,7 @@ const SlidingDoorsHero = () => {
 
         {/* Content - visible as doors open (immediate on mobile) */}
         <motion.div
-          style={isMobile ? { opacity: 1, scale: 1 } : { scale: contentScale, opacity: contentOpacity }}
+          style={disableScrollAnimation ? { opacity: 1, scale: 1 } : { scale: contentScale, opacity: contentOpacity }}
           className="absolute inset-0 z-10"
         >
           {/* Text - absolute, positioned from top */}

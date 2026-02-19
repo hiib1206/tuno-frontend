@@ -71,7 +71,8 @@ const FeatureSection = ({
   feature: Feature;
 }) => {
   const container = useRef(null);
-  const [isDesktop, setIsDesktop] = useState(false);
+  // SSR에서는 null로 시작하여 hydration mismatch 방지
+  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
@@ -86,10 +87,11 @@ const FeatureSection = ({
     offset: ["start end", "start start"],
   });
 
+  // 패럴랙스: 데스크탑에서만 활성화 (SSR/모바일에서는 비활성화)
   const y = useTransform(
     scrollYProgress,
     [0, 1],
-    isDesktop ? ["-15%", "15%"] : ["0%", "0%"],
+    isDesktop === true ? ["-15%", "15%"] : ["0%", "0%"],
   );
   const isReversed = i % 2 !== 0;
 

@@ -1,14 +1,22 @@
+/** 요금제 기능 항목 */
 export interface PlanFeature {
+  /** 기능 라벨 */
   label: string;
+  /** Free 요금제 지원 여부 (boolean 또는 문자열) */
   free: boolean | string;
+  /** Pro 요금제 지원 여부 (boolean 또는 문자열) */
   pro: boolean | string;
 }
 
+/** 요금제 기능 그룹 */
 export interface PlanFeatureGroup {
+  /** 카테고리명 */
   category: string;
+  /** 기능 목록 */
   features: PlanFeature[];
 }
 
+/** 요금제별 기능 그룹 목록 */
 export const planFeatureGroups: PlanFeatureGroup[] = [
   {
     category: "AI 주식 분석",
@@ -27,12 +35,15 @@ export const planFeatureGroups: PlanFeatureGroup[] = [
   },
 ];
 
+/** 요금제 정보 */
 export const planInfo = {
+  /** Free 요금제 */
   FREE: {
     name: "Free",
     price: 0,
     description: "기본적인 투자 분석을 무료로 시작하세요.",
   },
+  /** Pro 요금제 */
   PRO: {
     name: "Pro",
     price: 9900,

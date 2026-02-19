@@ -1,4 +1,9 @@
-// AI 모델 정보
+/**
+ * AI 모델 정보 상수
+ *
+ * @remarks
+ * 각 AI 모델의 이름, 라벨, 설명, 주요 기능을 정의한다.
+ */
 export const aiModels = {
   "prophet-v2": {
     name: "Prophet v2.0",
@@ -23,4 +28,5 @@ export const aiModels = {
   },
 } as const;
 
+/** AI 모델 키 타입 */
 export type AIModelKey = keyof typeof aiModels;

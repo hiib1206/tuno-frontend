@@ -5,28 +5,48 @@ import { useAuthStore } from "@/stores/authStore";
 import { Notification } from "@/types/Notification";
 import { create } from "zustand";
 
+/**
+ * 알림 스토어 인터페이스
+ *
+ * @remarks
+ * 알림 목록 관리, 읽음 처리, SSE 연결을 처리한다.
+ */
 interface NotificationStore {
-  // 상태
+  /** 알림 목록 */
   notifications: Notification[];
+  /** 읽지 않은 알림 수 */
   unreadCount: number;
+  /** 로딩 중 여부 */
   isLoading: boolean;
+  /** 추가 로드 가능 여부 */
   hasMore: boolean;
+  /** 다음 페이지 커서 */
   nextCursor: string | null;
+  /** 팝오버 열림 상태 */
   isPopoverOpen: boolean;
+  /** SSE 연결 해제 함수 (내부용) */
   _sseCleanup: (() => void) | null;
-
-  // 액션
+  /** 알림 목록을 조회한다. */
   fetchNotifications: () => Promise<void>;
+  /** 추가 알림을 로드한다. */
   fetchMore: () => Promise<void>;
+  /** 읽지 않은 알림 수를 조회한다. */
   fetchUnreadCount: () => Promise<void>;
+  /** 알림을 읽음 처리한다. */
   markAsRead: (id: string) => Promise<void>;
+  /** 모든 알림을 읽음 처리한다. */
   markAllAsRead: () => Promise<void>;
+  /** 팝오버 열림 상태를 설정한다. */
   setPopoverOpen: (open: boolean) => void;
+  /** SSE 연결을 시작한다. */
   connectSSE: () => void;
+  /** SSE 연결을 해제한다. */
   disconnectSSE: () => void;
+  /** 스토어를 초기화한다. */
   reset: () => void;
 }
 
+/** 초기 상태 */
 const INITIAL_STATE = {
   notifications: [] as Notification[],
   unreadCount: 0,
@@ -37,10 +57,10 @@ const INITIAL_STATE = {
   _sseCleanup: null as (() => void) | null,
 };
 
+/** 알림 스토어 */
 export const useNotificationStore = create<NotificationStore>()((set, get) => ({
   ...INITIAL_STATE,
 
-  // ── 목록 조회 (팝오버 열 때) ──────────────────────────
   fetchNotifications: async () => {
     set({ isLoading: true });
     try {
@@ -59,7 +79,6 @@ export const useNotificationStore = create<NotificationStore>()((set, get) => ({
     }
   },
 
-  // ── 추가 로드 (무한 스크롤) ──────────────────────────
   fetchMore: async () => {
     const { nextCursor, hasMore, isLoading } = get();
     if (!hasMore || isLoading || !nextCursor) return;
@@ -84,7 +103,6 @@ export const useNotificationStore = create<NotificationStore>()((set, get) => ({
     }
   },
 
-  // ── 읽지 않은 수 조회 (페이지 진입 시) ───────────────
   fetchUnreadCount: async () => {
     try {
       const response = await notificationApi.getUnreadCount();
@@ -96,7 +114,6 @@ export const useNotificationStore = create<NotificationStore>()((set, get) => ({
     }
   },
 
-  // ── 단건 읽음 처리 (optimistic) ──────────────────────
   markAsRead: async (id: string) => {
     const notification = get().notifications.find((n) => n.id === id);
     if (!notification || notification.readAt) return;
@@ -116,7 +133,6 @@ export const useNotificationStore = create<NotificationStore>()((set, get) => ({
     }
   },
 
-  // ── 전체 읽음 처리 (optimistic + revert) ─────────────
   markAllAsRead: async () => {
     const prev = {
       notifications: get().notifications,
@@ -138,12 +154,10 @@ export const useNotificationStore = create<NotificationStore>()((set, get) => ({
     }
   },
 
-  // ── 팝오버 열림/닫힘 상태 ───────────────────────────
   setPopoverOpen: (open: boolean) => {
     set({ isPopoverOpen: open });
   },
 
-  // ── SSE 연결 ───────────────────────────────────────
   connectSSE: () => {
     if (get()._sseCleanup) return;
 
@@ -173,7 +187,6 @@ export const useNotificationStore = create<NotificationStore>()((set, get) => ({
     set({ _sseCleanup: cleanup });
   },
 
-  // ── SSE 해제 ─────────────────────────────────────────
   disconnectSSE: () => {
     const cleanup = get()._sseCleanup;
     if (cleanup) {
@@ -182,7 +195,6 @@ export const useNotificationStore = create<NotificationStore>()((set, get) => ({
     }
   },
 
-  // ── 초기화 (로그아웃) ─────────────────────────────────
   reset: () => {
     get().disconnectSSE();
     set(INITIAL_STATE);

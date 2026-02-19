@@ -48,10 +48,11 @@ export default function DashboardLayout({
   const { fetchWatchlist, reset: resetWatchlist } = useWatchlistStore();
   const isLoggedIn = !!user;
 
-  const [isMobile, setIsMobile] = useState(false);
+  // SSR에서는 null로 시작하여 hydration mismatch 방지
+  const [isSmallScreen, setIsSmallScreen] = useState<boolean | null>(null);
   // 사이드바 관련
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [userClosedSidebar, setUserClosedSidebar] = useState(false); // 사용자가 수동으로 닫았는지 추적
+  const [userClosedSidebar, setUserClosedSidebar] = useState(false);
 
   // 로그인 요청 모달
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -68,37 +69,43 @@ export default function DashboardLayout({
 
   // 화면 크기 감지 및 반응형 처리
   useEffect(() => {
-    const checkMobile = () => {
-      const mobile = window.innerWidth < 1024; // lg breakpoint
-      const wasMobile = isMobile;
-      setIsMobile(mobile);
+    const mql = window.matchMedia("(max-width: 1023px)");
+
+    const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      const mobile = e.matches;
+      const wasMobile = isSmallScreen;
+      setIsSmallScreen(mobile);
+
+      // 초기 로드 시 (wasMobile === null)
+      if (wasMobile === null) {
+        if (mobile) {
+          setIsSidebarOpen(false);
+        }
+        return;
+      }
+
       // 모바일/데스크톱 전환 시에만 사이드바 상태 변경
       if (mobile && !wasMobile) {
-        // 데스크톱 -> 모바일: 사이드바 닫기
         setIsSidebarOpen(false);
         setUserClosedSidebar(false);
       } else if (!mobile && wasMobile) {
-        // 모바일 -> 데스크톱: 사용자가 닫지 않았다면 열기
         if (!userClosedSidebar) {
           setIsSidebarOpen(true);
         }
       }
     };
 
-    // 초기 체크
-    checkMobile();
-
-    // 리사이즈 이벤트 리스너
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    handleChange(mql);
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, [isSmallScreen, userClosedSidebar]);
 
   const handleToggle = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
   const handleOverlayClick = () => {
-    if (isMobile && isSidebarOpen) {
+    if (isSmallScreen && isSidebarOpen) {
       setIsSidebarOpen(false);
     }
   };
@@ -106,15 +113,15 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen w-full bg-background-2 overflow-hidden relative">
-      {/* 모바일 오버레이 - 사이드바 */}
-      {isMobile && isSidebarOpen && (
+      {/* 모바일 오버레이 - 사이드바 (CSS lg:hidden으로 데스크탑에서 숨김) */}
+      {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={handleOverlayClick}
         />
       )}
 
-      {/* 사이드바 */}
+      {/* 사이드바 - CSS 기본: 모바일에서 숨김, 데스크탑에서 표시 */}
       <div
         className={`
           fixed lg:static
@@ -122,16 +129,12 @@ export default function DashboardLayout({
           h-full
           z-50 lg:z-auto
           transition-transform duration-300 ease-in-out
-          ${isMobile
-            ? isSidebarOpen
-              ? "translate-x-0"
-              : "-translate-x-full"
-            : ""
-          }
+          -translate-x-full lg:translate-x-0
+          ${isSidebarOpen ? "!translate-x-0" : ""}
         `}
       >
         <Suspense fallback={<div className="w-64 h-full bg-background-1" />}>
-          <Sidebar isOpen={isSidebarOpen} onToggle={handleToggle} isMobile={isMobile} />
+          <Sidebar isOpen={isSidebarOpen} onToggle={handleToggle} isMobile={isSmallScreen === true} />
         </Suspense>
       </div>
 
@@ -140,8 +143,8 @@ export default function DashboardLayout({
         {/* 헤더 */}
         <div className="flex-shrink-0 z-30 bg-background-2">
           <div className="flex items-center gap-2 px-4 py-3 lg:px-6">
-            {/* 모바일: 햄버거 메뉴 */}
-            {isMobile && !isSidebarOpen && (
+            {/* 모바일: 햄버거 메뉴 (CSS lg:hidden으로 데스크탑에서 숨김) */}
+            {!isSidebarOpen && (
               <Button
                 variant="ghost"
                 size="icon"

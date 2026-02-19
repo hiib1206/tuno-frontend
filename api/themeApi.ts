@@ -9,33 +9,48 @@ import {
 } from "@/types/Theme";
 import apiClient from "./apiClient";
 
-// 특이테마 조회 쿼리 파라미터 타입
+/** 특이테마 조회 쿼리 파라미터 */
 type SpecialThemeQueryParams = {
-  gubun?: SpecialThemeGubun; // 정렬 기준 (기본값 "1")
+  /** 정렬 기준 (기본값 "1") */
+  gubun?: SpecialThemeGubun;
 };
 
-// 특이테마 조회 응답 타입
+/** 특이테마 조회 응답 */
 type SpecialThemeResult = {
   success: boolean;
   message: string;
   data: {
-    top: SpecialTheme[]; // 상위 15개 테마
-    bottom: SpecialTheme[]; // 하위 15개 테마
+    /** 상위 15개 테마 */
+    top: SpecialTheme[];
+    /** 하위 15개 테마 */
+    bottom: SpecialTheme[];
   } | null;
 };
 
-// 테마 종목 조회 응답 타입
+/** 테마 종목 조회 응답 */
 type ThemeStocksResult = {
   success: boolean;
   message: string;
   data: {
+    /** 테마 정보 */
     info: ThemeStockInfo;
+    /** 테마 종목 목록 */
     stocks: ThemeStock[];
   } | null;
 };
 
+/**
+ * 테마 관련 API
+ *
+ * @remarks
+ * 특이테마 조회 및 테마별 종목 조회를 처리한다.
+ */
 const themeApi = {
-  // 특이테마 조회
+  /**
+   * 특이테마 목록을 조회한다.
+   *
+   * @param params - 쿼리 파라미터
+   */
   getSpecialThemes: async (
     params?: SpecialThemeQueryParams
   ): Promise<SpecialThemeResult> => {
@@ -58,7 +73,11 @@ const themeApi = {
     };
   },
 
-  // 테마 종목 조회
+  /**
+   * 테마에 속한 종목 목록을 조회한다.
+   *
+   * @param tmcode - 테마 코드
+   */
   getThemeStocks: async (tmcode: string): Promise<ThemeStocksResult> => {
     const response = await apiClient.get(`/api/theme/${tmcode}/stocks`);
 

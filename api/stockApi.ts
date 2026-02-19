@@ -13,55 +13,70 @@ import {
 } from "@/types/Stock";
 import apiClient from "./apiClient";
 
-// 재무 데이터 조회 쿼리 파라미터 타입
+/** 재무 데이터 조회 쿼리 파라미터 */
 type FinancialsQueryParams = {
-  period?: "y" | "q"; // y: 연간, q: 분기
-  limit?: number; // 조회할 데이터 개수 (최소 1, 기본값 4)
-  order?: "asc" | "desc"; // 정렬 방향 (기본값 "desc")
+  /** 기간 구분 (y: 연간, q: 분기) */
+  period?: "y" | "q";
+  /** 조회할 데이터 개수 (최소 1, 기본값 4) */
+  limit?: number;
+  /** 정렬 방향 (기본값 "desc") */
+  order?: "asc" | "desc";
 };
-// 재무 데이터 조회 응답 타입
+
+/** 재무 데이터 조회 응답 */
 type FinancialsResult = {
   success: boolean;
   message: string;
   data: FinancialSummary[];
 };
 
-// 종목 정보 조회 쿼리 파라미터 타입
+/** 종목 정보 조회 쿼리 파라미터 */
 type StockInfoQueryParams = {
-  market: MarketCode; // 시장 코드 (KR: 국내, US: 미국)
-  exchange: ExchangeCode; // 거래소 코드 (KP, KQ, NAS, NYS, AMS)
+  /** 시장 코드 (KR: 국내, US: 미국) */
+  market: MarketCode;
+  /** 거래소 코드 (KP, KQ, NAS, NYS, AMS) */
+  exchange: ExchangeCode;
 };
-// 종목 정보 조회 응답 타입
+
+/** 종목 정보 조회 응답 */
 type StockInfoResult = {
   success: boolean;
   message: string;
   data: StockInfo | null;
 };
 
-// 지수 분봉 차트 조회 쿼리 파라미터 타입
+/** 지수 분봉 차트 조회 쿼리 파라미터 */
 type IndexMinuteChartQueryParams = {
-  interval?: "30" | "60" | "600" | "3600"; // 시간 간격(초), 기본값 "60"
-  include_past_data?: "true" | "false"; // 과거 포함 여부, 기본값 "false"
-  exclude_after_hours?: "true" | "false"; // 시간외 제외 여부, 기본값 "false"
+  /** 시간 간격(초), 기본값 "60" */
+  interval?: "30" | "60" | "600" | "3600";
+  /** 과거 데이터 포함 여부 */
+  include_past_data?: "true" | "false";
+  /** 시간외 데이터 제외 여부 */
+  exclude_after_hours?: "true" | "false";
 };
 
-// 지수 분봉 차트 조회 응답 타입
+/** 지수 분봉 차트 조회 응답 */
 type IndexMinuteChartResult = {
   success: boolean;
   message: string;
   data: IndexMinuteCandle[] | null;
 };
 
-// 지수 캔들 데이터 조회 쿼리 파라미터 타입
+/** 지수 캔들 데이터 조회 쿼리 파라미터 */
 type IndexCandleQueryParams = {
-  code: string; // 업종 코드 (0001: KOSPI, 1001: KOSDAQ)
-  interval: "1d" | "1w" | "1m" | "1y"; // 봉 단위 (일, 주, 월, 년)
-  limit?: number; // 조회 건수 (1~1000)
-  from?: number; // 시작일 (Unix timestamp, 초 단위)
-  to?: number; // 종료일 (Unix timestamp, 초 단위)
+  /** 업종 코드 (0001: KOSPI, 1001: KOSDAQ) */
+  code: string;
+  /** 봉 단위 (일, 주, 월, 년) */
+  interval: "1d" | "1w" | "1m" | "1y";
+  /** 조회 건수 (1~1000) */
+  limit?: number;
+  /** 시작일 (Unix timestamp, 초 단위) */
+  from?: number;
+  /** 종료일 (Unix timestamp, 초 단위) */
+  to?: number;
 };
 
-// 지수 캔들 데이터 조회 응답 타입
+/** 지수 캔들 데이터 조회 응답 */
 type IndexCandleResult = {
   success: boolean;
   message: string;
@@ -73,18 +88,25 @@ type IndexCandleResult = {
   } | null;
 };
 
-// 캔들 데이터 조회 쿼리 파라미터 타입
+/** 캔들 데이터 조회 쿼리 파라미터 */
 type CandleQueryParams = {
-  market: "KR" | "US"; // 시장 코드 (대문자)
-  exchange: string; // 거래소 코드 (KP, KQ, NAS, NYS, AMS 등)
-  code: string; // 종목 코드
-  interval: "1d"; // 봉 단위 (현재는 일봉만 지원)
-  limit?: number; // 조회할 봉 개수 (기본값: 250, 최대: 1000)
-  from?: number; // 시작 시각 (UTC seconds, Unix timestamp)
-  to?: number; // 종료 시각 (UTC seconds, Unix timestamp)
+  /** 시장 코드 (대문자) */
+  market: "KR" | "US";
+  /** 거래소 코드 (KP, KQ, NAS, NYS, AMS 등) */
+  exchange: string;
+  /** 종목 코드 */
+  code: string;
+  /** 봉 단위 (현재는 일봉만 지원) */
+  interval: "1d";
+  /** 조회할 봉 개수 (기본값: 250, 최대: 1000) */
+  limit?: number;
+  /** 시작 시각 (UTC seconds, Unix timestamp) */
+  from?: number;
+  /** 종료 시각 (UTC seconds, Unix timestamp) */
+  to?: number;
 };
 
-// 캔들 데이터 조회 응답 타입
+/** 캔들 데이터 조회 응답 */
 type CandleResult = {
   success: boolean;
   message: string;
@@ -97,7 +119,7 @@ type CandleResult = {
   } | null;
 };
 
-// 주식 검색 응답 타입 (data 구조 포함)
+/** 주식 검색 응답 */
 type StockSearchResultResponse = {
   success: boolean;
   message: string;
@@ -108,19 +130,22 @@ type StockSearchResultResponse = {
   } | null;
 };
 
-// 현재가 시세(Quote) 조회 쿼리 파라미터 타입
+/** 현재가 시세(Quote) 조회 쿼리 파라미터 */
 type StockQuoteQueryParams = {
+  /** 시장 구분 코드 (J: KRX, NX: NXT, UN: 통합) */
   market_division_code: "J" | "NX" | "UN";
+  /** 기간 타입 (D: 일, W: 주, M: 월) */
   period_type: "D" | "W" | "M";
 };
-// 현재가 시세(Quote) 조회 응답 타입
+
+/** 현재가 시세(Quote) 조회 응답 */
 type StockQuoteResult = {
   success: boolean;
   message: string;
   data: StockQuote | null;
 };
 
-// 관심종목 토글 응답 타입
+/** 관심종목 토글 응답 */
 type WatchlistToggleResult = {
   success: boolean;
   message: string;
@@ -129,12 +154,13 @@ type WatchlistToggleResult = {
   } | null;
 };
 
-// 관심종목 목록 조회 쿼리 파라미터 타입
+/** 관심종목 목록 조회 쿼리 파라미터 */
 type WatchlistQueryParams = {
-  exchange?: ExchangeCode; // 거래소 코드로 필터링 (선택)
+  /** 거래소 코드로 필터링 (선택) */
+  exchange?: ExchangeCode;
 };
 
-// 관심종목 목록 조회 응답 타입
+/** 관심종목 목록 조회 응답 */
 type WatchlistResult = {
   success: boolean;
   message: string;
@@ -144,13 +170,13 @@ type WatchlistResult = {
   } | null;
 };
 
-// 관심종목 순서 변경 요청 타입
+/** 관심종목 순서 변경 요청 항목 */
 type WatchlistOrderItem = {
   exchange: ExchangeCode;
   code: string;
 };
 
-// 관심종목 순서 변경 응답 타입
+/** 관심종목 순서 변경 응답 */
 type WatchlistOrderResult = {
   success: boolean;
   message: string;
@@ -159,7 +185,7 @@ type WatchlistOrderResult = {
   } | null;
 };
 
-// 전체 관심종목 삭제 응답 타입
+/** 전체 관심종목 삭제 응답 */
 type WatchlistDeleteResult = {
   success: boolean;
   message: string;
@@ -168,20 +194,32 @@ type WatchlistDeleteResult = {
   } | null;
 };
 
-// 호가 조회 쿼리 파라미터 타입
+/** 호가 조회 쿼리 파라미터 */
 type OrderbookQueryParams = {
-  market_division_code: "J" | "NX" | "UN"; // J: KRX, NX: NXT, UN: 통합
+  /** 시장 구분 코드 (J: KRX, NX: NXT, UN: 통합) */
+  market_division_code: "J" | "NX" | "UN";
 };
 
-// 호가 조회 응답 타입
+/** 호가 조회 응답 */
 type OrderbookResult = {
   success: boolean;
   message: string;
   data: StockOrderbookData | null;
 };
 
+/**
+ * 주식 관련 API
+ *
+ * @remarks
+ * 종목 정보, 시세, 캔들, 관심종목 등을 조회/관리한다.
+ */
 const stockApi = {
-  // 종목 정보 조회 (국내/해외 통합)
+  /**
+   * 종목 정보를 조회한다.
+   *
+   * @param code - 종목 코드
+   * @param params - 시장/거래소 정보
+   */
   getStockInfo: async (
     code: string,
     params: StockInfoQueryParams
@@ -196,7 +234,12 @@ const stockApi = {
     };
   },
 
-  // 재무 데이터 조회
+  /**
+   * 재무 데이터를 조회한다.
+   *
+   * @param code - 종목 코드
+   * @param params - 조회 옵션
+   */
   getFinancials: async (
     code: string,
     params?: FinancialsQueryParams
@@ -211,7 +254,12 @@ const stockApi = {
     };
   },
 
-  // 지수 분봉 차트 조회
+  /**
+   * 지수 분봉 차트를 조회한다.
+   *
+   * @param industryCode - 업종 코드
+   * @param params - 조회 옵션
+   */
   getIndexMinuteChart: async (
     industryCode: string,
     params?: IndexMinuteChartQueryParams
@@ -227,7 +275,11 @@ const stockApi = {
     };
   },
 
-  // 지수 캔들 데이터 조회
+  /**
+   * 지수 캔들 데이터를 조회한다.
+   *
+   * @param params - 조회 파라미터
+   */
   getIndexCandle: async (
     params: IndexCandleQueryParams
   ): Promise<IndexCandleResult> => {
@@ -241,7 +293,11 @@ const stockApi = {
     };
   },
 
-  // 캔들 데이터 조회
+  /**
+   * 종목 캔들 데이터를 조회한다.
+   *
+   * @param params - 조회 파라미터
+   */
   getCandle: async (params: CandleQueryParams): Promise<CandleResult> => {
     const response = await apiClient.get("/api/stock/candle", {
       params,
@@ -253,7 +309,12 @@ const stockApi = {
     };
   },
 
-  // 현재가 시세(Quote) 조회
+  /**
+   * 현재가 시세를 조회한다.
+   *
+   * @param code - 종목 코드
+   * @param params - 조회 옵션
+   */
   getStockQuote: async (
     code: string,
     params?: StockQuoteQueryParams
@@ -268,7 +329,11 @@ const stockApi = {
     };
   },
 
-  // 종목 검색
+  /**
+   * 종목을 검색한다.
+   *
+   * @param params - 검색 파라미터
+   */
   search: async (
     params: StockSearchQueryParams
   ): Promise<StockSearchResultResponse> => {
@@ -286,7 +351,12 @@ const stockApi = {
     };
   },
 
-  // 관심종목 토글 (추가/제거)
+  /**
+   * 관심종목을 토글한다 (추가/제거).
+   *
+   * @param code - 종목 코드
+   * @param exchange - 거래소 코드
+   */
   toggleWatchlist: async (
     code: string,
     exchange: ExchangeCode
@@ -305,7 +375,11 @@ const stockApi = {
     };
   },
 
-  // 관심종목 목록 조회
+  /**
+   * 관심종목 목록을 조회한다.
+   *
+   * @param params - 조회 옵션
+   */
   getWatchlist: async (
     params?: WatchlistQueryParams
   ): Promise<WatchlistResult> => {
@@ -322,7 +396,11 @@ const stockApi = {
     };
   },
 
-  // 관심종목 순서 변경
+  /**
+   * 관심종목 순서를 변경한다.
+   *
+   * @param order - 새로운 순서 배열
+   */
   updateWatchlistOrder: async (
     order: WatchlistOrderItem[]
   ): Promise<WatchlistOrderResult> => {
@@ -336,7 +414,7 @@ const stockApi = {
     };
   },
 
-  // 전체 관심종목 삭제
+  /** 전체 관심종목을 삭제한다. */
   deleteWatchlist: async (): Promise<WatchlistDeleteResult> => {
     const response = await apiClient.delete("/api/stock/watchlist");
     return {
@@ -346,7 +424,12 @@ const stockApi = {
     };
   },
 
-  // 호가 조회
+  /**
+   * 호가를 조회한다.
+   *
+   * @param code - 종목 코드
+   * @param params - 조회 옵션
+   */
   getOrderbook: async (
     code: string,
     params: OrderbookQueryParams

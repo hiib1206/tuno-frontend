@@ -2,25 +2,33 @@ import { PostCategory } from "@/types/Common";
 import { Post } from "@/types/Post";
 import apiClient from "./apiClient";
 
-// 쿼리 파라미터 타입
+/** 게시글 목록 조회 쿼리 파라미터 */
 type PostQueryParams = {
+  /** 페이지 번호 */
   page?: number;
+  /** 페이지당 항목 수 */
   limit?: number;
+  /** 정렬 기준 필드 */
   sort?: "created_at" | "view_count" | "title" | "comment_count" | "like_count";
+  /** 정렬 방향 */
   order?: "asc" | "desc";
+  /** 검색어 */
   search?: string;
+  /** 카테고리 필터 */
   category?: PostCategory;
 };
 
-// 여러 게시글 삭제 응답 타입
+/** 여러 게시글 삭제 응답 */
 type DeletePostsResult = {
   success: boolean;
   message: string;
   data: {
+    /** 삭제 성공 목록 */
     success: Array<{
       id: string;
       message: string;
     }>;
+    /** 삭제 실패 목록 */
     failed: Array<{
       id: string;
       message: string;
@@ -28,15 +36,17 @@ type DeletePostsResult = {
   };
 };
 
-// 좋아요 일괄 취소 응답 타입
+/** 좋아요 일괄 토글 응답 */
 type TogglePostLikesResult = {
   success: boolean;
   message: string;
   data: {
+    /** 토글 성공 목록 */
     success: Array<{
       id: string;
       message: string;
     }>;
+    /** 토글 실패 목록 */
     failed: Array<{
       id: string;
       message: string;
@@ -44,22 +54,34 @@ type TogglePostLikesResult = {
   };
 };
 
-// 게시글 목록 조회 응답 타입 (공통)
+/** 게시글 목록 조회 응답 (공통) */
 type PostsListResult = {
   success: boolean;
   message: string;
   data: {
+    /** 게시글 목록 */
     list: Post[];
+    /** 전체 게시글 수 */
     totalCount: number;
+    /** 현재 페이지 */
     page: number;
+    /** 페이지당 항목 수 */
     limit: number;
+    /** 전체 페이지 수 */
     totalPages: number;
+    /** 다음 페이지 존재 여부 */
     hasNextPage: boolean;
+    /** 이전 페이지 존재 여부 */
     hasPrevPage: boolean;
   };
 };
 
-// 쿼리 파라미터 구성 헬퍼 함수
+/**
+ * 쿼리 파라미터 객체를 URL 쿼리 문자열로 변환한다.
+ *
+ * @param params - 쿼리 파라미터 객체
+ * @returns URL 쿼리 문자열 (예: "?page=1&limit=10")
+ */
 const buildQueryParams = (params?: PostQueryParams): string => {
   if (!params) return "";
 
@@ -75,8 +97,18 @@ const buildQueryParams = (params?: PostQueryParams): string => {
   return queryString ? `?${queryString}` : "";
 };
 
+/**
+ * 게시글 관련 API
+ *
+ * @remarks
+ * 게시글 CRUD, 목록 조회, 좋아요 기능을 처리한다.
+ */
 const postApi = {
-  // 게시글 상세 조회
+  /**
+   * 게시글 상세를 조회한다.
+   *
+   * @param id - 게시글 ID
+   */
   getPostById: async (id: string) => {
     const response = await apiClient.get(`/api/post/${id}`);
     return {
@@ -88,7 +120,11 @@ const postApi = {
     };
   },
 
-  // 게시글 목록 조회
+  /**
+   * 게시글 목록을 조회한다.
+   *
+   * @param params - 쿼리 파라미터 (페이지, 정렬, 검색어 등)
+   */
   getPosts: async (params?: PostQueryParams): Promise<PostsListResult> => {
     const queryString = buildQueryParams(params);
     const url = `/api/post${queryString}`;
@@ -109,7 +145,11 @@ const postApi = {
     };
   },
 
-  // 내 게시글 목록 조회
+  /**
+   * 내가 작성한 게시글 목록을 조회한다.
+   *
+   * @param params - 쿼리 파라미터
+   */
   getMyPosts: async (params?: PostQueryParams): Promise<PostsListResult> => {
     const queryString = buildQueryParams(params);
     const url = `/api/post/me${queryString}`;
@@ -130,7 +170,11 @@ const postApi = {
     };
   },
 
-  // 좋아요한 게시글 목록 조회
+  /**
+   * 내가 좋아요한 게시글 목록을 조회한다.
+   *
+   * @param params - 쿼리 파라미터 (page, limit, order만 지원)
+   */
   getLikedPosts: async (
     params?: Pick<PostQueryParams, "page" | "limit" | "order">
   ): Promise<PostsListResult> => {
@@ -153,11 +197,22 @@ const postApi = {
     };
   },
 
-  // 게시글 생성 (FormData로 통일, 이미지 파일 포함/미포함 모두 처리)
+  /**
+   * 게시글을 생성한다.
+   *
+   * @remarks
+   * FormData로 전송하며, 이미지 파일 포함/미포함 모두 처리한다.
+   *
+   * @param title - 게시글 제목
+   * @param category - 게시글 카테고리
+   * @param content - 게시글 내용 (JSON 객체, 내부에서 문자열로 변환)
+   * @param imageFiles - 첨부 이미지 파일 배열
+   * @param blobUrlToIndex - Blob URL과 이미지 인덱스 매핑 (서버에서 순서 매칭용)
+   */
   createPost: async (
     title: string,
     category: PostCategory,
-    content: any, // JSON 객체 (내부에서 문자열로 변환)
+    content: any,
     imageFiles: File[],
     blobUrlToIndex: Map<string, number>
   ) => {
@@ -194,12 +249,24 @@ const postApi = {
     };
   },
 
-  // 게시글 수정 (FormData로 통일, 이미지 파일 포함/미포함 모두 처리)
+  /**
+   * 게시글을 수정한다.
+   *
+   * @remarks
+   * FormData로 전송하며, 이미지 파일 포함/미포함 모두 처리한다.
+   *
+   * @param id - 게시글 ID
+   * @param title - 게시글 제목
+   * @param category - 게시글 카테고리
+   * @param content - 게시글 내용 (JSON 객체, 내부에서 문자열로 변환)
+   * @param imageFiles - 첨부 이미지 파일 배열
+   * @param blobUrlToIndex - Blob URL과 이미지 인덱스 매핑
+   */
   updatePost: async (
     id: string,
     title: string,
     category: PostCategory,
-    content: any, // JSON 객체 (내부에서 문자열로 변환)
+    content: any,
     imageFiles: File[],
     blobUrlToIndex: Map<string, number>
   ) => {
@@ -236,7 +303,11 @@ const postApi = {
     };
   },
 
-  // 게시글 삭제
+  /**
+   * 게시글을 삭제한다.
+   *
+   * @param id - 게시글 ID
+   */
   deletePost: async (id: string) => {
     const response = await apiClient.delete(`/api/post/${id}`);
     return {
@@ -245,7 +316,11 @@ const postApi = {
     };
   },
 
-  // 여러 게시글 삭제
+  /**
+   * 여러 게시글을 일괄 삭제한다.
+   *
+   * @param ids - 삭제할 게시글 ID 배열
+   */
   deletePosts: async (ids: string[]): Promise<DeletePostsResult> => {
     const response = await apiClient.delete("/api/post", {
       data: { ids },
@@ -260,7 +335,11 @@ const postApi = {
     };
   },
 
-  // 좋아요 토글
+  /**
+   * 게시글 좋아요를 토글한다.
+   *
+   * @param id - 게시글 ID
+   */
   togglePostLike: async (id: string) => {
     const response = await apiClient.post(`/api/post/${id}/like`);
     return {
@@ -273,7 +352,11 @@ const postApi = {
     };
   },
 
-  // 좋아요 일괄 취소
+  /**
+   * 여러 게시글의 좋아요를 일괄 토글한다.
+   *
+   * @param ids - 게시글 ID 배열
+   */
   togglePostLikes: async (ids: string[]): Promise<TogglePostLikesResult> => {
     const response = await apiClient.post("/api/post/likes", { ids });
     return {

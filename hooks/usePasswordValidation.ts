@@ -1,15 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
 
+/** 비밀번호 상태 타입 */
 type PasswordStatus = "idle" | "valid" | "invalid";
+
+/** 비밀번호 강도 타입 */
 type PasswordStrength = "veryWeak" | "weak" | "medium" | "strong" | "veryStrong";
 
+/** 비밀번호 유효성 검증 결과 */
 interface PasswordValidation {
+  /** 최소 길이 충족 여부 */
   minLength: boolean;
+  /** 영문 포함 여부 */
   hasLetter: boolean;
+  /** 숫자 포함 여부 */
   hasNumber: boolean;
+  /** 특수문자 포함 여부 */
   hasSpecial: boolean;
 }
 
+/** usePasswordValidation 훅 반환 타입 */
 interface UsePasswordValidationReturn {
   /** 비밀번호 유효성 상태 */
   passwordStatus: PasswordStatus;
@@ -31,6 +40,7 @@ interface UsePasswordValidationReturn {
   reset: () => void;
 }
 
+/** 비밀번호 강도별 설정 */
 const STRENGTH_CONFIG = {
   veryWeak: {
     text: "매우 약함",
@@ -54,6 +64,7 @@ const STRENGTH_CONFIG = {
   },
 } as const;
 
+/** 조건별 에러 메시지 */
 const ERROR_MESSAGES = {
   minLength: "최소 8자 이상 입력해주세요.",
   hasLetter: "영문을 포함해주세요.",
@@ -61,6 +72,7 @@ const ERROR_MESSAGES = {
   hasSpecial: "특수문자를 포함해주세요.",
 } as const;
 
+/** 초기 유효성 검증 상태 */
 const INITIAL_VALIDATION: PasswordValidation = {
   minLength: false,
   hasLetter: false,

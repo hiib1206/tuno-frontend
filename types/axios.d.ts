@@ -1,9 +1,16 @@
 import "axios";
 
-// AxiosRequestConfig를 확장하여 skipRedirect 속성 추가
+/**
+ * AxiosRequestConfig 확장
+ *
+ * @remarks
+ * 커스텀 요청 옵션을 추가한다.
+ */
 declare module "axios" {
   export interface AxiosRequestConfig {
+    /** 401 응답 시 로그인 페이지 리다이렉트 건너뛰기 */
     skipRedirect?: boolean;
-    _retry?: boolean; // refresh 요청시 순환 요청 방지 플래그
+    /** 토큰 갱신 중 순환 요청 방지 플래그 */
+    _retry?: boolean;
   }
 }

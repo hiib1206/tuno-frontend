@@ -1,15 +1,31 @@
 import { User } from "./User";
 
+/**
+ * 게시물 댓글 클래스
+ *
+ * @remarks
+ * 백엔드 PostComment 엔티티와 매핑되는 클라이언트 모델.
+ * 대댓글 구조를 지원한다.
+ */
 export class PostComment {
-  id: string; // BigInt를 string으로 변환
-  postId: string; // BigInt를 string으로 변환
+  /** 댓글 ID (BigInt를 string으로 변환) */
+  id: string;
+  /** 게시물 ID (BigInt를 string으로 변환) */
+  postId: string;
+  /** 댓글 내용 */
   content: string;
-  parentId: string | null; // 부모 댓글 ID (최상위 댓글은 null)
+  /** 부모 댓글 ID (최상위 댓글은 null) */
+  parentId: string | null;
+  /** 작성 일시 */
   createdAt: Date;
+  /** 수정 일시 */
   updatedAt: Date;
-  deletedAt: Date | null; // 삭제일시
-  author: User | null; // 작성자 정보 (삭제된 댓글은 null)
-  replies?: PostComment[]; // 대댓글 배열 (최상위 댓글만 포함)
+  /** 삭제 일시 */
+  deletedAt: Date | null;
+  /** 작성자 정보 (삭제된 댓글은 null) */
+  author: User | null;
+  /** 대댓글 배열 (최상위 댓글만 포함) */
+  replies?: PostComment[];
 
   constructor(
     id: string,
@@ -33,6 +49,14 @@ export class PostComment {
     this.replies = replies;
   }
 
+  /**
+   * Record 객체에서 PostComment 인스턴스를 생성한다.
+   *
+   * @remarks
+   * replies가 있으면 재귀적으로 변환한다.
+   *
+   * @param map - 변환할 객체 (백엔드 API 응답)
+   */
   static fromMap(map: Record<string, any>): PostComment {
     const comment = new PostComment(
       String(map.id ?? ""),
@@ -57,7 +81,6 @@ export class PostComment {
       map.author ? User.fromMap(map.author) : null
     );
 
-    // replies가 있으면 재귀적으로 변환
     if (map.replies && Array.isArray(map.replies)) {
       comment.replies =
         map.replies.length > 0
@@ -68,6 +91,7 @@ export class PostComment {
     return comment;
   }
 
+  /** PostComment 인스턴스를 Record 객체로 변환한다. */
   toMap(): Record<string, any> {
     return {
       id: this.id,
