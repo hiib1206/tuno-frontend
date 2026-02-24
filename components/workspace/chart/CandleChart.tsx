@@ -552,19 +552,8 @@ export function CandleChart({
       if (logicalRange.from <= 20) {
         isLoadingMoreRef.current = true;
 
-        // 현재 visible range 저장
-        const currentRange = priceChart.timeScale().getVisibleLogicalRange();
-
-        // 과거 데이터 로드
-        const addedCount = await loadMoreDataRef.current();
-
-        // 뷰포트 위치 보정 (새로 추가된 데이터 개수만큼 오프셋)
-        if (addedCount > 0 && currentRange) {
-          priceChart.timeScale().setVisibleLogicalRange({
-            from: currentRange.from + addedCount,
-            to: currentRange.to + addedCount,
-          });
-        }
+        // timeScale 전달하여 setData() 직후 동기적으로 visible range 복원
+        await loadMoreDataRef.current(priceChart.timeScale());
 
         isLoadingMoreRef.current = false;
       }

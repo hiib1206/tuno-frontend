@@ -20,7 +20,9 @@ import {
   CandlestickData,
   HistogramData,
   ISeriesApi,
+  ITimeScaleApi,
   LineData,
+  Time,
   UTCTimestamp,
 } from "lightweight-charts";
 import { useTheme } from "next-themes";
@@ -50,8 +52,8 @@ interface UseStockChartResult {
   registerMaSeries: (period: number, series: ISeriesApi<"Line">) => void;
   /** 실시간 데이터 업데이트 함수 */
   updateRealtimeData: (data: StockRealtimeData) => void;
-  /** 과거 데이터 로드 함수 */
-  loadMoreData: () => Promise<number>;
+  /** 과거 데이터 로드 함수 (timeScale 전달 시 visible range 자동 보존) */
+  loadMoreData: (timeScale?: ITimeScaleApi<Time>) => Promise<number>;
   /** 추가 로드 가능한 데이터 존재 여부 */
   hasMoreData: boolean;
   /** 데이터 업데이트 이벤트 구독 함수 */
@@ -209,121 +211,131 @@ export function useStockChart(
   };
 
   // === 과거 데이터 로드 함수 ===
-  const loadMoreData = useCallback(async (): Promise<number> => {
-    // 이미 로딩 중이거나 더 불러올 데이터가 없으면 스킵
-    if (isLoadingMoreRef.current || !hasMoreData) return 0;
-    if (!oldestTimestampRef.current) return 0;
+  const loadMoreData = useCallback(
+    async (timeScale?: ITimeScaleApi<Time>): Promise<number> => {
+      // 이미 로딩 중이거나 더 불러올 데이터가 없으면 스킵
+      if (isLoadingMoreRef.current || !hasMoreData) return 0;
+      if (!oldestTimestampRef.current) return 0;
 
-    isLoadingMoreRef.current = true;
+      isLoadingMoreRef.current = true;
 
-    try {
-      const response = await stockApi.getCandle({
-        code,
-        market,
-        exchange,
-        interval,
-        limit: 250,
-        to: oldestTimestampRef.current - 1, // 현재 가장 오래된 것 이전부터
-      });
+      // setData() 후 뷰포트 복원을 위해 현재 visible range 저장
+      const currentRange = timeScale?.getVisibleLogicalRange();
 
-      if (response.success && response.data) {
-        const newCandles = response.data.candles;
+      try {
+        const response = await stockApi.getCandle({
+          code,
+          market,
+          exchange,
+          interval,
+          limit: 250,
+          to: oldestTimestampRef.current - 1,
+        });
 
-        // 데이터가 없으면 더 이상 불러올 데이터 없음
-        if (newCandles.length === 0) {
-          setHasMoreData(false);
-          return 0;
-        }
+        if (response.success && response.data) {
+          const newCandles = response.data.candles;
 
-        // 새 데이터 변환
-        const newPriceData = candlesToPriceData(newCandles);
-        const newVolumeData = candlesToVolumeData(newCandles);
-
-        // 기존 데이터 앞에 새 데이터 추가 (prepend)
-        const mergedPriceData = [
-          ...newPriceData,
-          ...loadedDataRef.current.priceData,
-        ];
-        const mergedVolumeData = [
-          ...newVolumeData,
-          ...loadedDataRef.current.volumeData,
-        ];
-        const mergedRawCandles = [
-          ...newCandles,
-          ...loadedDataRef.current.rawCandles,
-        ];
-
-        // 이동평균 재계산 (전체 데이터 기준)
-        const maData = new Map<number, MALineData[]>();
-        for (const config of DEFAULT_MA_CONFIGS) {
-          maData.set(
-            config.period,
-            calculateMA(mergedPriceData, config.period)
-          );
-        }
-
-        // ref 업데이트
-        loadedDataRef.current = {
-          priceData: mergedPriceData,
-          volumeData: mergedVolumeData,
-          rawCandles: mergedRawCandles,
-          maData,
-        };
-
-        // 가장 오래된 timestamp 업데이트
-        oldestTimestampRef.current = newPriceData[0].time as number;
-
-        // 차트에 전체 데이터 다시 설정
-        if (candleSeriesRef.current) {
-          try {
-            candleSeriesRef.current.setData(mergedPriceData);
-          } catch {
-            // 차트가 이미 dispose된 경우 무시
+          if (newCandles.length === 0) {
+            setHasMoreData(false);
+            return 0;
           }
-        }
 
-        if (volumeSeriesRef.current) {
-          try {
-            const coloredVolumeData = applyVolumeColors(
-              mergedVolumeData,
-              mergedPriceData
+          const newPriceData = candlesToPriceData(newCandles);
+          const newVolumeData = candlesToVolumeData(newCandles);
+
+          const mergedPriceData = [
+            ...newPriceData,
+            ...loadedDataRef.current.priceData,
+          ];
+          const mergedVolumeData = [
+            ...newVolumeData,
+            ...loadedDataRef.current.volumeData,
+          ];
+          const mergedRawCandles = [
+            ...newCandles,
+            ...loadedDataRef.current.rawCandles,
+          ];
+
+          const maData = new Map<number, MALineData[]>();
+          for (const config of DEFAULT_MA_CONFIGS) {
+            maData.set(
+              config.period,
+              calculateMA(mergedPriceData, config.period)
             );
-            volumeSeriesRef.current.setData(coloredVolumeData);
-          } catch {
-            // 차트가 이미 dispose된 경우 무시
           }
-        }
 
-        // 이동평균선 데이터 설정
-        for (const [period, data] of maData) {
-          const maSeries = maSeriesRef.current.get(period);
-          if (maSeries && data.length > 0) {
+          loadedDataRef.current = {
+            priceData: mergedPriceData,
+            volumeData: mergedVolumeData,
+            rawCandles: mergedRawCandles,
+            maData,
+          };
+
+          oldestTimestampRef.current = newPriceData[0].time as number;
+
+          // 차트에 전체 데이터 설정 후 즉시 visible range 복원
+          if (candleSeriesRef.current) {
             try {
-              maSeries.setData(data as LineData[]);
+              candleSeriesRef.current.setData(mergedPriceData);
             } catch {
               // 차트가 이미 dispose된 경우 무시
             }
           }
+
+          if (volumeSeriesRef.current) {
+            try {
+              const coloredVolumeData = applyVolumeColors(
+                mergedVolumeData,
+                mergedPriceData
+              );
+              volumeSeriesRef.current.setData(coloredVolumeData);
+            } catch {
+              // 차트가 이미 dispose된 경우 무시
+            }
+          }
+
+          for (const [period, data] of maData) {
+            const maSeries = maSeriesRef.current.get(period);
+            if (maSeries && data.length > 0) {
+              try {
+                maSeries.setData(data as LineData[]);
+              } catch {
+                // 차트가 이미 dispose된 경우 무시
+              }
+            }
+          }
+
+          // setData() 직후 동기적으로 visible range 복원 (점프 방지)
+          if (timeScale && currentRange) {
+            try {
+              timeScale.setVisibleLogicalRange({
+                from: currentRange.from + newCandles.length,
+                to: currentRange.to + newCandles.length,
+              });
+            } catch {
+              // 차트가 이미 dispose된 경우 무시
+            }
+          }
+
+          if (newCandles.length < 250) {
+            setHasMoreData(false);
+          }
+
+          dataUpdateListenersRef.current.forEach((callback) => callback());
+
+          return newCandles.length;
         }
 
-        // 250개보다 적으면 더 이상 데이터 없음
-        if (newCandles.length < 250) {
-          setHasMoreData(false);
-        }
-
-        dataUpdateListenersRef.current.forEach((callback) => callback());
-
-        return newCandles.length;
+        return 0;
+      } catch (err) {
+        console.error("과거 데이터 로드 실패:", err);
+        return 0;
+      } finally {
+        isLoadingMoreRef.current = false;
       }
-
-      return 0;
-    } catch (err) {
-      console.error("과거 데이터 로드 실패:", err);
-      return 0;
-    } finally {
-      isLoadingMoreRef.current = false;
-    }
-  }, [code, market, exchange, interval, hasMoreData]);
+    },
+    [code, market, exchange, interval, hasMoreData]
+  );
 
   // === 테마 변경 시 거래량 색상 재적용 ===
   useEffect(() => {
