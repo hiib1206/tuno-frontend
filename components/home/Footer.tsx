@@ -4,7 +4,7 @@ import { BrandText } from "@/components/ui/BrandText";
 
 const Footer = () => {
   return (
-    <footer className="bg-randing-door border-t border-white/10 pt-20 pb-10 text-white relative">
+    <footer className="bg-neutral-800 border-t border-white/10 pt-20 pb-10 text-white relative">
       <div className="max-w-6xl mx-auto px-6 sm:px-8 md:px-16 flex flex-col md:flex-row justify-between items-start gap-12 relative z-10">
         {/* Brand */}
         <div>

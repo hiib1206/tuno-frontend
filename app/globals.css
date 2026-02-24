@@ -17,7 +17,6 @@
   --foreground: oklch(0.15 0 0);
   --foreground-white: oklch(98 0 0);
 
-  --randing-door: oklch(0.25 0 0);
   --randing-accent: oklch(0.65 0.2 149.7);
   --randing-background-1: oklch(0.97 0 0);
 
@@ -194,7 +193,6 @@
   --color-foreground: var(--foreground);
   --color-foreground-white: var(--foreground-white);
 
-  --color-randing-door: var(--randing-door);
   --color-randing-accent: var(--randing-accent);
   --color-randing-background-1: var(--randing-background-1);
 
