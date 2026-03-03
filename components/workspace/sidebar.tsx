@@ -237,7 +237,7 @@ export function Sidebar({ isOpen, onToggle, isMobile = false }: SidebarProps) {
                         {user.nick}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        test
+                        {user.email}
                       </p>
                     </div>
                     {isDropdownOpen ? (
