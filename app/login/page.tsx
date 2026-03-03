@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getOrCreateDeviceId, getRedirectUrl, withRedirect } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
-import { LogIn } from "lucide-react";
+import { LogIn, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -29,6 +29,7 @@ function LoginContent() {
   const [username, setUsername] = useState("");
   const [pw, setPw] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const [error, setError] = useState("");
   const [rememberId, setRememberId] = useState(false);
   const [showOAuthErrorModal, setShowOAuthErrorModal] = useState(false);
@@ -99,6 +100,27 @@ function LoginContent() {
     }
   };
 
+  const handleDemoSubmit = async () => {
+    setError("");
+    setIsDemoLoading(true);
+
+    try {
+      const success = await login("demo", "!12345678Q");
+      if (success) {
+        const redirect = getRedirectUrl(searchParams);
+        const redirectPath = redirect || "/analysis/quant";
+        router.push(redirectPath);
+      } else {
+        setError("현재는 테스트 계정을 사용하실 수 없습니다.");
+      }
+    } catch (err: any) {
+      console.log(err);
+      setError("현재는 테스트 계정을 사용하실 수 없습니다.");
+    } finally {
+      setIsDemoLoading(false);
+    }
+  }
+
   const handleGoogleLogin = async () => {
     const deviceId = getOrCreateDeviceId();
     const redirectUrl = getRedirectUrl(searchParams);
@@ -162,77 +184,91 @@ function LoginContent() {
             </p>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="username">아이디</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="아이디"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                autoComplete="username"
-                required
-                disabled={isLoading}
-                className="rounded"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="pw">비밀번호</Label>
-              <Input
-                id="pw"
-                type="password"
-                placeholder="••••••••"
-                value={pw}
-                onChange={(e) => setPw(e.target.value)}
-                autoComplete="current-password"
-                required
-                disabled={isLoading}
-                className="rounded"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="rememberId"
-                  checked={rememberId}
-                  onCheckedChange={(checked) =>
-                    setRememberId(checked as boolean)
-                  }
-                  disabled={isLoading}
+          <div className="space-y-2">
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="space-y-2">
+                <Label htmlFor="username">아이디</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="아이디"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
+                  required
+                  disabled={isLoading || isDemoLoading}
+                  className="rounded"
                 />
-                <Label
-                  htmlFor="rememberId"
-                  className="text-sm font-normal cursor-pointer text-muted-foreground"
-                >
-                  아이디 저장
-                </Label>
               </div>
-              <Link
-                href="/find-account"
-                className="text-sm text-muted-foreground hover:text-accent transition-colors"
-                tabIndex={4}
+
+              <div className="space-y-2">
+                <Label htmlFor="pw">비밀번호</Label>
+                <Input
+                  id="pw"
+                  type="password"
+                  placeholder="••••••••"
+                  value={pw}
+                  onChange={(e) => setPw(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  disabled={isLoading || isDemoLoading}
+                  className="rounded"
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="rememberId"
+                    checked={rememberId}
+                    onCheckedChange={(checked) =>
+                      setRememberId(checked as boolean)
+                    }
+                    disabled={isLoading || isDemoLoading}
+                  />
+                  <Label
+                    htmlFor="rememberId"
+                    className="text-sm font-normal cursor-pointer text-muted-foreground"
+                  >
+                    아이디 저장
+                  </Label>
+                </div>
+                <Link
+                  href="/find-account"
+                  className="text-sm text-muted-foreground hover:text-accent transition-colors"
+                  tabIndex={4}
+                >
+                  아이디/비밀번호 찾기
+                </Link>
+              </div>
+
+              {error && <div className="text-sm text-destructive">{error}</div>}
+
+              <Button
+                type="submit"
+                className="group mt-4 w-full rounded bg-accent text-accent-foreground hover:bg-accent/90 hover:scale-100 transition-all duration-300"
+                disabled={isLoading || isDemoLoading}
+                tabIndex={3}
               >
-                아이디/비밀번호 찾기
-              </Link>
-            </div>
-
-            {error && <div className="text-sm text-destructive">{error}</div>}
-
+                <div className="group-hover:scale-110 transition-all duration-300 flex items-center justify-center">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  {isLoading ? "로그인 중..." : "로그인"}
+                </div>
+              </Button>
+            </form>
             <Button
               type="submit"
-              className="group mt-4 w-full rounded bg-accent text-accent-foreground hover:bg-accent/90 hover:scale-100 transition-all duration-300"
-              disabled={isLoading}
+              className="group w-full rounded bg-accent text-accent-foreground hover:bg-accent/90 hover:scale-100 transition-all duration-300"
+              disabled={isLoading || isDemoLoading}
               tabIndex={3}
+              onClick={handleDemoSubmit}
             >
               <div className="group-hover:scale-110 transition-all duration-300 flex items-center justify-center">
-                <LogIn className="mr-2 h-4 w-4" />
-                {isLoading ? "로그인 중..." : "로그인"}
+                <User className="mr-2 h-4 w-4" />
+                {isDemoLoading ? "로그인 중..." : "테스트 계정으로 로그인"}
               </div>
             </Button>
-          </form>
+          </div>
 
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
