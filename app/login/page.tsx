@@ -105,7 +105,7 @@ function LoginContent() {
     setIsDemoLoading(true);
 
     try {
-      const success = await login("demo", "!12345678Q");
+      const success = await login("demo", "!12345678q");
       if (success) {
         const redirect = getRedirectUrl(searchParams);
         const redirectPath = redirect || "/analysis/quant";
