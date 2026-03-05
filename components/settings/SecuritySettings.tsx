@@ -36,6 +36,9 @@ export function SecuritySettings() {
     (ap) => ap.provider === "local"
   ) : true;
 
+  // 데모 계정은 탈퇴 불가
+  const isDemoAccount = user?.username === "demo";
+
   // 새 비밀번호 검증 훅
   const {
     passwordStatus,
@@ -264,11 +267,16 @@ export function SecuritySettings() {
         </div>
 
         <p className="mb-4 text-sm text-muted-foreground">
-          계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다. 이 작업은 되돌릴
-          수 없습니다.
+          {isDemoAccount
+            ? "테스트 계정은 탈퇴할 수 없습니다."
+            : "계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다."}
         </p>
 
-        <Button variant="cancel" onClick={() => setIsDeleteModalOpen(true)}>
+        <Button
+          variant="cancel"
+          onClick={() => setIsDeleteModalOpen(true)}
+          disabled={isDemoAccount}
+        >
           계정 삭제
         </Button>
       </div>
